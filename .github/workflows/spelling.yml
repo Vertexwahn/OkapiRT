@@ -6,7 +6,7 @@ on:
 
 jobs:
   codespell_ubuntu22:
-    name: Codespell on Linux Ubuntu 22.04
+    name: Codespell {fmt}
     runs-on: ubuntu-22.04
 
     steps:
@@ -14,4 +14,5 @@ jobs:
 
       - uses: codespell-project/actions-codespell@v1
         with:
-          path: devertexwahn
+          ignore_words_file: .github/workflows/.codespellignore.fmt
+          path: third_party/fmt
