@@ -5,14 +5,21 @@ on:
   push: {}
 
 jobs:
-  codespell_ubuntu22:
-    name: Codespell {fmt}
+  codespell:
+    name: Codespell
     runs-on: ubuntu-22.04
 
     steps:
       - uses: actions/checkout@v3
 
-      - uses: codespell-project/actions-codespell@v1
+      - name: Codespell {fmt}
+        uses: codespell-project/actions-codespell@v1
         with:
           ignore_words_file: .github/workflows/.codespellignore.fmt
           path: third_party/fmt
+
+      - name: Codespell {rules_boost}
+        uses: codespell-project/actions-codespell@v1
+        with:
+          ignore_words_file: .github/workflows/.codespellignore.rules_boost
+          path: third_party/rules_boost
