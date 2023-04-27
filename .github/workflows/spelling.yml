@@ -18,8 +18,14 @@ jobs:
           ignore_words_file: .github/workflows/.codespellignore.fmt
           path: third_party/fmt
 
-      - name: Codespell {rules_boost}
+      - name: Codespell rules_boost
         uses: codespell-project/actions-codespell@v1
         with:
           ignore_words_file: .github/workflows/.codespellignore.rules_boost
           path: third_party/rules_boost
+
+      - name: Codespell bazel-skylib
+        uses: codespell-project/actions-codespell@v1
+        with:
+          ignore_words_file: .github/workflows/.codespellignore.bazel-skylib
+          path: third_party/bazel-skylib
