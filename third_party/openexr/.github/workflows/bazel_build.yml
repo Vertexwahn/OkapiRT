@@ -26,6 +26,9 @@ on:
     paths-ignore:
       - '**.md'
 
+permissions:
+  contents: read
+
 jobs:
   build_and_test_ubuntu:
     name: Linux Ubuntu 20.04 Bazel build <GCC 9.3.0>
@@ -35,7 +38,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Mount Bazel cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: "/home/runner/.cache/bazel"
         key: bazel-ubuntu
@@ -45,14 +48,17 @@ jobs:
         bazelisk build //...
 
   build_and_test_windows:
-    name: Windows Server 2022 build <Visual Studio 2022>
-    runs-on: windows-2022
+    # TODO: switch back to VS 2022 when https://github.com/bazelbuild/bazel/issues/18592 issue is solved
+    #name: Windows Server 2022 build <Visual Studio 2022>
+    #runs-on: windows-2022
+    name: Windows Server 2019 build <Visual Studio 2019>
+    runs-on: windows-2019
 
     steps:
     - uses: actions/checkout@v3
 
     - name: Mount Bazel cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: "/home/runner/.cache/bazel"
         key: bazel-windows
@@ -69,7 +75,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Mount Bazel cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: "/home/runner/.cache/bazel"
         key: bazel-macos

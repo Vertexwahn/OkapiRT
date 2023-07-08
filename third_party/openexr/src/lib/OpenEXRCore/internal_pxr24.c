@@ -22,6 +22,7 @@ float_to_float24 (float f)
         float    f;
         uint32_t i;
     } u;
+    uint32_t s, e, m, i;
 
     u.f = f;
 
@@ -30,10 +31,9 @@ float_to_float24 (float f)
     // into sign, s, exponent, e, and significand, m.
     //
 
-    uint32_t s = u.i & 0x80000000;
-    uint32_t e = u.i & 0x7f800000;
-    uint32_t m = u.i & 0x007fffff;
-    uint32_t i;
+    s = u.i & 0x80000000;
+    e = u.i & 0x7f800000;
+    m = u.i & 0x007fffff;
 
     if (e == 0x7f800000)
     {
@@ -89,9 +89,9 @@ float_to_float24 (float f)
 static exr_result_t
 apply_pxr24_impl (exr_encode_pipeline_t* encode)
 {
-    uint8_t*       out       = encode->scratch_buffer_1;
-    uint64_t       nOut      = 0;
-    const uint8_t* lastIn    = encode->packed_buffer;
+    uint8_t*       out    = encode->scratch_buffer_1;
+    uint64_t       nOut   = 0;
+    const uint8_t* lastIn = encode->packed_buffer;
     size_t         compbufsz;
     exr_result_t   rv;
 
@@ -217,12 +217,13 @@ apply_pxr24_impl (exr_encode_pipeline_t* encode)
     }
 
     rv = exr_compress_buffer (
+        encode->context,
         -1,
         encode->scratch_buffer_1,
         nOut,
         encode->compressed_buffer,
         encode->compressed_alloc_size,
-        &compbufsz );
+        &compbufsz);
 
     if (rv == EXR_ERR_SUCCESS)
     {
@@ -276,6 +277,7 @@ undo_pxr24_impl (
     if (scratch_size < uncompressed_size) return EXR_ERR_INVALID_ARGUMENT;
 
     rstat = exr_uncompress_buffer (
+        decode->context,
         compressed_data,
         comp_buf_size,
         scratch_data,

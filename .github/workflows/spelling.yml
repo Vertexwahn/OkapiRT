@@ -29,3 +29,9 @@ jobs:
         with:
           ignore_words_file: .github/workflows/.codespellignore.bazel-skylib
           path: third_party/bazel-skylib
+
+      - name: Cppcheck
+        shell: bash
+        run: |
+          sudo apt-get install cppcheck
+          cppcheck devertexwahn/core

@@ -67,10 +67,26 @@ TEST(CommandLineFlagsTest, CanBeAccessedInCodeOnceGTestHIsIncluded) {
 #include <string>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "gtest/gtest-spi.h"
 #include "src/gtest-internal-inl.h"
+
+struct ConvertibleGlobalType {
+  // The inner enable_if is to ensure invoking is_constructible doesn't fail.
+  // The outer enable_if is to ensure the overload resolution doesn't encounter
+  // an ambiguity.
+  template <
+      class T,
+      std::enable_if_t<
+          false, std::enable_if_t<std::is_constructible<T>::value, int>> = 0>
+  operator T() const;  // NOLINT(google-explicit-constructor)
+};
+void operator<<(ConvertibleGlobalType&, int);
+static_assert(sizeof(decltype(std::declval<ConvertibleGlobalType&>()
+                              << 1)(*)()) > 0,
+              "error in operator<< overload resolution");
 
 namespace testing {
 namespace internal {
@@ -173,7 +189,7 @@ class TestEventListenersAccessor {
   }
 
   static void SuppressEventForwarding(TestEventListeners* listeners) {
-    listeners->SuppressEventForwarding();
+    listeners->SuppressEventForwarding(true);
   }
 };
 
@@ -3312,11 +3328,7 @@ TEST_F(SingleEvaluationTest, OtherCases) {
 
 #if GTEST_HAS_RTTI
 
-#ifdef _MSC_VER
-#define ERROR_DESC "class std::runtime_error"
-#else
 #define ERROR_DESC "std::runtime_error"
-#endif
 
 #else  // GTEST_HAS_RTTI
 
@@ -6679,7 +6691,7 @@ TEST(ColoredOutputTest, UsesColorsWhenTermSupportsColors) {
   SetEnv("TERM", "linux");            // TERM supports colors.
   EXPECT_TRUE(ShouldUseColor(true));  // Stdout is a TTY.
 
-  SetEnv("TERM", "cygwin");           // TERM supports colors.
+  SetEnv("TERM", "cygwin");  // TERM supports colors.
   EXPECT_TRUE(ShouldUseColor(true));  // Stdout is a TTY.
 #endif  // GTEST_OS_WINDOWS
 }

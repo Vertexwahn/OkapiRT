@@ -730,7 +730,7 @@ regardless of what other data is stored in other chunks.
 Data Compression
 ----------------
 
-OpenEXR currently offers four different data compression methods, with
+OpenEXR currently offers several different data compression methods, with
 various speed versus compression ratio tradeoffs. Optionally, the
 pixels can be stored in uncompressed form. With fast filesystems,
 uncompressed files can be written and read significantly faster than
@@ -823,6 +823,19 @@ Supported compression schemes:
        compression. 
                
        Note: This lossy compression scheme is not supported in deep files.
+
+   * - DWAA (lossy)
+
+     - Lossy compression of RGB data by quantizing discrete cosine
+       transform (DCT) components, in blocks of 32 scanlines. More
+       efficient for partial buffer access.
+
+   * - DWAB (lossy)
+
+     - Lossy compression of RGB data by quantizing discrete cosine
+       transform (DCT) components, in blocks of 256 scanlines. More
+       efficient space wise and faster to decode full frames than DWAA
+       access.
 
 Luminance/Chroma Images
 =======================

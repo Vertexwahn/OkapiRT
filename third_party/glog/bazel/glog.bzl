@@ -156,20 +156,29 @@ def glog_library(namespace = "google", with_gflags = 1, **kwargs):
         "//conditions:default": [],
     })
 
+    # Needed to use these headers in `glog` and the test targets without exposing them as public targets in `glog`
+    native.filegroup(
+        name = "shared_headers",
+        srcs = [
+            "src/base/commandlineflags.h",
+            "src/base/mutex.h",
+            "src/stacktrace.h",
+            "src/utilities.h",
+        ]
+    )
+
     native.cc_library(
         name = "glog",
         visibility = ["//visibility:public"],
         srcs = [
             ":config_h",
-            "src/base/commandlineflags.h",
+            ":shared_headers",
             "src/base/googleinit.h",
-            "src/base/mutex.h",
             "src/demangle.cc",
             "src/demangle.h",
             "src/logging.cc",
             "src/raw_logging.cc",
             "src/signalhandler.cc",
-            "src/stacktrace.h",
             "src/stacktrace_generic-inl.h",
             "src/stacktrace_libunwind-inl.h",
             "src/stacktrace_powerpc-inl.h",
@@ -179,7 +188,6 @@ def glog_library(namespace = "google", with_gflags = 1, **kwargs):
             "src/symbolize.cc",
             "src/symbolize.h",
             "src/utilities.cc",
-            "src/utilities.h",
             "src/vlog_is_on.cc",
         ] + select({
             "@bazel_tools//src/conditions:windows": windows_only_srcs,
@@ -193,6 +201,14 @@ def glog_library(namespace = "google", with_gflags = 1, **kwargs):
             ":stl_logging_h",
             ":vlog_is_on_h",
         ],
+        # https://github.com/google/glog/issues/837: Replacing
+        # `strip_include_prefix` with `includes` would avoid spamming
+        # downstream projects with compiler warnings, but would also leak
+        # private headers like stacktrace.h, because strip_include_prefix's
+        # implementation only creates symlinks for the public hdrs. I suspect
+        # the only way to avoid this is to refactor the project including the
+        # CMake build, so that the private headers are in a glog_internal
+        # subdirectory.
         strip_include_prefix = "src",
         defines = final_lib_defines,
         copts = final_lib_copts,
@@ -226,12 +242,14 @@ def glog_library(namespace = "google", with_gflags = 1, **kwargs):
             name = test_name + "_test",
             visibility = ["//visibility:public"],
             srcs = [
+                ":config_h",
+                ":shared_headers",
                 "src/googletest.h",
                 "src/" + test_name + "_unittest.cc",
             ],
             defines = final_lib_defines,
             copts = final_lib_copts + test_only_copts,
-            deps = [
+            deps = gflags_deps + [
                 ":glog",
                 "@com_github_google_googletest//:gtest",
             ],

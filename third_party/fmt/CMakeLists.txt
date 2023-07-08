@@ -297,7 +297,11 @@ if (FMT_PEDANTIC)
   target_compile_options(fmt PRIVATE ${PEDANTIC_COMPILE_FLAGS})
 endif ()
 
-target_compile_features(fmt PUBLIC cxx_std_11)
+if (cxx_std_11 IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+  target_compile_features(fmt PUBLIC cxx_std_11)
+else ()
+  message(WARNING "Feature cxx_std_11 is unknown for the CXX compiler")
+endif ()
 
 target_include_directories(fmt ${FMT_SYSTEM_HEADERS_ATTRIBUTE} PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -380,7 +384,6 @@ if (FMT_INSTALL)
           LIBRARY DESTINATION ${FMT_LIB_DIR}
           ARCHIVE DESTINATION ${FMT_LIB_DIR}
           PUBLIC_HEADER DESTINATION "${FMT_INC_DIR}/fmt"
-          FRAMEWORK DESTINATION "."
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
   # Use a namespace because CMake provides better diagnostics for namespaced

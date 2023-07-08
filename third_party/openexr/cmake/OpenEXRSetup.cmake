@@ -177,8 +177,8 @@ if(NOT TARGET PkgConfig::deflate AND NOT deflate_FOUND)
   endif()
   include(FetchContent)
   FetchContent_Declare(Deflate
-    GIT_REPOSITORY ${OPENEXR_DEFLATE_REPO}
-    GIT_TAG ${OPENEXR_DEFLATE_TAG}
+    GIT_REPOSITORY "${OPENEXR_DEFLATE_REPO}"
+    GIT_TAG "${OPENEXR_DEFLATE_TAG}"
     GIT_SHALLOW ON
     )
 
@@ -190,7 +190,7 @@ if(NOT TARGET PkgConfig::deflate AND NOT deflate_FOUND)
   # Rather than actually compile something, just embed the sources
   # into exrcore. This could in theory cause issues when compiling as
   # a static library into another application which also uses
-  # libdeflate but we switch the export sysmbol to hidden which should
+  # libdeflate but we switch the export symbol to hidden which should
   # hide the symbols when linking...
   set(EXR_DEFLATE_SOURCES
     lib/arm/cpu_features.c
@@ -206,7 +206,7 @@ if(NOT TARGET PkgConfig::deflate AND NOT deflate_FOUND)
   # lib/gzip_compress.c
   # lib/gzip_decompress.c
   file(READ ${deflate_SOURCE_DIR}/lib/lib_common.h DEFLATE_HIDE)
-  string(REPLACE default hidden DEFLATE_HIDE "${DEFLATE_HIDE}")
+  string(REPLACE "visibility(\"default\")" "visibility(\"hidden\")" DEFLATE_HIDE "${DEFLATE_HIDE}")
   string(REPLACE "__declspec(dllexport)" "/**/" DEFLATE_HIDE "${DEFLATE_HIDE}")
   file(WRITE ${deflate_SOURCE_DIR}/lib/lib_common.h "${DEFLATE_HIDE}")
   
@@ -245,8 +245,8 @@ if(NOT TARGET Imath::Imath AND NOT Imath_FOUND)
   endif()
   include(FetchContent)
   FetchContent_Declare(Imath
-    GIT_REPOSITORY ${IMATH_REPO}
-    GIT_TAG ${IMATH_TAG}
+    GIT_REPOSITORY "${IMATH_REPO}"
+    GIT_TAG "${IMATH_TAG}"
     GIT_SHALLOW ON
       )
     

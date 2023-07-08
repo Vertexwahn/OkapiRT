@@ -505,7 +505,8 @@ typedef struct _RTL_CRITICAL_SECTION GTEST_CRITICAL_SECTION;
 #if (!(defined(GTEST_OS_LINUX_ANDROID) || defined(GTEST_OS_CYGWIN) || \
        defined(GTEST_OS_SOLARIS) || defined(GTEST_OS_HAIKU) ||        \
        defined(GTEST_OS_ESP32) || defined(GTEST_OS_ESP8266) ||        \
-       defined(GTEST_OS_XTENSA) || defined(GTEST_OS_QURT)))
+       defined(GTEST_OS_XTENSA) || defined(GTEST_OS_QURT) ||          \
+       defined(GTEST_OS_NXP_QN9090)))
 #define GTEST_HAS_STD_WSTRING 1
 #else
 #define GTEST_HAS_STD_WSTRING 0
@@ -924,9 +925,11 @@ using std::tuple_size;
 namespace internal {
 
 // A secret type that Google Test users don't know about.  It has no
-// definition on purpose.  Therefore it's impossible to create a
+// accessible constructors on purpose.  Therefore it's impossible to create a
 // Secret object, which is what we want.
-class Secret;
+class Secret {
+  Secret(const Secret&) = delete;
+};
 
 // A helper for suppressing warnings on constant condition.  It just
 // returns 'condition'.
@@ -1995,7 +1998,7 @@ inline bool IsUpper(char ch) {
 inline bool IsXDigit(char ch) {
   return isxdigit(static_cast<unsigned char>(ch)) != 0;
 }
-#ifdef __cpp_char8_t
+#ifdef __cpp_lib_char8_t
 inline bool IsXDigit(char8_t ch) {
   return isxdigit(static_cast<unsigned char>(ch)) != 0;
 }
@@ -2398,7 +2401,7 @@ using Any = ::absl::any;
 }  // namespace testing
 #else
 #ifdef __has_include
-#if __has_include(<any>) && __cplusplus >= 201703L && \
+#if __has_include(<any>) && GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L && \
     (!defined(_MSC_VER) || GTEST_HAS_RTTI)
 // Otherwise for C++17 and higher use std::any for UniversalPrinter<>
 // specializations.
@@ -2411,7 +2414,7 @@ using Any = ::std::any;
 }  // namespace testing
 // The case where absl is configured NOT to alias std::any is not
 // supported.
-#endif  // __has_include(<any>) && __cplusplus >= 201703L
+#endif  // __has_include(<any>) && GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L
 #endif  // __has_include
 #endif  // GTEST_HAS_ABSL
 
@@ -2433,7 +2436,7 @@ inline ::absl::nullopt_t Nullopt() { return ::absl::nullopt; }
 }  // namespace testing
 #else
 #ifdef __has_include
-#if __has_include(<optional>) && __cplusplus >= 201703L
+#if __has_include(<optional>) && GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L
 // Otherwise for C++17 and higher use std::optional for UniversalPrinter<>
 // specializations.
 #define GTEST_INTERNAL_HAS_OPTIONAL 1
@@ -2447,7 +2450,7 @@ inline ::std::nullopt_t Nullopt() { return ::std::nullopt; }
 }  // namespace testing
 // The case where absl is configured NOT to alias std::optional is not
 // supported.
-#endif  // __has_include(<optional>) && __cplusplus >= 201703L
+#endif  // __has_include(<optional>) && GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L
 #endif  // __has_include
 #endif  // GTEST_HAS_ABSL
 
@@ -2467,7 +2470,7 @@ using StringView = ::absl::string_view;
 }  // namespace testing
 #else
 #ifdef __has_include
-#if __has_include(<string_view>) && __cplusplus >= 201703L
+#if __has_include(<string_view>) && GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L
 // Otherwise for C++17 and higher use std::string_view for Matcher<>
 // specializations.
 #define GTEST_INTERNAL_HAS_STRING_VIEW 1
@@ -2479,7 +2482,8 @@ using StringView = ::std::string_view;
 }  // namespace testing
 // The case where absl is configured NOT to alias std::string_view is not
 // supported.
-#endif  // __has_include(<string_view>) && __cplusplus >= 201703L
+#endif  // __has_include(<string_view>) && GTEST_INTERNAL_CPLUSPLUS_LANG >=
+        // 201703L
 #endif  // __has_include
 #endif  // GTEST_HAS_ABSL
 
@@ -2500,7 +2504,7 @@ using Variant = ::absl::variant<T...>;
 }  // namespace testing
 #else
 #ifdef __has_include
-#if __has_include(<variant>) && __cplusplus >= 201703L
+#if __has_include(<variant>) && GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L
 // Otherwise for C++17 and higher use std::variant for UniversalPrinter<>
 // specializations.
 #define GTEST_INTERNAL_HAS_VARIANT 1
@@ -2512,7 +2516,7 @@ using Variant = ::std::variant<T...>;
 }  // namespace internal
 }  // namespace testing
 // The case where absl is configured NOT to alias std::variant is not supported.
-#endif  // __has_include(<variant>) && __cplusplus >= 201703L
+#endif  // __has_include(<variant>) && GTEST_INTERNAL_CPLUSPLUS_LANG >= 201703L
 #endif  // __has_include
 #endif  // GTEST_HAS_ABSL
 

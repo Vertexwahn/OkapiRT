@@ -196,7 +196,8 @@ template <typename Char> struct code_unit {
 
   template <typename OutputIt, typename... Args>
   constexpr OutputIt format(OutputIt out, const Args&...) const {
-    return write<Char>(out, value);
+    *out++ = value;
+    return out;
   }
 };
 
@@ -220,7 +221,12 @@ template <typename Char, typename T, int N> struct field {
 
   template <typename OutputIt, typename... Args>
   constexpr OutputIt format(OutputIt out, const Args&... args) const {
-    return write<Char>(out, get_arg_checked<T, N>(args...));
+    const T& arg = get_arg_checked<T, N>(args...);
+    if constexpr (std::is_convertible_v<T, basic_string_view<Char>>) {
+      auto s = basic_string_view<Char>(arg);
+      return copy_str<Char>(s.begin(), s.end(), out);
+    }
+    return write<Char>(out, arg);
   }
 };
 
@@ -448,20 +454,18 @@ constexpr auto compile_format_string(S format_str) {
       } else if constexpr (arg_id_result.arg_id.kind == arg_id_kind::name) {
         constexpr auto arg_index =
             get_arg_index_by_name(arg_id_result.arg_id.val.name, Args{});
-        if constexpr (arg_index != invalid_arg_index) {
+        if constexpr (arg_index >= 0) {
           constexpr auto next_id =
               ID != manual_indexing_id ? ID + 1 : manual_indexing_id;
           return parse_replacement_field_then_tail<
               decltype(get_type<arg_index, Args>::value), Args, arg_id_end_pos,
               arg_index, next_id>(format_str);
-        } else {
-          if constexpr (c == '}') {
-            return parse_tail<Args, arg_id_end_pos + 1, ID>(
-                runtime_named_field<char_type>{arg_id_result.arg_id.val.name},
-                format_str);
-          } else if constexpr (c == ':') {
-            return unknown_format();  // no type info for specs parsing
-          }
+        } else if constexpr (c == '}') {
+          return parse_tail<Args, arg_id_end_pos + 1, ID>(
+              runtime_named_field<char_type>{arg_id_result.arg_id.val.name},
+              format_str);
+        } else if constexpr (c == ':') {
+          return unknown_format();  // no type info for specs parsing
         }
       }
     }

@@ -26,6 +26,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "base/internal/low_level_alloc.cc"
   "base/internal/low_level_alloc.h"
   "base/internal/low_level_scheduling.h"
+  "base/internal/nullability_impl.h"
   "base/internal/per_thread_tls.h"
   "base/internal/prefetch.h"
   "base/prefetch.h"
@@ -56,6 +57,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "base/log_severity.cc"
   "base/log_severity.h"
   "base/macros.h"
+  "base/nullability.h"
   "base/optimization.h"
   "base/options.h"
   "base/policy_checks.h"
@@ -430,6 +432,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "types/span.h"
   "types/internal/span.h"
   "types/variant.h"
+  "utility/internal/if_constexpr.h"
   "utility/utility.h"
   "debugging/leak_check.cc"
 )
@@ -461,8 +464,14 @@ set(ABSL_INTERNAL_DLL_TARGETS
   "container_common"
   "container_memory"
   "cord"
+  "cord_internal"
+  "cordz_functions"
+  "cordz_handle"
+  "cordz_info"
+  "cordz_sample_token"
   "core_headers"
   "counting_allocator"
+  "crc_cord_state"
   "crc_cpu_detect"
   "crc_internal"
   "crc32c"
@@ -517,6 +526,7 @@ set(ABSL_INTERNAL_DLL_TARGETS
   "log_internal_structured"
   "log_severity"
   "log_structured"
+  "low_level_hash"
   "malloc_internal"
   "memory"
   "meta"
@@ -568,8 +578,10 @@ set(ABSL_INTERNAL_DLL_TARGETS
   "stack_consumption"
   "stacktrace"
   "status"
+  "statusor"
   "str_format"
   "str_format_internal"
+  "strerror"
   "strings"
   "strings_internal"
   "symbolize"
@@ -588,6 +600,10 @@ set(ABSL_INTERNAL_TEST_DLL_FILES
   "hash/hash_testing.h"
   "log/scoped_mock_log.cc"
   "log/scoped_mock_log.h"
+  "random/internal/chi_square.cc"
+  "random/internal/chi_square.h"
+  "random/internal/distribution_test_util.cc"
+  "random/internal/distribution_test_util.h"
   "random/internal/mock_helpers.h"
   "random/internal/mock_overload_set.h"
   "random/mocking_bit_gen.h"
@@ -601,6 +617,7 @@ set(ABSL_INTERNAL_TEST_DLL_TARGETS
   "cordz_test_helpers"
   "hash_testing"
   "random_mocking_bit_gen"
+  "random_internal_distribution_test_util"
   "random_internal_mock_overload_set"
   "scoped_mock_log"
 )
@@ -800,4 +817,6 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
+
+  add_library(absl::${_dll} ALIAS ${_dll})
 endfunction()
