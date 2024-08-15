@@ -1,0 +1,342 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "axis_aligned_bounding_box",
+    hdrs = ["axis_aligned_bounding_box.h"],
+    deps = [
+        ":point",
+        ":vector",
+    ],
+)
+
+cc_test(
+    name = "axis_aligned_bounding_box_test",
+    size = "small",
+    srcs = [
+        "axis_aligned_bounding_box_test.cpp",
+    ],
+    deps = [
+        ":axis_aligned_bounding_box",
+        ":ray",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "frame",
+    hdrs = ["frame.h"],
+    deps = [
+        ":normal",
+        ":vector",
+    ],
+)
+
+cc_test(
+    name = "frame_test",
+    size = "small",
+    srcs = [
+        "frame_test.cpp",
+    ],
+    deps = [
+        ":frame",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "geometry",
+    srcs = [
+        "geometry.inc",
+    ],
+    hdrs = ["geometry.h"],
+    deps = [
+        ":point",
+        #"@boost//:algorithm",
+        "@boost.algorithm",
+        "@fmt",
+    ],
+)
+
+cc_test(
+    name = "geometry_test",
+    size = "small",
+    srcs = [
+        "geometry_test.cpp",
+    ],
+    data = [
+        "//flatland/scenes/bunny:scenes",
+        "//flatland/scenes/terrain:scenes",
+    ],
+    deps = [
+        ":geometry",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "intersection",
+    hdrs = ["intersection.h"],
+    deps = [
+        ":normal",
+        ":point",
+        ":vector",
+    ],
+)
+
+cc_test(
+    name = "intersection_test",
+    size = "small",
+    srcs = [
+        "intersection_test.cpp",
+    ],
+    deps = [
+        ":intersection",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "matrix",
+    hdrs = ["matrix.h"],
+    deps = [
+        "//core:namespace",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "matrix_test",
+    size = "small",
+    srcs = [
+        "matrix_test.cpp",
+    ],
+    deps = [
+        ":matrix",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "normal",
+    hdrs = ["normal.h"],
+    deps = [
+        "//core:namespace",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "normal_test",
+    size = "small",
+    srcs = [
+        "normal_test.cpp",
+    ],
+    deps = [
+        "//math:normal",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "point",
+    hdrs = ["point.h"],
+    deps = [
+        "//core:namespace",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "point_test",
+    size = "small",
+    srcs = [
+        "point_test.cpp",
+    ],
+    deps = [
+        "//math:point",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "quaternion",
+    hdrs = ["quaternion.h"],
+    deps = [
+        "//core:namespace",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "quaternion_test",
+    srcs = ["quaternion_test.cpp"],
+    deps = [
+        ":quaternion",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "ray",
+    hdrs = [
+        "ray.h",
+    ],
+    deps = [
+        ":point",
+        ":vector",
+    ],
+)
+
+cc_test(
+    name = "ray_test",
+    size = "small",
+    srcs = [
+        "ray_test.cpp",
+    ],
+    deps = [
+        ":ray",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "refract",
+    srcs = ["refract.cpp"],
+    hdrs = ["refract.h"],
+    deps = [
+        ":normal",
+        ":vector",
+        "//core:namespace",
+    ],
+)
+
+cc_test(
+    name = "refract_test",
+    size = "small",
+    srcs = [
+        "refract_test.cpp",
+    ],
+    deps = [
+        ":refract",
+        ":util",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "sampling",
+    hdrs = ["sampling.h"],
+    deps = [
+        "//core:namespace",
+        "//math:normal",
+        "//math:point",
+        "//math:vector",
+    ],
+)
+
+cc_test(
+    name = "sampling_test",
+    size = "small",
+    srcs = [
+        "sampling_test.cpp",
+    ],
+    deps = [
+        ":sampling",
+        "//flatland/rendering:sampler",
+        "@googletest//:gtest_main",
+        "@hypothesis",
+    ],
+)
+
+cc_library(
+    name = "tensor",
+    hdrs = ["tensor.h"],
+    deps = [
+        "//core:namespace",
+        "@xtensor",
+    ],
+)
+
+cc_test(
+    name = "tensor_test",
+    size = "small",
+    srcs = ["tensor_test.cpp"],
+    deps = [
+        ":tensor",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "transform",
+    hdrs = ["transform.h"],
+    deps = [
+        ":matrix",
+        ":normal",
+        ":point",
+        ":ray",
+        ":vector",
+    ],
+)
+
+cc_test(
+    name = "transform_test",
+    size = "small",
+    srcs = [
+        "transform_test.cpp",
+    ],
+    deps = [
+        ":util",
+        "//math:transform",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "util",
+    hdrs = ["util.h"],
+    deps = [
+        "//core:namespace",
+        #"@boost//:predef",
+        "@boost.predef",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "util_test",
+    size = "small",
+    srcs = [
+        "util_test.cpp",
+    ],
+    deps = [
+        "//math:util",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "vector",
+    hdrs = ["vector.h"],
+    deps = [
+        "//core:namespace",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "vector_test",
+    size = "small",
+    srcs = [
+        "vector_test.cpp",
+    ],
+    deps = [
+        ":vector",
+        "@googletest//:gtest_main",
+    ],
+)

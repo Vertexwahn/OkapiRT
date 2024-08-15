@@ -1,0 +1,172 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "io_jpeg",
+    srcs = ["io_jpeg.cpp"],
+    hdrs = ["io_jpeg.h"],
+    deps = [
+        "//core:reference_counted",
+        "//imaging:image",
+        "@libjpeg_turbo//:jpeg",
+    ],
+)
+
+cc_test(
+    name = "io_jpeg_test",
+    size = "small",
+    srcs = [
+        "io_jpeg_test.cpp",
+    ],
+    data = [
+        "//imaging/tests/data:reference_images",
+    ],
+    deps = [
+        ":io_jpeg",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "io",
+    srcs = ["io.cpp"],
+    hdrs = ["io.h"],
+    deps = [
+        ":io_jpeg",
+        ":io_openexr",
+        ":io_pfm",
+        ":io_png",
+        ":io_ppm",
+        ":io_webp",
+        "//imaging:color_converter",
+        #"@boost//:algorithm",
+        "@boost.algorithm",
+    ],
+)
+
+cc_test(
+    name = "io_test",
+    size = "small",
+    srcs = [
+        "io_test.cpp",
+    ],
+    deps = [
+        ":io",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "io_openexr",
+    srcs = ["io_openexr.cpp"],
+    hdrs = ["io_openexr.h"],
+    deps = [
+        "//core:reference_counted",
+        "//imaging:image",
+        "@openexr//:OpenEXR",
+    ],
+)
+
+cc_test(
+    name = "io_openexr_test",
+    size = "small",
+    srcs = [
+        "io_openexr_test.cpp",
+    ],
+    deps = [
+        ":io_openexr",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "io_pfm",
+    srcs = ["io_pfm.cpp"],
+    hdrs = ["io_pfm.h"],
+    deps = [
+        "//core:logging",
+        "//core:reference_counted",
+        "//imaging:image",
+    ],
+)
+
+cc_test(
+    name = "io_pmf_test",
+    size = "small",
+    srcs = ["io_pfm_test.cpp"],
+    deps = [
+        ":io_pfm",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "io_png",
+    srcs = ["io_png.cpp"],
+    hdrs = ["io_png.h"],
+    deps = [
+        "//core:logging",
+        "//core:reference_counted",
+        "//imaging:color_converter",
+        "//imaging:image",
+        "@libpng",
+    ],
+)
+
+cc_test(
+    name = "io_png_test",
+    size = "small",
+    srcs = ["io_png_test.cpp"],
+    data = [
+        "//imaging/tests/data:reference_images",
+    ],
+    deps = [
+        ":io_png",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "io_ppm",
+    srcs = ["io_ppm.cpp"],
+    hdrs = ["io_ppm.h"],
+    deps = [
+        "//core:reference_counted",
+        "//imaging:image",
+    ],
+)
+
+cc_test(
+    name = "io_ppm_test",
+    size = "small",
+    srcs = ["io_ppm_test.cpp"],
+    deps = [
+        ":io_ppm",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "io_webp",
+    srcs = ["io_webp.cpp"],
+    hdrs = ["io_webp.h"],
+    deps = [
+        "//core:reference_counted",
+        "//imaging:image",
+        "@libwebp",
+    ],
+)
+
+cc_test(
+    name = "io_webp_test",
+    size = "small",
+    srcs = ["io_webp_test.cpp"],
+    deps = [
+        ":io_webp",
+        "@googletest//:gtest_main",
+    ],
+)

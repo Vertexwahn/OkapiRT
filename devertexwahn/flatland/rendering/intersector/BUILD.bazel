@@ -1,0 +1,56 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "brute_force_intersector",
+    hdrs = ["brute_force_intersector.h"],
+    deps = [
+        ":intersector",
+        "//core:logging",
+        "//flatland/rendering:property_set",
+    ],
+)
+
+cc_library(
+    name = "intersector",
+    hdrs = ["intersector.h"],
+    deps = [
+        "//core:object",
+        "//core:reference_counted",
+        "//math:ray",
+    ],
+)
+
+cc_library(
+    name = "quadtree_intersector",
+    srcs = ["quadtree_intersector.cpp"],
+    hdrs = ["quadtree_intersector.h"],
+    deps = [
+        ":intersector",
+        "//core:logging",
+        "//flatland/rendering/scene/shape:polygon",
+        "//flatland/rendering/scene/shape:triangle_mesh",
+        "//math:axis_aligned_bounding_box",
+        "//math:util",
+    ],
+)
+
+cc_test(
+    name = "quadtree_intersector_test",
+    size = "small",
+    srcs = [
+        "quadtree_intersector_test.cpp",
+    ],
+    data = [
+        "//flatland/scenes/quadtree:scenes",
+        "//flatland/scenes/terrain:scenes",
+    ],
+    deps = [
+        ":quadtree_intersector",
+        "@googletest//:gtest_main",
+    ],
+)

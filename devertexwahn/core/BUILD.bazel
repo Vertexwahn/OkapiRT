@@ -1,0 +1,267 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "exception",
+    srcs = ["exception.cpp"],
+    hdrs = ["exception.h"],
+    deps = [
+        ":namespace",
+        "@boost.predef",
+    ],
+)
+
+cc_test(
+    name = "exception_test",
+    size = "small",
+    srcs = ["exception_test.cpp"],
+    deps = [
+        ":exception",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "logging",
+    srcs = [
+        "logging.cpp",
+    ],
+    hdrs = [
+        "logging.h",
+    ],
+    deps = [
+        "@spdlog",
+    ],
+)
+
+cc_test(
+    name = "logging_test",
+    srcs = ["logging_test.cpp"],
+    deps = [
+        ":logging",
+        ":platform",
+        "//core/tests:test_logger",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "logging_test_env_info",
+    srcs = ["logging_test_env.cpp"],
+    env = {"DE_VERTEXWAHN_LOG_LEVEL": "info"},
+    deps = [
+        ":logging",
+        ":platform",
+        "//core/tests:test_logger",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "logging_test_env_warning",
+    srcs = ["logging_test_env.cpp"],
+    env = {"DE_VERTEXWAHN_LOG_LEVEL": "warning"},
+    deps = [
+        ":logging",
+        ":platform",
+        "//core/tests:test_logger",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "namespace",
+    hdrs = [
+        "namespace.h",
+    ],
+)
+
+cc_library(
+    name = "non_copyable",
+    hdrs = [
+        "non_copyable.h",
+    ],
+    deps = [
+        ":namespace",
+        "@boost.core",
+        #"@boost//:core",
+    ],
+)
+
+cc_library(
+    name = "object",
+    srcs = [
+        "object.cpp",
+    ],
+    hdrs = [
+        "object.h",
+    ],
+    deps = [
+        ":namespace",
+        ":non_copyable",
+    ],
+)
+
+cc_test(
+    name = "object_test",
+    srcs = [
+        "object_test.cpp",
+    ],
+    deps = [
+        ":object",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "object_factory",
+    srcs = [
+        "object_factory.cpp",
+    ],
+    hdrs = [
+        "object_factory.h",
+    ],
+    deps = [
+        ":object",
+        ":property_set",
+        ":reference_counted",
+    ],
+)
+
+cc_test(
+    name = "object_factory_test",
+    size = "small",
+    srcs = [
+        "object_factory_test.cpp",
+    ],
+    deps = [
+        ":object_factory",
+        "//flatland/rendering/integrator",
+        "//flatland/rendering/scene/shape:disk",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "platform",
+    srcs = [
+        "platform.cpp",
+        "platform.h",
+    ],
+    linkopts = select({
+        "@platforms//os:windows": [
+            "-DEFAULTLIB:advapi32.lib",
+            "-DEFAULTLIB:cfgmgr32.lib",
+        ],
+        "@platforms//os:linux": [
+            "-ldl",  # only needed for GCC9 - not for GCC11
+        ],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":logging",
+        ":namespace",
+        ":timer",
+        "@boost.predef",
+    ],
+)
+
+cc_test(
+    name = "platform_test",
+    srcs = [
+        "platform_test.cpp",
+    ],
+    data = [
+        ":platform_test_library",
+    ],
+    linkopts = select({
+        "@platforms//os:linux": ["-Wl,-rpath,bazel-bin"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":platform",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "platform_test_library",
+    srcs = ["platform_test_library.cpp"],
+    #linkopts = ["-ldl"],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "property_set",
+    srcs = [
+        "property_set.cpp",
+    ],
+    hdrs = [
+        "property_set.h",
+    ],
+    deps = [
+        "//core:namespace",
+        "@fmt",
+    ],
+)
+
+cc_test(
+    name = "property_set_test",
+    size = "small",
+    srcs = [
+        "property_set_test.cpp",
+    ],
+    deps = [
+        "//core:property_set",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "reference_counted",
+    hdrs = [
+        "reference_counted.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":namespace"],
+)
+
+cc_test(
+    name = "reference_counted_test",
+    size = "small",
+    srcs = [
+        "reference_counted_test.cpp",
+    ],
+    deps = [
+        "//core:reference_counted",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "timer",
+    srcs = [
+        "timer.cpp",
+    ],
+    hdrs = [
+        "timer.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":namespace"],
+)
+
+cc_test(
+    name = "timer_test",
+    size = "small",
+    srcs = [
+        "timer_test.cpp",
+    ],
+    deps = [
+        "//core:timer",
+        "@googletest//:gtest_main",
+    ],
+)

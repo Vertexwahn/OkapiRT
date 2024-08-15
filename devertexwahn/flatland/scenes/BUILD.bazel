@@ -1,0 +1,46 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "scenes",
+    srcs = [
+        "ao.flatland.xml",
+        "disk.ao.flatland.xml",
+        "disk.flatland.xml",
+        "disk_2.flatland.xml",
+        "disk_grid.flatland.xml",
+        "gradient_refractive_index.flatland.xml",
+        "mirror.flatland.xml",
+        "mirrors.flatland.xml",
+        "rectangle.flatland.xml",
+        "rectangles.flatland.xml",
+    ],
+)
+
+filegroup(
+    name = "reference_images",
+    srcs = [
+        "reference_images/ao_ref.M1_apple_silicon.svg",
+        "reference_images/ao_ref.svg",
+        "reference_images/bunny.ao_ref.M1_apple_silicon.svg",
+        "reference_images/bunny.ao_ref.svg",
+        "reference_images/bunny_ref.svg",
+        "reference_images/disk.ao_ref.svg",
+        "reference_images/disk_2_ref.svg",
+        "reference_images/disk_grid_ref.svg",
+        "reference_images/disk_ref.svg",
+        "reference_images/gradient_refractive_index_ref.svg",
+        "reference_images/mirror_ref.svg",
+        "reference_images/mirrors_ref.svg",
+        "reference_images/quadtree_corner_case_ref.svg",
+        "reference_images/quadtree_ref.svg",
+        "reference_images/rectangle_ref.svg",
+        "reference_images/rectangles_ref.svg",
+    ],
+)

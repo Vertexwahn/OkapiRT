@@ -1,0 +1,18 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "test_scene_files",
+    srcs = [
+        "integrator_missing.flatland.xml",
+        "no_bsdf_type.flatland.xml",
+        "property.test.flatland.xml",
+        "scene_tag_missing.flatland.xml",
+    ],
+)

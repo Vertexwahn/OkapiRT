@@ -1,0 +1,17 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "reference_images",
+    srcs = [
+        "red_square_quality100.jpg",
+        "RGBA.png",
+		"bay.png",
+    ],
+)

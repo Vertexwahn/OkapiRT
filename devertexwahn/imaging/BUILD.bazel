@@ -1,0 +1,71 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "color",
+    srcs = ["color.cpp"],
+    hdrs = ["color.h"],
+    deps = [
+        "//core:namespace",
+        "//math:util",
+        "@fmt",
+    ],
+)
+
+cc_test(
+    name = "color_test",
+    size = "small",
+    srcs = [
+        "color_test.cpp",
+    ],
+    deps = [
+        "//imaging:color",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "color_converter",
+    hdrs = ["color_converter.h"],
+    deps = [
+        ":color",
+        "//core:namespace",
+        "//math:vector",
+    ],
+)
+
+cc_test(
+    name = "color_converter_test",
+    srcs = ["color_converter_test.cpp"],
+    deps = [
+        ":color_converter",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "image",
+    srcs = ["image.cpp"],
+    hdrs = ["image.h"],
+    deps = [
+        ":color",
+        "//math:point",
+        "//math:vector",
+    ],
+)
+
+cc_test(
+    name = "image_test",
+    size = "small",
+    srcs = [
+        "image_test.cpp",
+    ],
+    deps = [
+        "//imaging/io",
+        "@googletest//:gtest_main",
+    ],
+)
