@@ -4,108 +4,124 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 [![Support Ukraine](https://img.shields.io/badge/Support-Ukraine-FFD500?style=flat&labelColor=005BBB)](https://opensource.fb.com/support-ukraine)
-[![Build Status](https://vertexwahn.visualstudio.com/FlatlandRT/_apis/build/status/Vertexwahn.FlatlandRT?branchName=main)](https://vertexwahn.visualstudio.com/FlatlandRT/_build/latest?definitionId=6&branchName=master)
+[![Build Status](https://vertexwahn.visualstudio.com/FlatlandRT/_apis/build/status/Vertexwahn.FlatlandRT?branchName=master)](https://vertexwahn.visualstudio.com/FlatlandRT/_build/latest?definitionId=6&branchName=master)
 
-# FlatlandRT
+# Okapi Renderer
 
 ## Description
 
-FlatlandRT is a 2D ray tracer visualization tool.
-The following pictures were created using FlatlandRT:
+Okapi is a 3D ray tracer. 
+The following image has been rendered with Okapi
+(Modeled by Mac Ptaszynski. Model available [here](https://www.behance.net/gallery/20046385/BMW-315-DA2))
 
-From left to right: Refraction, ambient occlusion and reflection:
+![BMW 315 DA2](screenshots/BMW_315_DA2.ao_9f93bf4.png)
 
-![Refraction, ambient occlusion and reflection](docs/images/header.svg)
+## Quickstart
 
-Quadtree intersection of 2D triangle meshes:
-
-![Quadtree](docs/images/quadtree_StopSplitIfAtLeastTwoChildsHaveAsManySubShapesAsParent.svg)
-
-More examples scenes can be found [here](devertexwahn/flatland/docs/example_scenes.md).
-See the [user manual](devertexwahn/flatland/docs/user_manual.md) if you want to find out how to use it. 
-
-## Quick start
-
-This project uses [Bazel](https://bazel.build/) as a build system.
-The current used version is defined in [.bazelversion](devertexwahn/.bazelversion).
+This project uses [Bazel](https://bazel.build/) as a build system. The current used version is defined in [.bazelversion](devertexwahn/.bazelversion).
 
 **Prerequisites:**
 
 The following tools should be installed:
 
-* [Git](https://git-scm.com/)
-* [Bazel](https://bazel.build/install)
-* A C++ compiler ([GCC](https://gcc.gnu.org/), [Visual Studio](https://visualstudio.microsoft.com/), [Clang](https://clang.llvm.org/), etc.)
+- [Git](https://git-scm.com/)
+- [Bazel](https://bazel.build/install)
+- A C++ compiler ([GCC](https://gcc.gnu.org/), [Visual Studio](https://visualstudio.microsoft.com/), [Clang](https://clang.llvm.org/), etc.)
 
 **Checkout, build, and run:**
-
-You can use Flatland by invoking the following commands:
 
 *All platforms:*
 
 ```shell
-git clone https://github.com/Vertexwahn/FlatlandRT # clone the repository
-cd FlatlandRT # change directory to cloned repository
-cd devertexwahn # switch to the location where the MODULE.bazel file is located
+git clone https://github.com/Vertexwahn/Piper.git # clone the repository
+cd Piper # change directory to cloned repository
+cd devertexwahn # switch to the location where the WORKSPACE.bazel file is located
 ```
+
+### Command line interface
+
+You can use the Okapi Renderer command line interface by invoking one of the following commands:
 
 *Render a scene with Windows 10/11 x64 with Visual Studio 2019:*
 
 ```shell
-bazel --output_base=C:/bazel_output_base  run --config=vs2019 //flatland/cli:flatland.cli --scene_filename=C:\scenes\bunny.flatland.xml
+bazel run --config=vs2019 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=C:\scenes\okapi\scenes\ajax\ajax.ao.okapi.xml
 ```
 
 *Render a scene with Windows 10/11 x64 with Visual Studio 2022:*
 
 ```shell
-bazel --output_base=C:/bazel_output_base  run --config=vs2022 //flatland/cli:flatland.cli --scene_filename=C:\scenes\bunny.flatland.xml
+bazel run --config=vs2022 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=C:\scenes\okapi\scenes\ajax\ajax.ao.okapi.xml
 ```
-
-For more hints on how to use Bazel on Windows have a look at the [Bazel on Windows](https://docs.google.com/document/d/17YIqUdffxpwcKP-0whHM6TFELN8VohTpjiiEIbbRfts/edit?usp=sharing) document.
 
 *Render a scene with Ubuntu 20.04:*
 
 ```shell
-bazel run --config=gcc9 //flatland/cli:flatland.cli -- --scene_filename=$(pwd)/flatland/scenes/bunny/bunny.flatland.xml
+bazel run --config=gcc9 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=$(pwd)/okapi/scenes/ajax/ajax.ao.okapi.xml
 ```
 
 *Render a scene with Ubuntu 22.04:*
 
 ```shell
-bazel run --config=gcc11 //flatland/cli:flatland.cli -- --scene_filename=$(pwd)/flatland/scenes/bunny/bunny.flatland.xml
+bazel run --config=gcc11 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=$(pwd)/okapi/scenes/ajax/ajax.ao.okapi.xml
 ```
 
-*Render a scene with macOS 11/12/13:*
+*Render a scene with macOS 11/12:*
 
 ```shell
-bazel run --config=macos //flatland/cli:flatland.cli -- --scene_filename=$(pwd)/flatland/scenes/bunny/bunny.flatland.xml
+bazel run --config=macos --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=${HOME}/dev/Piper/devertexwahn/okapi/scenes/ajax/ajax.ao.okapi.xml
 ```
 
-## Building & Testing
+### User Interface
 
-### Building and testing with Linux
+*Render a scene with Windows 10/11 x64 with Visual Studio 2019:*
+
+```shell
+bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui
+```
+
+*Render a scene with Windows 10/11 x64 with Visual Studio 2022:*
+
+```shell
+bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui
+```
+
+*Render a scene with Ubuntu 22.04:*
+
+```shell
+bazel run --config=gcc11 --compilation_mode=opt //okapi/ui:okapi.ui
+```
+
+![UI Ubuntu 20.04](screenshots/Screenshot%20from%202022-01-23%2015-02-35.png)
+
+*Render a scene with macOS 11/12:*
+
+```shell
+bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui
+```
+
+![UI Ubuntu 20.04](screenshots/macos%202022-02-16.png)
+
+## Building
+
+### Ubuntu 22.04
 
 #### Command line (bash/zsh)
 
 ```shell
-# Run all tests using GCC 9.3
-bazel test --config=gcc9 //...
-# Build all targets uing GCC 9.3
-bazel build --config=gcc9 //... 
-# Run all tests using GCC 11
+# Run all tests using GCC 11.2
 bazel test --config=gcc11 //...
-# Build all targets uing GCC 11
-bazel build --config=gcc11 //...
-# Run all tests using Clang 14
-bazel test --config=clang14 //...
-# Build all targets uing Clang 14
-bazel build --config=clang14 //...
+# Build all targets using GCC 11.2
+bazel build --config=gcc11 //... 
+# Run all tests using Clang14 (ree can not be build using Clang14)
+bazel test --config=clang14 -- //... 
+# Build all targets using Clang14 (ree can not be build using Clang14)
+bazel build --config=clang14 -- //... 
 ```
 
 #### CLion
 
-There is a Bazel plug-in for CLion.
-It can be downloaded from [here](https://plugins.jetbrains.com/author/4bb31785-ad06-4671-8e26-266aadc184bd).
+There is a Bazel Plugin for [CLion](https://www.jetbrains.com/clion/). It can be downloaded from [here](https://plugins.jetbrains.com/author/4bb31785-ad06-4671-8e26-266aadc184bd).
 
 You can use the following `.bazelproject` file:
 
@@ -115,6 +131,7 @@ directories:
 
 test_sources:
   flatland/tests
+  okapi/tests
 
 derive_targets_from_directories: true
 
@@ -125,86 +142,108 @@ build_flags:
   --config=gcc11
 ```
 
+#### Clang 14
+
+Bazel supports different toolchains. 
+Usually gcc is used a C++ default compiler when using Ubuntu 22.04.
+But you can also easily use Clang 14 to compile Okapi.
+
+```shell
+# Build with LLVM
+bazel build --config=clang14 //...
+# Test with LLVM
+bazel test --config=clang14 //...
+```
+
+#### Remote Build Cache
+
+When switching configuration (`--config=gcc11` vs. `--config=clang14`) it turns out that using a (local) remote build cache server results in better build performance.
+
+You can spin up your own local instance via:
+
+```shell
+sudo docker run -u 1000:1000 -v ~/bazel_remote_cache:/data \                       
+        -p 9090:8080 -p 9092:9092 buchgr/bazel-remote-cache --max_size=30
+```
+
+You can set up a home RC file (`.bazelrc`) to use the remote build cache:
+
+```shell
+cd ~
+echo "build --remote_cache=http://localhost:9090" >> .bazelrc
+```
+
 #### Code coverage
 
 Make sure that lcov is installed.
 
-```shell
-sudo apt install lcov
-```
+    sudo apt install lcov
 
-Go to the directory that contains the `MODULE.bazel` file and execute:
+Go to the directory that contains the `WORKSPACE.bazel` file and execute:
 
 ```shell
 ./coverage.sh --additonal_bazel_config=buchgr_remote_cache
-open coverage_report/index.html
 ```
 
 #### Address Sanitizer
 
-There is a build config called `asan` that can be used for detecting memory errors.
+There is a build config called `asan` that can be used for detection of memory errors.
 
-```shell
-bazel run --config=asan --compilation_mode=opt //flatland/cli:flatland.cli --  $(pwd)/flatland/scenes/sphere.flatland.xml
-```
+    bazel run --config=asan --compilation_mode=opt //okapi/cli:okapi.cli ~/scenes/sphere.okapi.xml
 
 #### Clang Tidy
 
-```shell
-bazel build --config=clang-tidy //flatland/core/...
-```
+    bazel build //flatland.cli:flatland --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output_groups=report
 
-### Building with Windows
+### Windows 10/11
 
 #### Command line (Powershell)
 
-```shell
-# Build with Visual Studio C++ Compiler
-bazel build --config=vs2022 //...
-```
+    # Build with Visual Studio 2022 C++ Compiler
+    bazel build --config=vs2022 //...
 
-#### Using Visual Studio
+#### Using Visual Studio 2022
 
 Use [Lavender](https://github.com/tmandry/lavender) to generate a solution and project files for Visual Studio.
 
 ```shell
-python3 G:\dev\lavender\generate.py --config=vs2022  //...
+python3 D:\dev\lavender\generate.py --config=vs2022  //...
 ```
 
-Lavender is far from being perfect.
+Lavender is far from being perfect. 
 It might be necessary to do some modifications to the generated solution and project files.
+
+### macOS
+
+```shell
+bazel build --config=clang14 //...
+```
 
 ## Development process
 
-I made a short video where I describe how I use test driven development to implement this project:
+I made a short video where I describe how I use test driven development to implement this project: 
+
 [![Let's Code: Using Test-driven Development to implement a ray tracer](https://img.youtube.com/vi/vFBXNr952nU/0.jpg)](https://www.youtube.com/watch?v=vFBXNr952nU)
-
-## Ray tracing 101
-
-I have written some blog post about ray tracing that can be found here: [Ray Tracing 101](https://book.vertexwahn.de/)
 
 ## License
 
-The source code of FlatlandRT itself is under the Apache License 2.0 (see [LICENSE](LICENSE)).
-The license of its third-party dependencies or some third-party code fragments can and is under different license terms.
-See copyright notes in the next section.
+See [LICENSE.md](../LICENSE.md).
 
 ## Copyright notes
 
-FlatlandRT makes use of several software libraries.
-Some tools and libraries were copied to this repository (see `third_party` folder).
-The corresponding licenses can be found in the `third_party` folder of this repository.
-Besides this,
-some source code was directly copied from other open-source software libraries or programs.
-This is always clearly stated as a comment in the source code of FlatlandRT.
-If you find any copyright or license violations or issues please let me know.
+The Okapi Project makes use of several software libraries. 
+Besides this, 
+some source code was directly copied from other open-source software libraries or programs. 
+This is always clearly stated as a comment in the source code of Flatland. 
+Additionally, some tools where copied to this repository.
+The corresponding licenses can be found in the Licenses folder distributed with this source code:
 
 ### Copied source code/ideas
 
-* Mitsuba Renderer 2 (https://github.com/mitsuba-renderer/mitsuba2) (scene file format) ([License](devertexwahn/flatland/LICENSES/mitsuba2/LICENSE))
-* pbrt, Version 3 (https://github.com/mmp/pbrt-v3) (Refract, face_forward functions) ([License](devertexwahn/flatland/LICENSES/pbrt-v3/LICENSE.txt))
-* pbrt, Version 4 (https://github.com/mmp/pbrt-v4) (concentric sampling of unit disk) ([License](devertexwahn/flatland/LICENSES/pbrt-v4/LICENSE.txt))
-* bazel_clang_tidy (https://github.com/erenon/bazel_clang_tidy) (almost everything) ([License](devertexwahn/flatland/LICENSES/bazel_clang_tidy/LICENSE))
+* Mitsuba Renderer 2 (https://github.com/mitsuba-renderer/mitsuba2) (scene file format) ([License](licenses/mitsuba2/LICENSE))
+* pbrt, Version 3 (https://github.com/mmp/pbrt-v3) (Refract, face_forward functions) ([License](licenses/pbrt-v3/LICENSE.txt))
+* pbrt, Version 4 (https://github.com/mmp/pbrt-v4) (concentric sampling of unit disk) ([License](licenses/pbrt-v4/LICENSE.txt))
+* bazel_clang_tidy (https://github.com/erenon/bazel_clang_tidy) (almost everything) ([License](licenses/bazel_clang_tidy/LICENSE))
 
 ### Build related
 
@@ -212,32 +251,27 @@ If you find any copyright or license violations or issues please let me know.
 
 ### Third-party dependencies
 
-* Boost (https://www.boost.org/) (third party dependency) ([License](devertexwahn/flatland/LICENSES/boost/LICENSE))
-* Catch2 (https://github.com/catchorg/Catch2) (see `third_party` folder)
-* Eigen (see `third_party` folder)
-* Google Test (https://github.com/google/googletest) (see `third_party` folder)
-* Imath (see `third_party` folder)
-* LLVM toolchain for Bazel (see `third_party` folder)
-* [OpenEXR](/third_party/openexr) (https://github.com/AcademySoftwareFoundation/openexr) ([License](/third_party/openexr/LICENSE.md))
-* [libpng](/third_party/libpng-1.6.40) (http://www.libpng.org/pub/png/libpng.html) ([License](/third_party/libpng-1.6.40/LICENSE))
-* [pcg-cpp](/third_party/pcg-cpp) (https://github.com/imneme/pcg-cpp/)
-* [pugixml](/third_party/pugixml-1.13) (https://pugixml.org/, https://github.com/zeux/pugixml)
-* [rules_boost](/third_party/rules_boost) (https://github.com/nelhage/rules_boost) ([License](/third_party/rules_boost/LICENSE))
-* [rules_pkg-0.9.1](/third_party/rules_pkg)
-* abseil (https://abseil.io/) (see `third_party` folder)
-* gflags (https://github.com/gflags/gflags/) (see `third_party` folder)
-* glog (https://github.com/google/glog) (see `third_party` folder)
-* hypothesis (https://github.com/wjakob/hypothesis) (see `third_party` folder)
-* yaml-cpp (https://github.com/jbeder/yaml-cpp) (third party dependency) ([License](devertexwahn/flatland/LICENSES/yaml-cpp/LICENSE))
-* zlib (https://zlib.net/) ([License](devertexwahn/flatland/LICENSES/third_party/zlib-1.2.11/README))
-* {fmt} (https://github.com/fmtlib/fmt) (see `third_party` folder)
+* {fmt} (https://github.com/fmtlib/fmt) (third party dependency) ([License](licenses/fmt/LICENSE.rst))
+* Boost (https://www.boost.org/) (third party dependency) ([License](licenses/boost/LICENSE))
+* catch2 (https://github.com/catchorg/Catch2) (third party dependency) ([License](licenses/catch2/LICENSE.txt))
+* gflags (https://github.com/gflags/gflags/) (third party dependency) ([License](licenses/gflags/COPYING.txt))
+* glog (https://github.com/google/glog) (third party dependency) ([License](licenses/glog/COPYING))
+* Google Test (https://github.com/google/googletest) (third party dependency) ([License](licenses/googletest/LICENSE))
+* hypothesis (https://github.com/wjakob/hypothesis) (third party dependency) ([License](licenses/hypothesis/LICENSE))
+* pcg-cpp (https://github.com/imneme/pcg-cpp/)  (third party dependency) ([License](licenses/pcg-cpp/LICENSE-MIT.txt))
+* pugixml (https://pugixml.org/, https://github.com/zeux/pugixml) (third party dependency) ([License](licenses/pugixml/LICENSE.md))
+* yaml-cpp (https://github.com/jbeder/yaml-cpp) (third party dependency) ([License](../../yaml-cpp-c73ee34704c512ebe915b283645aefa9f424a22f/LICENSE))
+* zlib (https://zlib.net/) ([License](../../third_party/zlib-1.2.12/README))
+
+### Tools
+
+* Bazelisk (https://github.com/bazelbuild/bazelisk) ([License](licenses/bazelisk/)) 
 
 ### Artwork
 
-The Stanford Bunny was derived from the Stanford Bunny provided from the Stanford 3D Scanning Repository (see [here](http://graphics.stanford.edu/data/3Dscanrep/#bunny)).
-
-The data for the Donut, Armadillo, and Stanford Bunny for the 2D triangle data was derived from https://github.com/mmacklin/sandbox.
+The Stanford Bunny was derived from the Stanford Bunny provided from the     
+the Stanford 3D Scanning Repository (see [here](http://graphics.stanford.edu/data/3Dscanrep/#bunny)).
 
 ### Credits
 
-A big thank goes to all the providers, developers, and maintainers of the aforementioned open-source projects and artifacts.
+A big thank goes to all the providers, developers and maintainers of the aforementioned artifacts.
