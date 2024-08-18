@@ -19,9 +19,9 @@ TEST(EmbreeIntersector, IntersectTriangle) {
 
     std::vector<unsigned int> indices = {0, 1, 2};
     std::vector<Point3f> positions = {
-      {-1.f-.5f, -1.f, 10.f},
-      { 1.f-.5f, -1.f, 10.f},
-      { 1.f-.5f,  1.f, 10.f},
+        {-1.f-.5f, -1.f, 10.f},
+        { 1.f-.5f, -1.f, 10.f},
+        { 1.f-.5f,  1.f, 10.f},
     };
 
     ReferenceCounted<TriangleMesh3f> mesh =
@@ -42,8 +42,8 @@ TEST(EmbreeIntersector, IntersectTriangle) {
     std::vector<ReferenceCounted<Shape3f>> shapes;
 	shapes.push_back(mesh);
 
-    Point3f ray_origin{0.f,0.f,-100.f};
-    Vector3f ray_direction{0.f,0.f,1.f};
+    Point3f ray_origin{0.f,0.f, -100.f};
+    Vector3f ray_direction{0.f, 0.f, 1.f};
     Ray3f ray{ray_origin, ray_direction, 0.f, 1000.f};
 
 	// Act
@@ -78,9 +78,9 @@ TEST(EmbreeIntersector, IntersectTranslatedTriangle) {
 
     std::vector<unsigned int> indices = {0, 1, 2};
     std::vector<Point3f> positions = {
-            {-1.f-.5f, -1.f, 0.f},
-            { 1.f-.5f, -1.f, 0.f},
-            { 1.f-.5f,  1.f, 0.f},
+        {-1.f-.5f, -1.f, 0.f},
+        { 1.f-.5f, -1.f, 0.f},
+        { 1.f-.5f,  1.f, 0.f},
     };
 
     ReferenceCounted<TriangleMesh3f> mesh =
