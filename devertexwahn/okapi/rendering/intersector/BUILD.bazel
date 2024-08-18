@@ -24,7 +24,6 @@ cc_test(
     srcs = [
         "embree_intersector_test.cpp",
     ],
-    data = ["//okapi/scenes"],
     deps = [
         ":embree_intersector",
         "@googletest//:gtest_main",
