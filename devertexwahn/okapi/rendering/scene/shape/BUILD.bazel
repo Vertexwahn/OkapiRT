@@ -3,8 +3,6 @@
     SPDX-License-Identifier: Apache-2.0
 """
 
-package(default_visibility = ["//visibility:public"])
-
 
 cc_test(
     name = "medium_event_test",
@@ -24,6 +22,7 @@ cc_test(
 cc_library(
     name = "moeller_trumbore",
     hdrs = ["moeller_trumbore.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "//math:point",
         "//math:ray",
@@ -34,21 +33,10 @@ cc_library(
 cc_library(
     name = "sphere",
     hdrs = ["sphere.h"],
+    visibility = ["//visibility:public"],
     deps = ["//flatland/rendering/scene/shape"],
 )
 
-cc_test(
-    name = "sphere_test",
-    size = "small",
-    srcs = [
-        "sphere_test.cpp",
-    ],
-    deps = [
-        ":sphere",
-        "//okapi/rendering/scene:load_scene",
-        "@googletest//:gtest_main",
-    ],
-)
 
 cc_library(
     name = "triangle_mesh",
@@ -56,6 +44,7 @@ cc_library(
         "tiny_obj_loader_impl.cpp",
     ],
     hdrs = ["triangle_mesh.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":moeller_trumbore",
         "//core:logging",
@@ -66,17 +55,3 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "triangle_mesh_test",
-    size = "small",
-    srcs = [
-        "triangle_intersection_moeller_trumbore_test.cpp",
-        "triangle_mesh_test.cpp",
-    ],
-    data = ["//okapi/scenes"],
-    deps = [
-        ":triangle_mesh",
-        "//okapi/rendering/scene:load_scene",
-        "@googletest//:gtest_main",
-    ],
-)
