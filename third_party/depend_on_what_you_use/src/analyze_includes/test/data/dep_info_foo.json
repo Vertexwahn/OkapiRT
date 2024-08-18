@@ -1,0 +1,7 @@
+{
+  "header_files": [
+    "public/dep/foo_1.h",
+    "public/dep/foo_2.h"
+  ],
+  "target": "//public/dep:foo"
+}

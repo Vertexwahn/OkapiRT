@@ -1,0 +1,17 @@
+*~
+
+# Bazel
+bazel-*
+*MODULE.bazel.lock
+user.bazelrc
+
+# Python
+__pycache__
+*.pyc
+venv/
+.coverage
+
+# IDEs
+.clwb
+.idea
+.vscode

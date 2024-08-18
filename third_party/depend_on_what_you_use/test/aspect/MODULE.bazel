@@ -1,0 +1,61 @@
+module(name = "dwyu_aspect_integration_tests")
+
+bazel_dep(name = "depend_on_what_you_use")
+local_path_override(
+    module_name = "depend_on_what_you_use",
+    path = "../../",
+)
+
+##
+## Python toolchains for testing compatibility to various Python versions
+##
+
+# We use a newer rules_python version than the one DWYU depends on to profit from the ability to select a toolchain
+# without specifying the patch version, which is possible from >= 0.30.0 onward.
+# Furthermore, this allows ensuring that we are compatible to new rules_python versions. The most crucial parts of DWYU
+# do not depend on rules_python and therefore we are confident in the example integration tests and unit tests finding
+# all issues related to the rules_python version DWYU depends on.
+bazel_dep(name = "rules_python", version = "0.32.2")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+
+# Choose different version via: --@rules_python//python/config_settings:python_version=X
+python.toolchain(
+    is_default = True,
+    python_version = "3.8",
+)
+python.toolchain(python_version = "3.9")
+python.toolchain(python_version = "3.10")
+python.toolchain(python_version = "3.11")
+python.toolchain(python_version = "3.12")
+
+##
+## Workspaces for test purposes
+##
+
+bazel_dep(name = "external_test_repo")
+local_path_override(
+    module_name = "external_test_repo",
+    path = "external_repo/repo",
+)
+
+bazel_dep(name = "complex_includes_test_repo")
+local_path_override(
+    module_name = "complex_includes_test_repo",
+    path = "complex_includes/ext_repo",
+)
+
+bazel_dep(name = "skip_external_deps_test_repo")
+local_path_override(
+    module_name = "skip_external_deps_test_repo",
+    path = "skip_external_targets/external_dep",
+)
+
+##
+## The Migration phase using WORKSPACE.bzlmod and MODULE.bazel together does not support properly loading the implicit
+## Bazel dependencies. Thus, we need to load some basic things directly. This should become superfluous when we are
+## only using bzlmod eventually
+## Reference https://github.com/bazelbuild/bazel/blob/master/src/MODULE.tools
+##
+
+bazel_dep(name = "platforms", version = "0.0.7")

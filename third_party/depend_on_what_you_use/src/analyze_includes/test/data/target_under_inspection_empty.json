@@ -1,0 +1,8 @@
+{
+  "defines": [],
+  "includes": [],
+  "quote_includes": [],
+  "system_includes": [],
+  "header_files": [],
+  "target": "//:foo"
+}
