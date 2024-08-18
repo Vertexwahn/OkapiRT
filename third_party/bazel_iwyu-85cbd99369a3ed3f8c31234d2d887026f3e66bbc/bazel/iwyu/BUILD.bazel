@@ -1,0 +1,11 @@
+package(default_visibility = ["//visibility:public"])
+
+sh_binary(
+    name = "run_iwyu",
+    srcs = ["run_iwyu.sh"],
+    data = [
+        "@iwyu_prebuilt_pkg//:bin/include-what-you-use",
+        "@iwyu_prebuilt_pkg//:include",
+    ],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)

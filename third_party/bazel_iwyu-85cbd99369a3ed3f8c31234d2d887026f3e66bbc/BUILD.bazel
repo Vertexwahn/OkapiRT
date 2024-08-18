@@ -1,0 +1,29 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_list_flag")
+
+package(default_visibility = ["//visibility:public"])
+
+label_flag(
+    name = "iwyu_mappings",
+    build_setting_default = ":iwyu_mappings_default",
+)
+
+filegroup(
+    name = "iwyu_mappings_default",
+    srcs = glob([
+        "mappings/*.imp",
+    ]),
+)
+
+# NOTE(storypku):
+# 1) Don't put `--mapping_file=<filename>` here.
+# 2) Ref to `include-what-you-use --help` for more.
+string_list_flag(
+    name = "iwyu_opts",
+    build_setting_default = [
+        "--cxx17ns",
+        "--error=1",
+        "--max_line_length=127",
+        "--no_fwd_decls",
+        "--transitive_includes_only",
+    ],
+)

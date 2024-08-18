@@ -101,7 +101,7 @@ TEST(EmbreeIntersector, IntersectTranslatedTriangle) {
     std::vector<ReferenceCounted<Shape3f>> shapes;
     shapes.push_back(mesh);
 
-    Point3f ray_origin{0.f,0.f,-100.f};
+    Point3f ray_origin{0.f, 0.f, -100.f};
     Vector3f ray_direction{0.f,0.f,1.f};
     Ray3f ray{ray_origin, ray_direction, 0.f, 1000.f};
 
