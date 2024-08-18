@@ -938,6 +938,41 @@ class basic_memory_buffer : public detail::buffer<T> {
 
 using memory_buffer = basic_memory_buffer<char>;
 
+// A writer to a buffered stream. It doesn't own the underlying stream.
+class writer {
+ private:
+  detail::buffer<char>* buf_;
+
+  // We cannot create a file buffer in advance because any write to a FILE may
+  // invalidate it.
+  FILE* file_;
+
+ public:
+  writer(FILE* f) : buf_(nullptr), file_(f) {}
+  writer(detail::buffer<char>& buf) : buf_(&buf) {}
+
+  /// Formats `args` according to specifications in `fmt` and writes the
+  /// output to the file.
+  template <typename... T> void print(format_string<T...> fmt, T&&... args) {
+    if (buf_)
+      fmt::format_to(appender(*buf_), fmt, std::forward<T>(args)...);
+    else
+      fmt::print(file_, fmt, std::forward<T>(args)...);
+  }
+};
+
+class string_buffer {
+ private:
+  std::string str_;
+  detail::container_buffer<std::string> buf_;
+
+ public:
+  string_buffer() : buf_(str_) {}
+
+  operator writer() { return buf_; }
+  std::string& str() { return str_; }
+};
+
 template <typename T, size_t SIZE, typename Allocator>
 struct is_contiguous<basic_memory_buffer<T, SIZE, Allocator>> : std::true_type {
 };
@@ -2264,26 +2299,24 @@ FMT_CONSTEXPR auto write(OutputIt out, basic_string_view<Char> s,
   auto size = s.size();
   if (specs.precision >= 0 && to_unsigned(specs.precision) < size)
     size = code_point_index(s, to_unsigned(specs.precision));
-  bool is_debug = specs.type() == presentation_type::debug;
-  size_t width = 0;
 
+  bool is_debug = specs.type() == presentation_type::debug;
   if (is_debug) {
     auto buf = counting_buffer<Char>();
     write_escaped_string(basic_appender<Char>(buf), s);
     size = buf.count();
   }
 
+  size_t width = 0;
   if (specs.width != 0) {
-    if (is_debug)
-      width = size;
-    else
-      width = compute_width(basic_string_view<Char>(data, size));
+    width =
+        is_debug ? size : compute_width(basic_string_view<Char>(data, size));
   }
-  return write_padded<Char>(out, specs, size, width,
-                            [=](reserve_iterator<OutputIt> it) {
-                              if (is_debug) return write_escaped_string(it, s);
-                              return copy<Char>(data, data + size, it);
-                            });
+  return write_padded<Char>(
+      out, specs, size, width, [=](reserve_iterator<OutputIt> it) {
+        return is_debug ? write_escaped_string(it, s)
+                        : copy<Char>(data, data + size, it);
+      });
 }
 template <typename Char, typename OutputIt>
 FMT_CONSTEXPR auto write(OutputIt out,

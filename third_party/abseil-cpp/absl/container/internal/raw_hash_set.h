@@ -540,8 +540,8 @@ ABSL_DLL extern const ctrl_t kEmptyGroup[32];
 // classes of bugs.
 enum InvalidCapacity : size_t {
   kAboveMaxValidCapacity = ~size_t{} - 100,
-  // Used for reentrancy assertions.
-  kInvalidReentrance,
+  kReentrance,
+  kDestroyed,
 };
 
 // Returns a pointer to a control byte group that can be used by empty tables.
@@ -1462,7 +1462,7 @@ class CommonFields : public CommonFieldsGenerationInfo {
     return;
 #endif
     const size_t cap = capacity();
-    set_capacity(kInvalidReentrance);
+    set_capacity(InvalidCapacity::kReentrance);
     f();
     set_capacity(cap);
   }
@@ -2858,7 +2858,12 @@ class raw_hash_set {
         typename AllocTraits::propagate_on_container_move_assignment());
   }
 
-  ~raw_hash_set() { destructor_impl(); }
+  ~raw_hash_set() {
+    destructor_impl();
+#ifndef NDEBUG
+    common().set_capacity(InvalidCapacity::kDestroyed);
+#endif
+  }
 
   iterator begin() ABSL_ATTRIBUTE_LIFETIME_BOUND {
     if (ABSL_PREDICT_FALSE(empty())) return end();
@@ -2897,7 +2902,7 @@ class raw_hash_set {
   size_t max_size() const { return (std::numeric_limits<size_t>::max)(); }
 
   ABSL_ATTRIBUTE_REINITIALIZES void clear() {
-    AssertValidCapacity();
+    AssertNotDebugCapacity();
     // Iterating over this container is O(bucket_count()). When bucket_count()
     // is much greater than size(), iteration becomes prohibitively expensive.
     // For clear() it is more important to reuse the allocated array when the
@@ -3151,7 +3156,7 @@ class raw_hash_set {
   // This overload is necessary because otherwise erase<K>(const K&) would be
   // a better match if non-const iterator is passed as an argument.
   void erase(iterator it) {
-    AssertValidCapacity();
+    AssertNotDebugCapacity();
     AssertIsFull(it.control(), it.generation(), it.generation_ptr(), "erase()");
     destroy(it.slot());
     if (is_soo()) {
@@ -3163,7 +3168,7 @@ class raw_hash_set {
 
   iterator erase(const_iterator first,
                  const_iterator last) ABSL_ATTRIBUTE_LIFETIME_BOUND {
-    AssertValidCapacity();
+    AssertNotDebugCapacity();
     // We check for empty first because ClearBackingArray requires that
     // capacity() > 0 as a precondition.
     if (empty()) return end();
@@ -3219,7 +3224,7 @@ class raw_hash_set {
   }
 
   node_type extract(const_iterator position) {
-    AssertValidCapacity();
+    AssertNotDebugCapacity();
     AssertIsFull(position.control(), position.inner_.generation(),
                  position.inner_.generation_ptr(), "extract()");
     auto node = CommonAccess::Transfer<node_type>(alloc_ref(), position.slot());
@@ -3726,17 +3731,12 @@ class raw_hash_set {
       lhs = std::move(rhs);
     } else {
       lhs.move_non_heap_or_soo_fields(rhs);
-#ifndef NDEBUG
-      const size_t rhs_capacity = rhs.capacity();
-      rhs.set_capacity(kInvalidReentrance);
-#endif
-      lhs.RunWithReentrancyGuard([&] {
-        PolicyTraits::transfer(&rhs_alloc, to_slot(lhs.soo_data()),
-                               to_slot(rhs.soo_data()));
+      rhs.RunWithReentrancyGuard([&] {
+        lhs.RunWithReentrancyGuard([&] {
+          PolicyTraits::transfer(&rhs_alloc, to_slot(lhs.soo_data()),
+                                 to_slot(rhs.soo_data()));
+        });
       });
-#ifndef NDEBUG
-      rhs.set_capacity(rhs_capacity);
-#endif
     }
   }
 
@@ -3876,15 +3876,17 @@ class raw_hash_set {
     return;
 #endif
     AssertHashEqConsistent(key);
-    AssertValidCapacity();
+    AssertNotDebugCapacity();
   }
 
   // Asserts that the capacity is not a sentinel invalid value.
-  // TODO(b/296061262): also add asserts for moved-from and destroyed states.
-  void AssertValidCapacity() const {
-    assert(capacity() != kInvalidReentrance &&
+  // TODO(b/296061262): also add asserts for moved-from state.
+  void AssertNotDebugCapacity() const {
+    assert(capacity() != InvalidCapacity::kReentrance &&
            "reentrant container access during element construction/destruction "
            "is not allowed.");
+    assert(capacity() != InvalidCapacity::kDestroyed &&
+           "use of destroyed hash table.");
   }
 
   // Asserts that hash and equal functors provided by the user are consistent,

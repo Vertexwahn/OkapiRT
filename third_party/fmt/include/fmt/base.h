@@ -926,9 +926,8 @@ template <typename T> class buffer {
 
   /// Appends data to the end of the buffer.
   template <typename U>
-// Workaround for Visual Studio 2019 to fix error C2893: Failed to specialize
-// function template 'void fmt::v11::detail::buffer<T>::append(const U *,const
-// U *)'
+// Workaround for MSVC2019 to fix error C2893: Failed to specialize function
+// template 'void fmt::v11::detail::buffer<T>::append(const U *,const U *)'.
 #if !FMT_MSC_VERSION || FMT_MSC_VERSION >= 1930
   FMT_CONSTEXPR20
 #endif
@@ -1070,6 +1069,24 @@ template <typename T> class iterator_buffer<T*, T> : public buffer<T> {
   auto out() -> T* { return &*this->end(); }
 };
 
+template <typename Container>
+class container_buffer : public buffer<typename Container::value_type> {
+ private:
+  using value_type = typename Container::value_type;
+
+  static FMT_CONSTEXPR void grow(buffer<value_type>& buf, size_t capacity) {
+    auto& self = static_cast<container_buffer&>(buf);
+    self.container.resize(capacity);
+    self.set(&self.container[0], capacity);
+  }
+
+ public:
+  Container& container;
+
+  explicit container_buffer(Container& c)
+      : buffer<value_type>(grow, c.size()), container(c) {}
+};
+
 // A buffer that writes to a container with the contiguous storage.
 template <typename OutputIt>
 class iterator_buffer<
@@ -1077,25 +1094,16 @@ class iterator_buffer<
     enable_if_t<detail::is_back_insert_iterator<OutputIt>::value &&
                     is_contiguous<typename OutputIt::container_type>::value,
                 typename OutputIt::container_type::value_type>>
-    : public buffer<typename OutputIt::container_type::value_type> {
+    : public container_buffer<typename OutputIt::container_type> {
  private:
-  using container_type = typename OutputIt::container_type;
-  using value_type = typename container_type::value_type;
-  container_type& container_;
-
-  static FMT_CONSTEXPR void grow(buffer<value_type>& buf, size_t capacity) {
-    auto& self = static_cast<iterator_buffer&>(buf);
-    self.container_.resize(capacity);
-    self.set(&self.container_[0], capacity);
-  }
+  using base = container_buffer<typename OutputIt::container_type>;
 
  public:
-  explicit iterator_buffer(container_type& c)
-      : buffer<value_type>(grow, c.size()), container_(c) {}
+  explicit iterator_buffer(typename OutputIt::container_type& c) : base(c) {}
   explicit iterator_buffer(OutputIt out, size_t = 0)
-      : iterator_buffer(get_container(out)) {}
+      : base(get_container(out)) {}
 
-  auto out() -> OutputIt { return OutputIt(container_); }
+  auto out() -> OutputIt { return OutputIt(this->container); }
 };
 
 // A buffer that counts the number of code units written discarding the output.
@@ -2285,7 +2293,7 @@ template <typename Char>
 FMT_CONSTEXPR auto code_point_length(const Char* begin) -> int {
   if (const_check(sizeof(Char) != 1)) return 1;
   auto c = static_cast<unsigned char>(*begin);
-  return static_cast<int>((0x3a55000000000000ull >> (2 * (c >> 3))) & 0x3) + 1;
+  return static_cast<int>((0x3a55000000000000ull >> (2 * (c >> 3))) & 3) + 1;
 }
 
 // Return the result via the out param to workaround gcc bug 77539.
@@ -2880,8 +2888,7 @@ inline void report_truncation(bool truncated) {
   if (truncated) report_error("output is truncated");
 }
 
-// Use vformat_args and avoid type_identity to keep symbols short and workaround
-// a GCC <= 4.8 bug.
+// Use vformat_args and avoid type_identity to keep symbols short.
 template <typename Char = char> struct vformat_args {
   using type = basic_format_args<buffered_context<Char>>;
 };
