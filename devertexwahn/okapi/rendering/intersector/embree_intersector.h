@@ -30,7 +30,7 @@ DE_VERTEXWAHN_BEGIN_NAMESPACE
 
 class EmbreeIntersector : public IntersectorType<float, 3> {
 public:
-	EmbreeIntersector(const PropertySet& ps) {
+	explicit EmbreeIntersector(const PropertySet&  /*ps*/) {
         LOG_INFO_WITH_LOCATION("Setup Embree integrator.");
 #if BOOST_ARCH_X86_64
         // Setup SIMD Extensions intrinsics for EmbreeIntersector
