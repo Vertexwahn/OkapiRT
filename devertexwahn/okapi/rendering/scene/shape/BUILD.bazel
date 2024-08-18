@@ -1,0 +1,82 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+
+cc_test(
+    name = "medium_event_test",
+    size = "small",
+    srcs = [
+        "medium_event_test.cpp",
+    ],
+    data = ["//flatland/scenes"],
+    deps = [
+        "//flatland/rendering/scene:load_scene",
+        "//flatland/rendering/scene/shape",
+        "//flatland/rendering/scene/shape:medium_event",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "moeller_trumbore",
+    hdrs = ["moeller_trumbore.h"],
+    deps = [
+        "//math:point",
+        "//math:ray",
+    ],
+)
+
+
+cc_library(
+    name = "sphere",
+    hdrs = ["sphere.h"],
+    deps = ["//flatland/rendering/scene/shape"],
+)
+
+cc_test(
+    name = "sphere_test",
+    size = "small",
+    srcs = [
+        "sphere_test.cpp",
+    ],
+    deps = [
+        ":sphere",
+        "//okapi/rendering/scene:load_scene",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "triangle_mesh",
+    srcs = [
+        "tiny_obj_loader_impl.cpp",
+    ],
+    hdrs = ["triangle_mesh.h"],
+    deps = [
+        ":moeller_trumbore",
+        "//core:logging",
+        "//flatland/rendering/scene/shape",
+        "//math:geometry",
+        "//math:intersection",
+        "@tinyobjloader",
+    ],
+)
+
+cc_test(
+    name = "triangle_mesh_test",
+    size = "small",
+    srcs = [
+        "triangle_intersection_moeller_trumbore_test.cpp",
+        "triangle_mesh_test.cpp",
+    ],
+    data = ["//okapi/scenes"],
+    deps = [
+        ":triangle_mesh",
+        "//okapi/rendering/scene:load_scene",
+        "@googletest//:gtest_main",
+    ],
+)
