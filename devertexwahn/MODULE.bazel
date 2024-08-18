@@ -17,7 +17,7 @@ module(
 bazel_dep(name = "abseil-cpp", version = "20240722.0")
 bazel_dep(name = "apple_support", version = "1.16.0")
 bazel_dep(name = "aspect_rules_lint", version = "1.0.0-rc8")
-bazel_dep(name = "autodiff", version = "1.0.3")
+
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "bazel_sonarqube", version = "1.0.2")
 bazel_dep(name = "boost.algorithm", version = "1.83.0.bcr.1")
@@ -98,10 +98,6 @@ local_path_override(
     path = "../third_party/abseil-cpp",
 )
 
-local_path_override(
-    module_name = "autodiff",
-    path = "../third_party/autodiff",
-)
 
 local_path_override(
     module_name = "bazel_skylib",
@@ -131,13 +127,13 @@ local_path_override(
 #)
 
 local_path_override(
-    module_name = "hypothesis",
-    path = "../third_party/hypothesis",
+    module_name = "imath",
+    path = "../third_party/Imath",
 )
 
 local_path_override(
-    module_name = "imath",
-    path = "../third_party/Imath",
+    module_name = "hypothesis",
+    path = "../third_party/hypothesis",
 )
 
 local_path_override(
@@ -170,10 +166,6 @@ local_path_override(
     path = "../third_party/pugixml",
 )
 
-local_path_override(
-    module_name = "rules_cuda",
-    path = "../third_party/rules_cuda",
-)
 
 local_path_override(
     module_name = "rules_pkg",
@@ -221,7 +213,6 @@ local_path_override(
     path = "../third_party/depend_on_what_you_use",
 )
 
-# Windows 2022 opt mode generates errors that my be related to mock methods...
 local_path_override(
     module_name = "googletest",
     path = "../third_party/googletest",
