@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "okapi/rendering/intersector/embree_intersector.h"
-#include "okapi/rendering/scene/shape/triangle_mesh.h"
+#include "okapi/rendering/intersector/embree_intersector.hpp"
+#include "okapi/rendering/shape/triangle_mesh.h"
 
 #include "gmock/gmock.h"
 
