@@ -1,0 +1,60 @@
+"""
+    SPDX-FileCopyrightText: 2022 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+core.workflow(
+    name = "default",
+    #origin = git.origin(
+    #    url = "https://github.com/Vertexwahn/Piper.git",
+    #    ref = "main",
+    #),
+    origin = git.origin(
+        url = "file:////home/vertexwahn/dev/Piper",  #"file:////Users/Q448004/dev/Piper",  #
+        ref = "main",
+    ),
+    destination = git.destination(
+        #url = "https://github.com/Vertexwahn/rules_qt6_internal.git",
+        url = "https://github.com/Vertexwahn/rules_qt6.git",
+        fetch = "main",
+        push = "main",
+    ),
+    mode = "ITERATIVE",
+    origin_files =
+        glob(
+            [
+                "devertexwahn/rules_qt6/**",
+            ],
+            exclude = ["devertexwahn/rules_qt6/copy.bara.sky"],
+        ),
+    authoring = authoring.pass_thru("Vertexwahn <julian.amann@tum.de>"),
+    transformations = [
+        core.move("devertexwahn/rules_qt6", ""),  # otherwise README does not work
+        # try to change as little as possible
+        #core.replace(
+        #    before = "${x}",
+        #    after = "",
+        #    multiline = True,
+        #    regex_groups = {
+        #    },
+        #),
+    ],
+)
+
+core.workflow(
+    name = "import",
+    origin = git.origin(
+        url = "https://github.com/Vertexwahn/rules_qt6.git",
+        ref = "main",
+    ),
+    destination = git.destination(
+        url = "file:////home/vertexwahn/dev/Piper",  #"file:////Users/Q448004/dev/Piper",  #
+        fetch = "main",
+        push = "main",
+    ),
+    mode = "ITERATIVE",
+    authoring = authoring.pass_thru("Vertexwahn <julian.amann@tum.de>"),
+    transformations = [
+        core.move("", "devertexwahn/rules_qt6"),
+    ],
+)
