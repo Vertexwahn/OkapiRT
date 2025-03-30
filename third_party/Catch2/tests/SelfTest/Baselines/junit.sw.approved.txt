@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuitesloose text artifact
 >
-  <testsuite name="<exe-name>" errors="17" failures="130" skipped="12" tests="2271" hostname="tbd" time="{duration}" timestamp="{iso8601-timestamp}">
+  <testsuite name="<exe-name>" errors="17" failures="130" skipped="12" tests="2281" hostname="tbd" time="{duration}" timestamp="{iso8601-timestamp}">
     <properties>
       <property name="random-seed" value="1"/>
       <property name="filters" value="&quot;*&quot; ~[!nonportable] ~[!benchmark] ~[approvals]"/>
@@ -420,6 +420,7 @@ at Exception.tests.cpp:<line number>
     <testcase classname="<exe-name>.global" name="Character pretty printing/Specifically escaped" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Character pretty printing/General chars" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Character pretty printing/Low ASCII" time="{duration}" status="run"/>
+    <testcase classname="<exe-name>.global" name="Clara::Arg does not crash on incomplete input" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Clara::Arg supports single-arg parse the way Opt does" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Clara::Opt supports accept-many lambdas" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Clara::Opt supports accept-many lambdas/Parsing fails on multiple options without accept_many" time="{duration}" status="run"/>
@@ -520,8 +521,8 @@ with expansion:
 at Matchers.tests.cpp:<line number>
       </failure>
     </testcase>
-    <testcase classname="<exe-name>.global" name="Enums can quickly have stringification enabled using REGISTER_ENUM" time="{duration}" status="run"/>
-    <testcase classname="<exe-name>.global" name="Enums in namespaces can quickly have stringification enabled using REGISTER_ENUM" time="{duration}" status="run"/>
+    <testcase classname="<exe-name>.global" name="Enums can quickly have stringification enabled using CATCH_REGISTER_ENUM" time="{duration}" status="run"/>
+    <testcase classname="<exe-name>.global" name="Enums in namespaces can quickly have stringification enabled using CATCH_REGISTER_ENUM" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Epsilon only applies to Approx's value" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Equality checks that should fail" time="{duration}" status="run">
       <skipped message="TEST_CASE tagged with !mayfail"/>
@@ -1651,6 +1652,7 @@ at Exception.tests.cpp:<line number>
     <testcase classname="<exe-name>.global" name="Usage of RangeEquals range matcher/Custom predicate/Two equal non-empty containers (close enough)" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of RangeEquals range matcher/Custom predicate/Two non-equal non-empty containers (close enough)" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of RangeEquals range matcher/Ranges that need ADL begin/end" time="{duration}" status="run"/>
+    <testcase classname="<exe-name>.global" name="Usage of RangeEquals range matcher/Compare against std::initializer_list" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of RangeEquals range matcher/Check short-circuiting behaviour" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of RangeEquals range matcher/Check short-circuiting behaviour/Check short-circuits on failure" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of RangeEquals range matcher/Check short-circuiting behaviour/All elements are checked on success" time="{duration}" status="run"/>
@@ -1666,6 +1668,7 @@ at Exception.tests.cpp:<line number>
     <testcase classname="<exe-name>.global" name="Usage of UnorderedRangeEquals range matcher/Custom predicate/Two equal non-empty containers (close enough)" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of UnorderedRangeEquals range matcher/Custom predicate/Two non-equal non-empty containers (close enough)" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of UnorderedRangeEquals range matcher/Ranges that need ADL begin/end" time="{duration}" status="run"/>
+    <testcase classname="<exe-name>.global" name="Usage of UnorderedRangeEquals range matcher/Compare against std::initializer_list" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of the SizeIs range matcher" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of the SizeIs range matcher/Some with stdlib containers" time="{duration}" status="run"/>
     <testcase classname="<exe-name>.global" name="Usage of the SizeIs range matcher/Type requires ADL found size free function" time="{duration}" status="run"/>
