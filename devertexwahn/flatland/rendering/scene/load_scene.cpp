@@ -7,18 +7,18 @@
  *  SPDX-License-Identifier: BSD-3-Clause-LBNL
  */
 
-#include "flatland/rendering/scene/load_scene.h"
+#include "flatland/rendering/scene/load_scene.hpp"
 
-#include "core/object_factory.h"
-#include "flatland/rendering/integrator/path_mirror_reflection.h"
-#include "flatland/rendering/integrator/path_specular_transmission.h"
-#include "flatland/rendering/intersector/brute_force_intersector.h"
-#include "flatland/rendering/intersector/quadtree_intersector.h"
-#include "flatland/rendering/scene/shape/disk.h"
-#include "flatland/rendering/scene/shape/polygon.h"
-#include "flatland/rendering/scene/shape/rectangle.h"
-#include "flatland/rendering/scene/shape/triangle_mesh.h"
-#include "flatland/rendering/integrator/ambient_occlusion.h"
+#include "core/object_factory.hpp"
+#include "flatland/rendering/integrator/path_mirror_reflection.hpp"
+#include "flatland/rendering/integrator/path_specular_transmission.hpp"
+#include "flatland/rendering/intersector/brute_force_intersector.hpp"
+#include "flatland/rendering/intersector/quadtree_intersector.hpp"
+#include "flatland/rendering/shape/disk.hpp"
+#include "flatland/rendering/shape/polygon.hpp"
+#include "flatland/rendering/shape/rectangle.hpp"
+#include "flatland/rendering/shape/triangle_mesh.hpp"
+#include "flatland/rendering/integrator/ambient_occlusion.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 
@@ -159,15 +159,15 @@ Point3f convert_csv_to_point3f(const std::string& csv) {
     return Point3f{values[0], values[1], values[2]};
 }
 
-Color3f convert_csv_to_color3f(const std::string& csv) {
+ColorRGB3f convert_csv_to_color3f(const std::string& csv) {
     std::vector<float> values = convert_to_float_vector(csv);
 
     if(values.size() == 1) {
-        return Color3f{values[0]};
+        return ColorRGB3f{values[0]};
     }
 
     assert(values.size() == 3);
-    return Color3f{values[0], values[1], values[2]};
+    return ColorRGB3f{values[0], values[1], values[2]};
 }
 
 void read_all_properties(const pugi::xml_node &node, PropertySet& out_ps) {

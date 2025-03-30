@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "math/matrix.h"
+#include "math/matrix.hpp"
 
 #include "gmock/gmock.h"
 
@@ -65,5 +65,16 @@ TEST(Matrix44f, translation_with_scalars) {
             0.f, 1.f, 0.f, 2.f,
             0.f, 0.f, 1.f, 3.f,
             0.f, 0.f, 0.f, 1.f;
+    EXPECT_THAT(result, expected_result);
+}
+
+TEST(Matrix44f, identity_matrix) {
+    Matrix44f result = identity_matrix<float>();
+
+    Matrix44f expected_result;
+    expected_result << 1.f, 0.f, 0.f, 0.f,
+                       0.f, 1.f, 0.f, 0.f,
+                       0.f, 0.f, 1.f, 0.f,
+                       0.f, 0.f, 0.f, 1.f;
     EXPECT_THAT(result, expected_result);
 }

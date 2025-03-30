@@ -1,11 +1,11 @@
 /*
- *  SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+ *  SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "flatland/rendering/integrator/path_mirror_reflection.h"
-#include "flatland/rendering/rendering.h"
-#include "flatland/rendering/scene/load_scene.h"
+#include "flatland/rendering/integrator/path_mirror_reflection.hpp"
+#include "flatland/rendering/rendering.hpp"
+#include "flatland/rendering/scene/load_scene.hpp"
 
 #include "gmock/gmock.h"
 
@@ -31,7 +31,6 @@ TEST(PathMirrorReflection, GivenSceneWithMirror_WhenRayHitsMirror_ExpectReflecti
     EXPECT_FLOAT_EQ(sc->rays()[1].direction.x(), sqrt(.5f));
     EXPECT_FLOAT_EQ(sc->rays()[1].direction.y(), -sqrt(.5f));
 }
-
 
 TEST(PathMirrorReflection2, trace) {
     PropertySet ps;

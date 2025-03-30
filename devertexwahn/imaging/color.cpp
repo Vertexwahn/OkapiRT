@@ -1,7 +1,7 @@
 // Code copied form paulbourke 
 // Modified by julianamann
 
-#include "imaging/color.h"
+#include "imaging/color.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 
@@ -16,8 +16,8 @@ DE_VERTEXWAHN_BEGIN_NAMESPACE
       double r,g,b;
    } COLOUR;
 */
-Color3f hot_to_cold_color_ramp(float v, float vmin, float vmax) {
-    Color3f c = {1.f, 1.f, 1.f}; // white
+ColorRGB3f hot_to_cold_color_ramp(float v, float vmin, float vmax) {
+    ColorRGB3f c = {1.f, 1.f, 1.f}; // white
 
     if (v < vmin)
         v = vmin;

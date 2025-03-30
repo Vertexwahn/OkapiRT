@@ -3,15 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "imaging/color_converter.h"
-#include "imaging/io/io.h"
-#include "imaging/io/io_jpeg.h"
-#include "imaging/io/io_openexr.h"
-#include "imaging/io/io_png.h"
-#include "imaging/io/io_ppm.h"
-#include "imaging/io/io_webp.h"
+#include "imaging/color_converter.hpp"
+#include "imaging/io/io.hpp"
+#include "imaging/io/io_jpeg.hpp"
+#include "imaging/io/io_openexr.hpp"
+#include "imaging/io/io_png.hpp"
+#include "imaging/io/io_ppm.hpp"
+#include "imaging/io/io_webp.hpp"
 
-#include "math/util.h"
+#include "math/util.hpp"
 
 #include "boost/algorithm/string.hpp"
 
@@ -43,8 +43,8 @@ ReferenceCounted<Image4b> convert_to_Image4b(const Image3b* image) {
 
     for (int y = 0; y < image->height(); ++y) {
         for (int x = 0; x < image->width(); ++x) {
-            Color3b c = image->get_pixel(x, y);
-            Color4b converted_color = ColorConverter::convertTo<Color4b>(c);
+            ColorRGB3b c = image->get_pixel(x, y);
+            ColorRGBA4b converted_color = ColorConverter::convertTo<ColorRGBA4b>(c);
             converted_image->set_pixel(x,y,converted_color);
         }
     }
@@ -124,8 +124,8 @@ ReferenceCounted<Image3b> convert_to_Image3b(const Image4b* image) {
 
     for (int y = 0; y < image->height(); ++y) {
         for (int x = 0; x < image->width(); ++x) {
-            Color4b c = image->get_pixel(x, y);
-            auto converted_color = ColorConverter::convertTo<Color3b>(c);
+            ColorRGBA4b c = image->get_pixel(x, y);
+            auto converted_color = ColorConverter::convertTo<ColorRGB3b>(c);
             converted_image->set_pixel(x,y,converted_color);
         }
     }
@@ -157,8 +157,8 @@ Image4f load_image_asImage4f(std::string_view filename) {
 
         for (int y = 0; y < image->height(); ++y) {
             for (int x = 0; x < image->width(); ++x) {
-                Color4b c = image->get_pixel(x, y);
-                auto converted_color = ColorConverter::convertTo<Color4f>(c);
+                ColorRGBA4b c = image->get_pixel(x, y);
+                auto converted_color = ColorConverter::convertTo<ColorRGBA4f>(c);
                 converted_image.set_pixel(x,y,converted_color);
             }
         }
