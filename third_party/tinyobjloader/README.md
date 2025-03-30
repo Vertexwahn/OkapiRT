@@ -14,7 +14,7 @@ Tiny but powerful single file wavefront obj loader written in C++03. No dependen
 
 `tinyobjloader` is good for embedding .obj loader to your (global illumination) renderer ;-)
 
-If you are looking for C89 version, please see https://github.com/syoyo/tinyobjloader-c .
+If you are looking for C99 version, please see https://github.com/syoyo/tinyobjloader-c .
 
 Version notice
 --------------
@@ -250,7 +250,7 @@ You can enable `double(64bit)` precision by using `TINYOBJLOADER_USE_DOUBLE` def
 When you enable `triangulation`(default is enabled),
 TinyObjLoader triangulate polygons(faces with 4 or more vertices).
 
-Built-in trinagulation code may not work well in some polygon shape.
+Built-in triangulation code may not work well in some polygon shape.
 
 You can define `TINYOBJLOADER_USE_MAPBOX_EARCUT` for robust triangulation using `mapbox/earcut.hpp`.
 This requires C++11 compiler though. And you need to copy `mapbox/earcut.hpp` to your project.
@@ -260,7 +260,7 @@ If you have your own `mapbox/earcut.hpp` file incuded in your project, you can d
 
 ```c++
 #define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
-// Optional. define TINYOBJLOADER_USE_MAPBOX_EARCUT gives robust trinagulation. Requires C++11
+// Optional. define TINYOBJLOADER_USE_MAPBOX_EARCUT gives robust triangulation. Requires C++11
 //#define TINYOBJLOADER_USE_MAPBOX_EARCUT
 #include "tiny_obj_loader.h"
 
@@ -332,7 +332,7 @@ for (size_t s = 0; s < shapes.size(); s++) {
 
 ```c++
 #define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
-// Optional. define TINYOBJLOADER_USE_MAPBOX_EARCUT gives robust trinagulation. Requires C++11
+// Optional. define TINYOBJLOADER_USE_MAPBOX_EARCUT gives robust triangulation. Requires C++11
 //#define TINYOBJLOADER_USE_MAPBOX_EARCUT
 #include "tiny_obj_loader.h"
 

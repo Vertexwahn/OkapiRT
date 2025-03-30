@@ -48,7 +48,8 @@ set(SPDLOG_UTESTS_SOURCES
     test_cfg.cpp
     test_time_point.cpp
     test_stopwatch.cpp
-    test_circular_q.cpp)
+    test_circular_q.cpp
+    test_bin_to_hex.cpp)
 
 if(NOT SPDLOG_NO_EXCEPTIONS)
     list(APPEND SPDLOG_UTESTS_SOURCES test_errors.cpp)
@@ -56,10 +57,6 @@ endif()
 
 if(systemd_FOUND)
     list(APPEND SPDLOG_UTESTS_SOURCES test_systemd.cpp)
-endif()
-
-if(NOT SPDLOG_USE_STD_FORMAT)
-    list(APPEND SPDLOG_UTESTS_SOURCES test_bin_to_hex.cpp)
 endif()
 
 enable_testing()
@@ -73,8 +70,10 @@ function(spdlog_prepare_test test_target spdlog_lib)
     endif()
     target_link_libraries(${test_target} PRIVATE Catch2::Catch2WithMain)
     if(SPDLOG_SANITIZE_ADDRESS)
-        spdlog_enable_sanitizer(${test_target})
-    endif()
+        spdlog_enable_addr_sanitizer(${test_target})
+    elseif (SPDLOG_SANITIZE_THREAD)
+        spdlog_enable_thread_sanitizer(${test_target})
+    endif ()
     add_test(NAME ${test_target} COMMAND ${test_target})
     set_tests_properties(${test_target} PROPERTIES RUN_SERIAL ON)
 endfunction()
