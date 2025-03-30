@@ -2,18 +2,25 @@ from __future__ import annotations
 
 import logging
 import subprocess
+from copy import deepcopy
 from importlib.machinery import SourceFileLoader
+from os import environ
 from pathlib import Path
+from re import fullmatch
 from typing import TYPE_CHECKING
 
-from result import Error
 from version import CompatibleVersions, TestedVersions
+
+from test.support.bazel import get_bazel_binary, get_current_workspace
+from test.support.result import Error
 
 if TYPE_CHECKING:
     from test_case import TestCaseBase
 
 
-def execute_test(test: TestCaseBase, version: TestedVersions, output_base: Path, extra_args: list[str]) -> bool:
+def execute_test(
+    test: TestCaseBase, version: TestedVersions, bazel_bin: Path, output_base: Path, extra_args: list[str]
+) -> bool:
     if not test.compatible_bazel_versions.is_compatible_to(version.bazel):
         logging.info(f"--- Skip '{test.name}' due to incompatible Bazel '{version.bazel}'\n")
         return True
@@ -22,7 +29,7 @@ def execute_test(test: TestCaseBase, version: TestedVersions, output_base: Path,
     succeeded = False
     result = None
     try:
-        result = test.execute_test(version=version, output_base=output_base, extra_args=extra_args)
+        result = test.execute_test(version=version, bazel_bin=bazel_bin, output_base=output_base, extra_args=extra_args)
     except Exception:
         logging.exception("Test failed due to exception:")
 
@@ -33,14 +40,35 @@ def execute_test(test: TestCaseBase, version: TestedVersions, output_base: Path,
         succeeded = True
     else:
         logging.info(result.error)
-    logging.info(f'<<< {"OK" if succeeded else "FAILURE"}\n')
+    logging.info(f"<<< {'OK' if succeeded else 'FAILURE'}\n")
 
     return succeeded
 
 
-def get_current_workspace() -> Path:
-    process = subprocess.run(["bazel", "info", "workspace"], check=True, capture_output=True, text=True)
-    return Path(process.stdout.strip())
+def get_explicit_bazel_version(bazel_bin: Path, dynamic_version: str) -> str:
+    run_env = deepcopy(environ)
+    run_env["USE_BAZEL_VERSION"] = dynamic_version
+    process = subprocess.run(
+        [bazel_bin, "--version"], env=run_env, shell=False, check=True, capture_output=True, text=True
+    )
+    return process.stdout.split("bazel")[1].strip()
+
+
+def make_bazel_versions_explicit(versions: list[TestedVersions], bazel_bin: Path) -> list[TestedVersions]:
+    """
+    We want to utilize dynamic version references like 'rolling' or '42.x'. However, for debugging and caching we
+    prefer using concrete version numbers in the test orechstrtion logic. Thus, we resolve the dynamic version
+    identifiers before using them.
+    """
+    logging.info("Parsing Bazel versions:")
+    for version in versions:
+        if not fullmatch(r"\d+\.\d+\.\d+", version.bazel):
+            dynamic_version = version.bazel
+            version.bazel = get_explicit_bazel_version(bazel_bin=bazel_bin, dynamic_version=dynamic_version)
+            logging.info(f"{dynamic_version} -> {version.bazel}")
+        else:
+            logging.info(version.bazel)
+    return versions
 
 
 def file_to_test_name(test_file: Path) -> str:
@@ -56,7 +84,8 @@ def main(
     list_tests: bool = False,
     only_default_version: bool = False,
 ) -> int:
-    workspace_path = get_current_workspace()
+    bazel_binary = get_bazel_binary()
+    workspace_path = get_current_workspace(bazel_binary)
     test_files = sorted([Path(x) for x in workspace_path.glob("*/test_*.py")])
 
     if list_tests:
@@ -79,9 +108,17 @@ def main(
     else:
         versions = tested_versions
 
+    versions = make_bazel_versions_explicit(versions=versions, bazel_bin=bazel_binary)
+
     failed_tests = []
     output_root = Path.home() / ".cache" / "bazel" / "dwyu"
     for version in versions:
+        logging.info(f"""
+###
+### Aspect integration tests based on: Bazel '{version.bazel}' and Python '{version.python}'
+###
+""")
+
         output_base = output_root / f"aspect_integration_tests_bazel_{version.bazel}_python_{version.python}"
         output_base.mkdir(parents=True, exist_ok=True)
 
@@ -95,11 +132,13 @@ def main(
             [
                 f"'{test.name}' for Bazel {version.bazel} and Python {version.python}"
                 for test in tests
-                if not execute_test(test=test, version=version, output_base=output_base, extra_args=extra_args)
+                if not execute_test(
+                    test=test, version=version, bazel_bin=bazel_binary, output_base=output_base, extra_args=extra_args
+                )
             ]
         )
 
-    logging.info(f'Running tests {"FAILED" if failed_tests else "SUCCEEDED"}')
+    logging.info(f"Running tests {'FAILED' if failed_tests else 'SUCCEEDED'}")
     if failed_tests:
         logging.info("\nFailed tests:")
         logging.info("\n".join(f"- {failed}" for failed in failed_tests))

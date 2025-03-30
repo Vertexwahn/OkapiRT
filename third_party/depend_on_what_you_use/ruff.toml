@@ -33,14 +33,12 @@ ignore = [
     "FBT",
     # Annotating **kwargs has little value
     "ANN003",
-    # Documenting the type of 'self' is too verbose and in most cases either way obvious
-    "ANN101",
     # We omit trailing commas deliberately to keep code in a single line instead of multiple lines due to the formatting
     # rules automatically using a trailing comma as indicator for breaking a statement into multiple lines.
     "COM812",
     # It is fine that some line are longer than the length limit whenever the formatter finds not better option
     "E501",
-    # We prefer simple code to performance.
+    # The performance benefits are not measurable. We prefer simple code with increased readability.
     "G004",
     # We use implicit namespace packages by design
     "INP001",

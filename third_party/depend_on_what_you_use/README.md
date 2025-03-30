@@ -1,5 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 - [Depend on what you use (DWYU)](#depend-on-what-you-use-dwyu)
@@ -9,6 +10,7 @@
   - [Use DWYU](#use-dwyu)
 - [Applying automatic fixes](#applying-automatic-fixes)
 - [Assumptions of use](#assumptions-of-use)
+- [Known problems](#known-problems)
 - [Supported Platforms](#supported-platforms)
 - [Alternatives to DWYU](#alternatives-to-dwyu)
 - [Versioning](#versioning)
@@ -117,7 +119,7 @@ This is demonstrated in the [rule_using_dwyu example](/examples/rule_using_dwyu)
 
 # Applying automatic fixes
 
-> \[!WARNING\]
+> [!WARNING]
 > Please note that **the tool cannot guarantee that your build is not being broken** by the changes.
 > Always make sure your project is still valid after the changes and review the performed changes.
 
@@ -169,24 +171,45 @@ For example, including header files which do not exist at the expected path.
 There shall not be multiple header files in the dependency tree of a target matching an include statement.
 Even if analysing the code works initially, it might break at any time if the ordering of paths in the analysis changes.
 
+# Known problems
+
+## Preprocessor statements
+
+DWYU does not compile the code, but parses it as text and searches for include statements.
+If preprocessor statements control how the code should be interpreted, this is a flawed approach (e.g. include different headers based on the platform).
+To work around this DWYU uses [`pcpp`](https://github.com/ned14/pcpp) to preprocess files before searching for include statements.
+
+In most cases this approach works as desired.
+There are however some edge cases to be aware of:
+
+1)<br>
+`pcpp` is not the preprocessor used by your C++ toolchain.
+There is no guarantee that it behaves exactly the same.
+
+2)<br>
+DWYU can only forward defined values to `pcpp` which are part of the compiler command build by Bazel.
+Some values are however set internally by the compiler while processing files and are unknown to DWYU.<br>
+Common cases for such macros can be seen at [cppreference.com](https://en.cppreference.com/w/cpp/preprocessor/replace#Predefined_macros).
+While DWYU cannot generally know the values of all those compiler defined macros, we offer a feature to set `__cplusplus` based on a heuristic.
+
 # Supported Platforms
 
 ### Aspect
 
-| Platform         | Constraints                                                                       |
-| ---------------- | --------------------------------------------------------------------------------- |
-| Operating system | Integration tests check \[Ubuntu 22.04, Macos 12, Windows 2022\].                 |
-| Python           | Minimum version is 3.8. Integration tests check \[3.8, 3.9, 3.10, 3.11, 3.12\].   |
-| Bazel            | Minimum version is 5.4.0. Integration tests check \[5.x, 6.x, 7.x, 8.0.0-pre.x\]. |
+| Platform         | Constraints                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| Operating system | Integration tests check [Ubuntu 24.04, Macos 15, Windows 2022].                     |
+| Python           | Minimum version is 3.8. Integration tests check [3.8, 3.9, 3.10, 3.11, 3.12, 3.13]. |
+| Bazel            | Minimum version is 6.4.0. Integration tests check [6.4, 7.x, 8.x, rolling].         |
 
 ### Applying fixes
 
-| Platform         | Constraints                                                       |
-| ---------------- | ----------------------------------------------------------------- |
-| Operating system | Integration tests check \[Ubuntu 22.04, Macos 12, Windows 2022\]. |
-| Python           | Minimum version is 3.8. Integration tests check 3.8.              |
-| Bazel            | No known constraint. Integration tests check 7.0.0.               |
-| Buildozer        | No known constraint. Integration tests check 6.4.0.               |
+| Platform         | Constraints                                                     |
+| ---------------- | --------------------------------------------------------------- |
+| Operating system | Integration tests check [Ubuntu 24.04, Macos 15, Windows 2022]. |
+| Python           | Minimum version is 3.8. Integration tests check 3.8.            |
+| Bazel            | No known constraint. Integration tests check 7.4.1.             |
+| Buildozer        | No known constraint. Integration tests check 7.3.1.             |
 
 # Alternatives to DWYU
 

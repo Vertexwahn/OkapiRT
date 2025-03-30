@@ -6,17 +6,17 @@ set -o nounset
 echo ""
 echo "Pre-commit checks"
 echo ""
-poetry run pre-commit run --all-files
+pre-commit run --all-files
 
 echo ""
-echo "Execute unit tests"
+echo "Execute DWYU unit tests"
 echo ""
 bazel test //...
 
 echo ""
-echo "Build aspect integration tests"
+echo "Aspect integration tests scripts unittests"
 echo ""
-./scripts/build_aspect_tests.sh
+./scripts/test_aspect_tests_scripts.sh
 
 echo ""
 echo "Build examples"

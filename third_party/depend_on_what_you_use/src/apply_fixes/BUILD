@@ -1,4 +1,5 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("@rules_python//python:py_binary.bzl", "py_binary")
+load("@rules_python//python:py_library.bzl", "py_library")
 
 py_library(
     name = "lib",
@@ -17,6 +18,8 @@ py_library(
 py_binary(
     name = "main",
     srcs = ["main.py"],
+    # Compatibility to --noexperimental_python_import_all_repositories
+    imports = ["../.."],
     visibility = ["//:__pkg__"],
     deps = [":lib"],
 )

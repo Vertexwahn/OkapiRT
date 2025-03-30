@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 import logging
+import sys
 from argparse import ArgumentParser, Namespace
-from sys import exit
+from pathlib import Path
 
-from execution_logic import main
+# Allow importing test support code. Relative imports do not work in our case.
+# We do this centrally here, so all code we import while executing this knows the extended PYTHONPATH
+# ruff: noqa: E402
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(WORKSPACE_ROOT))
+
+from test.apply_fixes.execution_logic import main
 
 logging.basicConfig(format="%(message)s", level=logging.INFO)
 
@@ -25,4 +32,4 @@ if __name__ == "__main__":
     args = cli()
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    exit(main(requested_tests=args.test, list_tests=args.list))
+    sys.exit(main(requested_tests=args.test, list_tests=args.list))

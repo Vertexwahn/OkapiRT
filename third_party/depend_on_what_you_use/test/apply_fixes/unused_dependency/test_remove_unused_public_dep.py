@@ -1,5 +1,5 @@
-from result import Result, Success
-from test_case import TestCaseBase
+from test.apply_fixes.test_case import TestCaseBase
+from test.support.result import Result, Success
 
 
 class TestCase(TestCaseBase):

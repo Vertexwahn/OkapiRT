@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 import logging
+import sys
 from argparse import ArgumentParser, Namespace
 from os import chdir
 from pathlib import Path
-from sys import exit
+
+# Allow importing test support code. Relative imports do not work in our case.
+# We do this centrally here, so all code we import while executing this knows the extended PYTHONPATH
+# ruff: noqa: E402
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(WORKSPACE_ROOT))
 
 from execution_logic import main
 from test_case import CompatibleVersions, TestedVersions
@@ -14,18 +20,19 @@ logging.basicConfig(format="%(message)s", level=logging.INFO)
 # manually define pairs which make sure each Bazel and Python version we care about is used at least once.
 # For versions using the legacy WORKSPACE setup we have to specify the patch version for Python
 TESTED_VERSIONS = [
-    TestedVersions(bazel="5.4.1", python="3.8.18"),
-    TestedVersions(bazel="6.5.0", python="3.9.18"),
-    TestedVersions(bazel="7.0.0", python="3.10"),
-    TestedVersions(bazel="7.2.1", python="3.11", is_default=True),
-    TestedVersions(bazel="rolling", python="3.12"),
+    TestedVersions(bazel="6.4.0", python="3.8"),
+    TestedVersions(bazel="7.0.0", python="3.9"),
+    TestedVersions(bazel="7.x", python="3.10"),
+    TestedVersions(bazel="8.0.0", python="3.11"),
+    TestedVersions(bazel="8.x", python="3.12", is_default=True),
+    TestedVersions(bazel="rolling", python="3.13"),
 ]
 
 VERSION_SPECIFIC_ARGS = {
-    # We support Bazel's modern dependency management system, but it works only as desired with a recent Bazel version
-    "--experimental_enable_bzlmod=false": CompatibleVersions(before="6.0.0"),
-    "--enable_bzlmod=false": CompatibleVersions(minimum="6.0.0", before="6.2.0"),
-    # Incompatible changes
+    "--enable_bzlmod=true": CompatibleVersions(minimum="6.2.0", before="7.0.0"),
+    # Experimental changes we want to be compatible for
+    "--noexperimental_python_import_all_repositories": CompatibleVersions(minimum="1.0.0"),
+    # Preparation for incompatible changes
     "--incompatible_legacy_local_fallback=false": CompatibleVersions(minimum="5.0.0"),  # false is the forward path
     "--incompatible_enforce_config_setting_visibility": CompatibleVersions(minimum="5.0.0"),
     "--incompatible_config_setting_private_default_visibility": CompatibleVersions(minimum="5.0.0"),
@@ -46,8 +53,11 @@ VERSION_SPECIFIC_ARGS = {
     "--incompatible_disable_non_executable_java_binary": CompatibleVersions(minimum="7.0.0"),
     "--incompatible_python_disallow_native_rules": CompatibleVersions(minimum="7.0.0"),
     "--incompatible_disallow_struct_provider_syntax": CompatibleVersions(minimum="7.0.0"),
+    "--incompatible_use_plus_in_repo_names": CompatibleVersions(minimum="7.2.0"),
+    "--incompatible_disable_native_repo_rules": CompatibleVersions(minimum="7.2.0"),
     # Theoretically of interest for us, but rules_python does not comply to this.
     # "--incompatible_stop_exporting_language_modules": CompatibleVersions(minimum="6.0.0"),
+    # "--noincompatible_enable_deprecated_label_apis": CompatibleVersions(minimum="7.0.0"),  # false is the forward path
 }
 
 
@@ -84,7 +94,7 @@ def cli() -> Namespace:
     parsed_args = parser.parse_args()
     if (parsed_args.bazel and not parsed_args.python) or (not parsed_args.bazel and parsed_args.python):
         logging.error("ERROR: '--bazel' and '--python' have to be used together")
-        exit(1)
+        sys.exit(1)
 
     return parsed_args
 
@@ -97,7 +107,7 @@ if __name__ == "__main__":
     # Ensure we can invoke the script from various places
     chdir(Path(__file__).parent)
 
-    exit(
+    sys.exit(
         main(
             tested_versions=TESTED_VERSIONS,
             version_specific_args=VERSION_SPECIFIC_ARGS,

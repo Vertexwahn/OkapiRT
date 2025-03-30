@@ -1,7 +1,12 @@
-load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_common")
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load(":providers.bzl", "DwyuCcInfoRemapInfo")
 
 def _aggregate_transitive_deps_aspect_impl(target, ctx):
+    # 'cc_*' targets can depend on things like sh_library not providing CcInfo at all
+    if CcInfo not in target:
+        return DwyuCcInfoRemapInfo(target = target.label, cc_info = CcInfo())
+
     all_cc_info = [target[CcInfo]]
     all_cc_info.extend([dep[DwyuCcInfoRemapInfo].cc_info for dep in ctx.rule.attr.deps])
     aggregated_compilation_context = cc_common.merge_compilation_contexts(
@@ -16,6 +21,7 @@ def _aggregate_transitive_deps_aspect_impl(target, ctx):
 _aggregate_transitive_deps_aspect = aspect(
     implementation = _aggregate_transitive_deps_aspect_impl,
     provides = [DwyuCcInfoRemapInfo],
+    # We deliberately ignore implementation_deps since headers provided by them shall by design not be used by consumers of the target
     attr_aspects = ["deps"],
 )
 
