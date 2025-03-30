@@ -1,9 +1,9 @@
 #
-#   SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+#   SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
 #   SPDX-License-Identifier: Apache-2.0
 #
 
-# GCC 11 on Ubuntu 22.04
+# GCC 13 on Ubuntu 24.04
 # Make sure we can build with GCC9 in all different compilation modes
 
 steps:
@@ -16,7 +16,7 @@ steps:
     fetchDepth: 1
     lfs: false
     submodules: false
-    
+
 
 
   - script: |
@@ -39,7 +39,7 @@ steps:
 
   - script: |
       cd devertexwahn
-      bazel run --config=gcc11  --compilation_mode=dbg -- //tools/compiler_feature_dump
+      bazel run --config=gcc13  --compilation_mode=dbg -- //tools/compiler_feature_dump
     displayName: "Compiler feature dump"
 
   - script: |
@@ -48,17 +48,17 @@ steps:
 
   - script: |
       cd devertexwahn
-      bazel build --config=gcc11  --compilation_mode=dbg -- //... -//okapi/...
-    displayName: "Bazel build gcc11-dbg (part 1)"
-
-  - script: |
-     cd devertexwahn
-     bazel test --config=gcc11  --compilation_mode=dbg -- //... -//okapi/...
-    displayName: "Bazel test gcc11-dbg (part 1)"
+      bazel build --config=gcc13  --compilation_mode=dbg -- //okapi/...
+    displayName: "Bazel build gcc13-dbg (part 2)"
 
   - script: |
       df
     displayName: "Show disk space"
+
+  - script: |
+      cd devertexwahn
+      bazel test --config=gcc13  --compilation_mode=dbg -- //okapi/...
+    displayName: "Bazel test gcc13-dbg (part 2)"
 
   - script: |
       df

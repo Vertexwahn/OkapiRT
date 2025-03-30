@@ -1,14 +1,14 @@
 #
-#   SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+#   SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
 #   SPDX-License-Identifier: Apache-2.0
 #
 
-# LCOV and GCC11 on Ubuntu 22.04
+# LCOV and GCC13 on Ubuntu 24.04
 # Make sure code coverage does not drop
 steps:
   - script: |
       df
-    displayName: 'Show disk space'
+    displayName: "Show disk space"
 
   - checkout: self
     clean: true
@@ -48,4 +48,4 @@ steps:
 
   - script: |
       df
-    displayName: 'Show disk space'
+    displayName: "Show disk space"

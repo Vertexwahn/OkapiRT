@@ -3,13 +3,13 @@
 #   SPDX-License-Identifier: Apache-2.0
 #
 
-# GCC11 on Ubuntu 22.04
+# GCC11 on Ubuntu 24.04
 # Make sure that Bazel query works
 
 steps:
   - script: |
       df
-    displayName: 'Show disk space'
+    displayName: "Show disk space"
 
   - checkout: self
     clean: true
@@ -25,7 +25,7 @@ steps:
 
   - script: |
       df
-    displayName: 'Show disk space'
+    displayName: "Show disk space"
 
   - script: |
       cd devertexwahn
@@ -39,12 +39,12 @@ steps:
 
   - script: |
       cd devertexwahn
-      bazel run --config=gcc11  -- //tools/compiler_information
-    displayName: "Show compiler information"
+      bazel run --config=gcc13  -- //tools/compiler_feature_dump
+    displayName: "Compiler feature dump"
 
   - script: |
       df
-    displayName: 'Show disk space'
+    displayName: "Show disk space"
 
   - script: |
      cd devertexwahn
@@ -53,13 +53,13 @@ steps:
 
   - script: |
       df
-    displayName: 'Show disk space'
+    displayName: "Show disk space"
 
   - script: |
      cd devertexwahn
-     bazel cquery --config=gcc11 //...
+     bazel cquery --config=gcc13 //...
     displayName: "Bazel cquery"  
 
   - script: |
       df
-    displayName: 'Show disk space'
+    displayName: "Show disk space"

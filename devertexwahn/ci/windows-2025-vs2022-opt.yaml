@@ -1,9 +1,9 @@
 #
-#   SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
+#   SPDX-FileCopyrightText: Copyright 2025 Julian Amann <dev@vertexwahn.de>
 #   SPDX-License-Identifier: Apache-2.0
 #
 
-# VS2022 on Windows Server 2022
+# VS2022 on Windows Server 2025
 # Make sure we can build with VS2022 in all different compilation modes
 steps:
   - script: |
