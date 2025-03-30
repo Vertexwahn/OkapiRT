@@ -1,0 +1,7 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2025 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+bazel_dep(name = "buildifier_prebuilt", version = "8.0.1", dev_dependency = True)
+bazel_dep(name = "buildozer", version = "8.0.3", dev_dependency = True)
