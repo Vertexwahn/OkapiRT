@@ -378,7 +378,7 @@ imath_float_to_half (float f)
     // msvc does not seem to have cvtsh_ss :(
     return _mm_extract_epi16 (
         _mm_cvtps_ph (
-            _mm_set_ss (f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC)),
+            _mm_set_ss (f), (_MM_FROUND_TO_NEAREST_INT)),
         0);
 #    else
     // preserve the fixed rounding mode to nearest
@@ -985,11 +985,13 @@ IMATH_EXPORT void printBits (std::ostream& os, float f);
 IMATH_EXPORT void printBits (char c[19], IMATH_INTERNAL_NAMESPACE::half h);
 IMATH_EXPORT void printBits (char c[35], float f);
 
-#    if !defined(__CUDACC__) && !defined(__CUDA_FP16_HPP__)
+#if !defined(__CUDACC__) && !defined(__CUDA_FP16_HPP__) && !defined(__HIP__)
 using half = IMATH_INTERNAL_NAMESPACE::half;
-#    else
-#        include <cuda_fp16.h>
-#    endif
+#elif defined(__CUDACC__) || defined(__CUDA_FP16_HPP__)
+#include <cuda_fp16.h>
+#elif defined(__HIP__)
+#include <hip/amd_detail/amd_hip_fp16.h>
+#endif
 
 #endif // __cplusplus
 
