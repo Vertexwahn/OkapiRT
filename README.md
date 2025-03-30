@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -54,16 +54,16 @@ bazel run --config=vs2019 --compilation_mode=opt //okapi/cli:okapi.cli -- --scen
 bazel run --config=vs2022 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=C:\scenes\okapi\scenes\ajax\ajax.ao.okapi.xml
 ```
 
-*Render a scene with Ubuntu 20.04:*
-
-```shell
-bazel run --config=gcc9 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=$(pwd)/okapi/scenes/ajax/ajax.ao.okapi.xml
-```
-
 *Render a scene with Ubuntu 22.04:*
 
 ```shell
 bazel run --config=gcc11 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=$(pwd)/okapi/scenes/ajax/ajax.ao.okapi.xml
+```
+
+*Render a scene with Ubuntu 24.04:*
+
+```shell
+bazel run --config=gcc13 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=$(pwd)/okapi/scenes/ajax/ajax.ao.okapi.xml
 ```
 
 *Render a scene with macOS 11/12:*
@@ -139,7 +139,10 @@ additional_languages:
   python
 
 build_flags:
-  --config=gcc11
+  --config=gcc13 # on Ubuntu 24.04
+  #--config=macos # on macOS 15
+  #--config=vs2022 # on Windows 11
+  #--config=clang19
 ```
 
 #### Clang 14
@@ -182,7 +185,7 @@ Make sure that lcov is installed.
 Go to the directory that contains the `WORKSPACE.bazel` file and execute:
 
 ```shell
-./coverage.sh --additonal_bazel_config=buchgr_remote_cache
+./coverage.sh --additional_bazel_config=buchgr_remote_cache
 ```
 
 #### Address Sanitizer

@@ -99,8 +99,8 @@ bazel_dep(name = "google_benchmark", version = "1.9.2", dev_dependency = True)
 bazel_dep(name = "googletest", version = "1.16.0", dev_dependency = True)
 bazel_dep(name = "rules_doxygen", version = "2.2.0", dev_dependency = True)
 
+include("//bazel/module/go:Go.MODULE.bazel")
 include("//bazel/module/java:Java.MODULE.bazel")
-
 include("//bazel/module/tools:Tools.MODULE.bazel")
 
 local_path_override(

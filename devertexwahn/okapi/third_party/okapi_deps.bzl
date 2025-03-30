@@ -11,13 +11,37 @@ def okapi_deps():
     """Fetch external dependencies for Okapi."""
 
     #-------------------------------------------------------------------------------------
-    # bazel_clang_tidy
+    # rules_vulkan
     #-------------------------------------------------------------------------------------
 
     maybe(
         native.local_repository,
-        name = "bazel_clang_tidy",
-        path = "../third_party/bazel_clang_tidy-4884c32e09c1ea9ac96b3f08c3004f3ac4c3fe39",
+        name = "rules_7zip",
+        path = "../third_party/rules_7zip",
     )
 
+    maybe(
+        native.local_repository,
+        name = "com_github_zaucy_rules_vulkan",
+        path = "../third_party/rules_vulkan",
+    )
 
+    #-------------------------------------------------------------------------------------
+    # emsdk
+    #-------------------------------------------------------------------------------------
+
+    # Use local repository
+    maybe(
+        native.local_repository,
+        name = "emsdk",
+        path = "../third_party/emsdk/bazel",
+    )
+
+    # Use http archive from github.com
+    #maybe(
+    #    http_archive,
+    #    name = "emsdk",
+    #    sha256 = "a41dccfd15be9e85f923efaa0ac21943cbab77ec8d39e52f25eca1ec61a9ac9e",
+    #    strip_prefix = "emsdk-3.0.0/bazel",
+    #    url = "https://github.com/emscripten-core/emsdk/archive/refs/tags/3.0.0.tar.gz",
+    #)

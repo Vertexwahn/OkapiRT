@@ -10,12 +10,19 @@
 #build --symlink_prefix=/ # Suppress symlink creation (to avoid untracked files issues with git)
 
 #-------------------------------------------------------------------------------------
+# Bazel 8 migration
+#-------------------------------------------------------------------------------------
+
+#common --enable_workspace # Todo: breaks running Qt applications -> Migrate rules_qt first to Bazel 8
+#common --incompatible_disallow_empty_glob=false  # TODO: Get rid of this - Set empty globs allowed policy explicitly where needed
+
+#-------------------------------------------------------------------------------------
 # Bzlmod
 #-------------------------------------------------------------------------------------
 
+common --allow_yanked_versions=rules_cc@0.1.0
+
 #common --registry=file:///%workspace%/registry  # Does not work on Windows 11 + Bazel 6.5.0
-#common --registry=https://vertexwahn.de/registry
-common --registry=https://raw.githubusercontent.com/Vertexwahn/bazel-registry/main/  # Needed for Boost
 common --registry=https://bcr.bazel.build
 
 
@@ -23,18 +30,17 @@ common --registry=https://bcr.bazel.build
 # C++ compiler settings
 #-------------------------------------------------------------------------------------
 
+build --@boost.asio//:ssl=boringssl
+
 # macOS (e.g. Clang 14.0.0)
 build:macos --cxxopt=-std=c++2b  # see https://clang.llvm.org/cxx_status.html
 build:macos --cxxopt=-Wall  # Turn on all warnings
+#build:macos --sandbox_block_path=/usr/local # This will fix okapi.cli but break okapi.ui - Note: Workaround for https://github.com/bazelbuild/bazel/issues/10472 - compile error with boringssl
 build:macos --define compiler=macos
 build:macos --noincompatible_enable_cc_toolchain_resolution  # disable LLVM toolchain
 #build:macos --cxxopt=-Werror # Commented out because of Embree
 #build:macos --cxxopt=-Wextra
 #build:macos --spawn_strategy=local
-
-# Xcode 15 has some compiler issues - therefore there is this special config
-build:macos_xcode15 --config=macos
-build:macos_xcode15 --linkopt=-ld_classic # Workaround for Xcode 15 linker bug, see for instance https://github.com/godotengine/godot/pull/81968/files
 
 # macOS Intel (config used in CI jobs)
 build:clang14_macos --cxxopt=-std=c++20
@@ -53,19 +59,6 @@ build:clang14_macos --define compiler=clang14_macos
 # Todo: Add apple_debug config
 # https://github.com/RobotLocomotion/drake/search?q=apple_debug
 
-# GCC 9.3
-build:gcc9 --cxxopt=-std=c++2a
-build:gcc9 --cxxopt=-Wall
-build:gcc9 --define compiler=gcc9
-build:gcc9 --noincompatible_enable_cc_toolchain_resolution  # disable LLVM toolchain
-#build:gcc9 --cxxopt=-Werror # blocked by googletest
-##build:gcc9 --cxxopt=-Wextra
-
-build:remote_gcc9 --cxxopt=-Wall
-build:remote_gcc9 --cxxopt=-Werror
-build:remote_gcc9 --define compiler=remote_gcc9
-##build:remote_gcc9 --cxxopt=-Wextra
-
 # GCC 11.4
 #build:gcc11 --cxxopt=-std=c++23 # blocked by emsdk
 build:gcc11 --cxxopt=-std=c++20
@@ -83,6 +76,13 @@ build:gcc11_cpp14 --cxxopt=-std=c++14
 build:gcc11_cpp14 --cxxopt=-Wall
 build:gc11_cpp14 --define compiler=gcc11_cpp14
 
+# GCC 13
+build:gcc13 --cxxopt=-std=c++23
+build:gcc13 --cxxopt=-Wall
+build:gcc13 --define compiler=gcc13
+build:gcc13 --cxxopt=-fpermissive # Needed for fmt
+build:gcc13 --noincompatible_enable_cc_toolchain_resolution  # disable LLVM toolchain
+
 # Clang 14.0.0 (config is used on Ubuntu)
 build:clang14 --cxxopt=-std=c++20
 #build:clang14 --cxxopt=-mavx
@@ -96,24 +96,15 @@ build:clang14 --features=-libtool
 build:clang14 --cxxopt=-mwaitpkg
 build:clang14 --define compiler=clang14
 
-# Clang 16.0.0 (config is used on Ubuntu)
-build:clang16 --cxxopt=-std=c++20
-#build:clang16 --cxxopt=-mavx
-#build:clang16 --cxxopt=-mavx2
-#build:clang16 --cxxopt=-msse4.2
-#build:clang16 --cxxopt=-Werror
-build:clang16 --incompatible_enable_cc_toolchain_resolution
+# Clang 19 (config is used on Ubuntu)
+build:clang19 --cxxopt=-std=c++20
+
+build:clang19 --extra_toolchains=@llvm_toolchain//:cc-toolchain-x86_64-linux
 # Tell Bazel to pass the right flags for llvm-ar, not libtool. Only needed if you are building on darwin.
 # See https://github.com/bazelbuild/bazel/blob/5c75d0acec21459bbb13520817e3806e1507e907/tools/cpp/unix_cc_toolchain_config.bzl#L1000-L1024
-build:clang16 --features=-libtool
-build:clang16 --cxxopt=-mwaitpkg
-build:clang16 --define compiler=clang14
-
-# MinGW
-build:mingw --cxxopt=-std=c++2a
-#build:mingw --cxxopt=-Wall
-#build:mingw --cxxopt=-Werror
-#build:mingw --cxxopt=-Wextra
+build:clang19 --features=-libtool
+build:clang19 --cxxopt=-mwaitpkg
+build:clang19 --define compiler=clang19
 
 # Visual Studio 2019
 #build:vs2019 --copt=-DNOGDI
@@ -152,8 +143,6 @@ build:asan --linkopt -fsanitize=address
 # clang-tidy
 build:clang-tidy --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect
 build:clang-tidy --output_groups=report
-build:clang-tidy --@bazel_clang_tidy//:clang_tidy_config=//:clang_tidy_config2
-build:clang-tidy --cxxopt=-std=c++17
 
 # Optimized build
 build:optimized build --copt=-O3
@@ -162,11 +151,14 @@ build:optimized build --copt=-O3
 # More details here: https://github.com/storypku/bazel_iwyu/pull/12
 #build:iwyu --@bazel_iwyu//:iwyu_mappings=@my_repo//tools:iwyu_mappings
 build:iwyu --config=gcc11
-#build:iwyu --config=clang16
+#build:iwyu --config=clang19
 build:iwyu --aspects @bazel_iwyu//bazel/iwyu:iwyu.bzl%iwyu_aspect
 build:iwyu --output_groups=report
 build:iwyu --build_tag_filters=-no-iwyu # To include everything except the rules tagged with "no-iwyu"
 build:iwyu --@bazel_iwyu//:iwyu_opts=--verbose=3,--no_fwd_decls,--cxx17ns,--max_line_length=127
 
-try-import %workspace%/.bazelrc.remote_cache
-try-import %workspace%/.bazelrc.build_meta
+# Emscripten
+build:emscripten --features=exceptions
+
+try-import %workspace%/bazel/bazelrc/.bazelrc.remote_cache
+try-import %workspace%/bazel/bazelrc/.bazelrc.build_meta

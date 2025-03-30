@@ -8,12 +8,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "embree_intersector",
-    hdrs = ["embree_intersector.h"],
+    hdrs = ["embree_intersector.hpp"],
     deps = [
         "//flatland/rendering/intersector",
         "//flatland/rendering/scene",
-        "//okapi/rendering/scene/shape:triangle_mesh",
-        "@boost.predef//:predef",
+        "//okapi/rendering/shape:triangle_mesh",
+        "@boost.predef//:boost.predef",
         "@embree",
     ],
 )
