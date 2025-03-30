@@ -191,6 +191,14 @@ TEST(NodeTest, MapElementRemoval) {
   EXPECT_TRUE(!node["foo"]);
 }
 
+TEST(NodeTest, MissingKey) {
+  Node node;
+  node["foo"] = "value";
+  EXPECT_TRUE(!node["bar"]);
+  EXPECT_EQ(NodeType::Undefined, node["bar"].Type());
+  EXPECT_THROW(node["bar"].as<std::string>(), InvalidNode);
+}
+
 TEST(NodeTest, MapIntegerElementRemoval) {
   Node node;
   node[1] = "hello";
@@ -749,8 +757,15 @@ TEST_F(NodeEmitterTest, SimpleFlowSeqNode) {
   node.push_back(1.5);
   node.push_back(2.25);
   node.push_back(3.125);
+  node.push_back(34.34);
+  node.push_back(56.56);
+  node.push_back(12.12);
+  node.push_back(78.78);
+  node.push_back(0.0003);
+  node.push_back(4000.);
+  node.push_back(1.5474251e+26f);
 
-  ExpectOutput("[1.5, 2.25, 3.125]", node);
+  ExpectOutput("[1.5, 2.25, 3.125, 34.34, 56.56, 12.12, 78.78, 0.0003, 4000, 1.5474251e+26]", node);
 }
 
 TEST_F(NodeEmitterTest, NestFlowSeqNode) {
