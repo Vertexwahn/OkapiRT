@@ -104,6 +104,11 @@ struct FlatHashMapPolicy;
 // If your types are not moveable or you require pointer stability for keys,
 // consider `absl::node_hash_map`.
 //
+// PERFORMANCE WARNING: Erasure & sparsity can negatively affect performance:
+//  * Iteration takes O(capacity) time, not O(size).
+//  * erase() slows down begin() and ++iterator.
+//  * Capacity only shrinks on rehash() or clear() -- not on erase().
+//
 // Example:
 //
 //   // Create a flat hash map of three strings (that map to strings)
@@ -125,7 +130,7 @@ struct FlatHashMapPolicy;
 template <class K, class V, class Hash = DefaultHashContainerHash<K>,
           class Eq = DefaultHashContainerEq<K>,
           class Allocator = std::allocator<std::pair<const K, V>>>
-class ABSL_INTERNAL_ATTRIBUTE_OWNER flat_hash_map
+class ABSL_ATTRIBUTE_OWNER flat_hash_map
     : public absl::container_internal::raw_hash_map<
           absl::container_internal::FlatHashMapPolicy<K, V>, Hash, Eq,
           Allocator> {

@@ -95,6 +95,18 @@ absl_cc_test(
     GTest::gtest_main
 )
 
+absl_cc_test(
+  NAME
+    nullability_default_nonnull_test
+  SRCS
+    "nullability_default_nonnull_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    absl::nullability
+    GTest::gtest_main
+)
+
 # Internal-only target, do not depend on directly.
 absl_cc_library(
   NAME
@@ -204,8 +216,6 @@ absl_cc_library(
   HDRS
     "internal/hide_ptr.h"
     "internal/identity.h"
-    "internal/inline_variable.h"
-    "internal/invoke.h"
     "internal/scheduling_mode.h"
   COPTS
     ${ABSL_DEFAULT_COPTS}
@@ -361,6 +371,19 @@ absl_cc_test(
 
 absl_cc_test(
   NAME
+    attributes_test
+  SRCS
+    "attributes_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    absl::config
+    absl::core_headers
+    GTest::gtest_main
+)
+
+absl_cc_test(
+  NAME
     bit_cast_test
   SRCS
     "bit_cast_test.cc"
@@ -397,36 +420,6 @@ absl_cc_test(
     absl::base
     absl::config
     absl::throw_delegate
-    GTest::gtest_main
-)
-
-absl_cc_test(
-  NAME
-    inline_variable_test
-  SRCS
-    "internal/inline_variable_testing.h"
-    "inline_variable_test.cc"
-    "inline_variable_test_a.cc"
-    "inline_variable_test_b.cc"
-  COPTS
-    ${ABSL_TEST_COPTS}
-  DEPS
-    absl::base_internal
-    GTest::gtest_main
-)
-
-absl_cc_test(
-  NAME
-    invoke_test
-  SRCS
-    "invoke_test.cc"
-  COPTS
-    ${ABSL_TEST_COPTS}
-  DEPS
-    absl::base_internal
-    absl::memory
-    absl::strings
-    GTest::gmock
     GTest::gtest_main
 )
 
@@ -534,6 +527,7 @@ absl_cc_test(
     absl::no_destructor
     absl::config
     absl::raw_logging_internal
+    GTest::gmock
     GTest::gtest_main
 )
 
@@ -807,4 +801,45 @@ absl_cc_test(
     absl::base
     absl::tracing_internal
     GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    iterator_traits_internal
+  HDRS
+    "internal/iterator_traits.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    absl::config
+    absl::type_traits
+  PUBLIC
+)
+
+absl_cc_test(
+  NAME
+    iterator_traits_test
+  SRCS
+    "internal/iterator_traits_test.cc"
+  COPTS
+    ${ABSL_TEST_COPTS}
+  DEPS
+    absl::config
+    absl::iterator_traits_internal
+    absl::iterator_traits_test_helper_internal
+    GTest::gtest_main
+)
+
+# Internal-only target, do not depend on directly.
+absl_cc_library(
+  NAME
+    iterator_traits_test_helper_internal
+  HDRS
+    "internal/iterator_traits_test_helper.h"
+  COPTS
+    ${ABSL_DEFAULT_COPTS}
+  DEPS
+    absl::config
+  PUBLIC
 )

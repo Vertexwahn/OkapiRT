@@ -7,7 +7,7 @@
 
 void cpuinfo_arm64_linux_decode_isa_from_proc_cpuinfo(
 	uint32_t features,
-	uint32_t features2,
+	uint64_t features2,
 	uint32_t midr,
 	const struct cpuinfo_arm_chipset chipset[restrict static 1],
 	struct cpuinfo_arm_isa isa[restrict static 1]) {
@@ -144,6 +144,27 @@ void cpuinfo_arm64_linux_decode_isa_from_proc_cpuinfo(
 	if (features2 & CPUINFO_ARM_LINUX_FEATURE2_SVE2) {
 		isa->sve2 = true;
 	}
+	if (features2 & CPUINFO_ARM_LINUX_FEATURE2_SME) {
+		isa->sme = true;
+	}
+	if (features2 & CPUINFO_ARM_LINUX_FEATURE2_SME2) {
+		isa->sme2 = true;
+	}
+	if (features2 & CPUINFO_ARM_LINUX_FEATURE2_SME2P1) {
+		isa->sme2p1 = true;
+	}
+	if (features2 & CPUINFO_ARM_LINUX_FEATURE2_SME_I16I32) {
+		isa->sme_i16i32 = true;
+	}
+	if (features2 & CPUINFO_ARM_LINUX_FEATURE2_SME_BI32I32) {
+		isa->sme_bi32i32 = true;
+	}
+	if (features2 & CPUINFO_ARM_LINUX_FEATURE2_SME_B16B16) {
+		isa->sme_b16b16 = true;
+	}
+	if (features2 & CPUINFO_ARM_LINUX_FEATURE2_SME_F16F16) {
+		isa->sme_f16f16 = true;
+	}
 	// SVEBF16 is set iff SVE and BF16 are both supported, but the SVEBF16
 	// feature flag was added in Linux kernel before the BF16 feature flag,
 	// so we check for either.
@@ -164,7 +185,7 @@ void cpuinfo_arm64_linux_decode_isa_from_proc_cpuinfo(
 
 	int ret = prctl(PR_SVE_GET_VL);
 	if (ret < 0) {
-		cpuinfo_log_error("prctl(PR_SVE_GET_VL) failed");
+		cpuinfo_log_warning("No SVE support on this machine");
 		isa->svelen = 0; // Assume no SVE support if the call fails
 	} else {
 		// Mask out the SVE vector length bits
