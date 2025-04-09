@@ -38,6 +38,14 @@ steps:
       clang --version
     displayName: "Show Clang version"
 
+  - script: |
+      brew install qt@6
+      brew link qt@6
+    displayName: "Install dependencies"
+
+  - script: |
+      /usr/local/opt/qt@6/share/qt/libexec/uic --version # rules_qt6 depend on the availability of uic on exactly this path
+    displayName: "Show Qt uic version"
 
   # fastbuild
   - script: |
