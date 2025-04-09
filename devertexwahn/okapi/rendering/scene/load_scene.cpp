@@ -18,6 +18,7 @@
 //#include "okapi/rendering/integrator/path_tracing_naive_diffuse.hpp"
 //#include "okapi/rendering/integrator/simple_integrator.hpp"
 //#include "okapi/rendering/integrator/whitted_integrator.hpp"
+#include "okapi/rendering/integrator/rtiow_integrator.hpp"
 #include "okapi/rendering/intersector/embree_intersector.hpp"
 //#include "okapi/rendering/intersector/octree_intersector.hpp"
 //#include "okapi/rendering/emitter/area_light.hpp"
@@ -101,6 +102,7 @@ ReferenceCounted<Scene3f> load_scene3f(std::string_view filename, const Property
     sf.register_class<SimpleIntegrator3f>("simple");
     sf.register_class<WhittedIntegrator3f>("whitted");
     */
+    sf.register_class<RtiowIntegrator3f>("rtiow");
 
     // shapes
     sf.register_class<Sphere3f>("sphere");

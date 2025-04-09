@@ -30,6 +30,7 @@ cc_library(
         #"//okapi/rendering/integrator:simple_integrator",
         #"//okapi/rendering/integrator:whitted_integrator",
         "//okapi/rendering/intersector:embree_intersector",
+        "//okapi/rendering/integrator:rtiow_integrator",
         #"//okapi/rendering/intersector:octree_intersector",
         #"//okapi/rendering/emitter:area_light",
         #"//okapi/rendering/shape:serialzied_mesh",

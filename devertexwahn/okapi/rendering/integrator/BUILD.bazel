@@ -1,0 +1,32 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "rtiow_integrator",
+    srcs = ["rtiow_integrator.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core:namespace",
+        "//flatland/rendering/integrator",
+        "//math:constants",
+    ],
+)
+
+cc_test(
+    name = "rtiow_integrator_test",
+    size = "small",
+    srcs = [
+        "rtiow_integrator_test.cpp",
+    ],
+    data = ["//okapi/scenes"],
+    deps = [
+        ":rtiow_integrator",
+        "//flatland/rendering/intersector",
+        "//flatland/rendering/scene",
+        "@googletest//:gtest_main",
+    ],
+)
