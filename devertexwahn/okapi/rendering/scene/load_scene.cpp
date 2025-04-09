@@ -5,24 +5,9 @@
 
 #include "okapi/rendering/scene/load_scene.h"
 
-//#include "okapi/rendering/bsdf/dielectric.hpp"
-//#include "okapi/rendering/bsdf/diffuse.hpp"
-//#include "okapi/rendering/bsdf/mirror.hpp"
-//#include "okapi/rendering/bsdf/phong.hpp"
-//#include "okapi/rendering/integrator/ambient_occlusion.h"
-//#include "okapi/rendering/integrator/aov.hpp"
-//#include "okapi/rendering/integrator/hit_integrator.hpp"
-//#include "okapi/rendering/integrator/next_integrator.hpp"
-//#include "okapi/rendering/integrator/normal_integrator.hpp"
-//#include "okapi/rendering/integrator/path_tracing_diffuse.hpp"
-//#include "okapi/rendering/integrator/path_tracing_naive_diffuse.hpp"
-//#include "okapi/rendering/integrator/simple_integrator.hpp"
-//#include "okapi/rendering/integrator/whitted_integrator.hpp"
 #include "okapi/rendering/integrator/rtiow_integrator.hpp"
 #include "okapi/rendering/intersector/embree_intersector.hpp"
-//#include "okapi/rendering/intersector/octree_intersector.hpp"
-//#include "okapi/rendering/emitter/area_light.hpp"
-//#include "okapi/rendering/shape/serialized_mesh.h"
+
 #include "okapi/rendering/shape/sphere.h"
 #include "okapi/rendering/shape/triangle_mesh.h"
 #include "okapi/rendering/sensor/sensor.hpp"
@@ -87,21 +72,10 @@ ReferenceCounted<Scene3f> load_scene3f(std::string_view filename, const Property
     //sf.register_class<OctreeIntersector>("octree");
 
     // sampler
-    //sf.register_class<IndependentSampler>("independent");
-    //sf.register_class<ConstantSampler>("static");
+    sf.register_class<IndependentSampler>("independent");
+    sf.register_class<ConstantSampler>("static");
 
     // integrator
-    /*
-    sf.register_class<AOVIntegrator3f>("aov");
-    sf.register_class<AmbientOcclusion3f>("ambient_occlusion");
-    sf.register_class<HitIntegrator3f>("hit");
-    sf.register_class<NextIntegrator3f>("next");
-    sf.register_class<NormalIntegrator3f>("normal");
-    sf.register_class<PathTracingDiffuse3f>("pt_diffuse");
-    sf.register_class<PathTracingNaiveDiffuse3f>("naive_diffuse");
-    sf.register_class<SimpleIntegrator3f>("simple");
-    sf.register_class<WhittedIntegrator3f>("whitted");
-    */
     sf.register_class<RtiowIntegrator3f>("rtiow");
 
     // shapes
