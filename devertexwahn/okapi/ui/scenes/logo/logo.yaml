@@ -1,0 +1,52 @@
+#
+#  SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+scene:
+  sensor:
+    property:
+      name: fov
+      value: 30
+    transform:
+      lookat:
+        origin: "0, 13, 0"
+        target: "0, 0, 0"
+        up: "0, 0, 1"
+    film:
+      property_set:
+        - property: width
+            type: integer
+            value: 800
+        - property: height
+            type: integer
+            value: 800
+        - property: filename
+            type: string
+            value: "logo.ao.exr"
+      rfilter:
+        vector:
+          _name: radius
+          _value: "1.0, 1.0"
+        _type: tent
+    sampler:
+      integer:
+        _name: sample_count
+        _value: 32
+      _type: independent
+    _type: perspective
+  integrator:
+    float:
+      _name: length
+      _value: "0.1"
+    _type: ambient_occlusion
+  intersector:
+    type: embree
+  shape:
+    string:
+      _name: filename
+      _value: "logo.obj"
+    bsdf:
+      _type: diffuse
+    _type: obj
+  _version: "2.0.0"

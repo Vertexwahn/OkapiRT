@@ -1,0 +1,57 @@
+module(name = "dwyu_aspect_integration_tests")
+
+bazel_dep(name = "depend_on_what_you_use")
+local_path_override(
+    module_name = "depend_on_what_you_use",
+    path = "../../",
+)
+
+##
+## Python toolchains for testing compatibility to various Python versions
+##
+
+# We specify by design an outdated rules_python version.
+# bzlmod resolves dependencies to the maximum of all requested versions for all involved modules.
+# Specifying an ancient version here gives us in the end whatever rules_python version DWYU defines as dependency.
+bazel_dep(name = "rules_python", version = "0.12.0")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+
+# Choose different version via: --@rules_python//python/config_settings:python_version=X
+python.toolchain(
+    is_default = True,
+    python_version = "3.8",
+)
+python.toolchain(python_version = "3.9")
+python.toolchain(python_version = "3.10")
+python.toolchain(python_version = "3.11")
+python.toolchain(python_version = "3.12")
+python.toolchain(python_version = "3.13")
+
+##
+## Test Dependencies
+##
+
+bazel_dep(name = "platforms", version = "0.0.11")
+
+##
+## Workspaces for test purposes
+##
+
+bazel_dep(name = "external_test_repo")
+local_path_override(
+    module_name = "external_test_repo",
+    path = "external_repo/repo",
+)
+
+bazel_dep(name = "complex_includes_test_repo")
+local_path_override(
+    module_name = "complex_includes_test_repo",
+    path = "complex_includes/ext_repo",
+)
+
+bazel_dep(name = "skip_external_deps_test_repo")
+local_path_override(
+    module_name = "skip_external_deps_test_repo",
+    path = "skip_external_targets/external_dep",
+)

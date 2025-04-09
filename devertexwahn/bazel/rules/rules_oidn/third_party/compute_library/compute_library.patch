@@ -1,0 +1,8 @@
+diff --git arm_compute_version.embed arm_compute_version.embed
+new file mode 100644
+index 000000000..c986ad52a
+--- /dev/null
++++ arm_compute_version.embed
+@@ -0,0 +1,1 @@
++"arm_compute_version=v22.11 Build options: {} Git hash=b'1b3192e8a23513031163dc14d248f47671986121'"
+\ No newline at end of file

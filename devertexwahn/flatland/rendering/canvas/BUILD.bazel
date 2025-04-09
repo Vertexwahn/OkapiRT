@@ -1,0 +1,40 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "label",
+    hdrs = ["label.hpp"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "svg_canvas",
+    hdrs = ["svg_canvas.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":label",
+        "//flatland/rendering/shape",
+        "//math:axis_aligned_bounding_box",
+    ],
+)
+
+cc_test(
+    name = "svg_canvas_test",
+    size = "small",
+    srcs = [
+        "svg_canvas_test.cpp",
+    ],
+    data = [
+        "//flatland/scenes",
+        "//flatland/scenes/bunny:scenes",
+    ],
+    deps = [
+        ":svg_canvas",
+        "//flatland/rendering/scene:load_scene",
+        "@googletest//:gtest_main",
+    ],
+)

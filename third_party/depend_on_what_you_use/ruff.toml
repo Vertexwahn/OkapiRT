@@ -1,0 +1,64 @@
+exclude = [
+    ".git",
+    ".ruff_cache",
+]
+line-length = 120
+indent-width = 4
+# Minimum Python version which we support
+target-version = "py38"
+
+[format]
+quote-style = "double"
+indent-style = "space"
+# We want to be able to force spreading things over multiple lines by adding a ',' for readability
+skip-magic-trailing-comma = false
+line-ending = "auto"
+# We have no Python code in documentation
+docstring-code-format = false
+
+[lint]
+select = ["ALL"]
+ignore = [
+    # Do not execute checks for tools we do not use
+    "AIR", # airflow
+    "DJ", # django
+    "NPY", # numpy
+    "PD", # pandas
+    "PT", # pytest
+    # This documentation style is too opinionated and too verbose, given our Python code is an implementation detail.
+    "D",
+    # Users are not expected to see exceptions. Optimizing the trace is not worth more complex code.
+    "EM",
+    # We don't believe these findings are worth refactoring the code. Using bools as feature flag is fine for now.
+    "FBT",
+    # Annotating **kwargs has little value
+    "ANN003",
+    # We omit trailing commas deliberately to keep code in a single line instead of multiple lines due to the formatting
+    # rules automatically using a trailing comma as indicator for breaking a statement into multiple lines.
+    "COM812",
+    # It is fine that some line are longer than the length limit whenever the formatter finds not better option
+    "E501",
+    # The performance benefits are not measurable. We prefer simple code with increased readability.
+    "G004",
+    # We use implicit namespace packages by design
+    "INP001",
+    # Number of function arguments is too opinionated
+    "PLR0913",
+    # High false positive rate. Often a plain number is the most expressive, e.g. when checking lengths.
+    "PLR2004",
+    # XML is not an attack vector for DWYU, as we don't process user provided xml content. We generate the xml content
+    # we use oureselves via bazel (c)query. If somebody can manipulate bazel (c)query to inject malicious xml code, the
+    # attacker has either way already access to the system.
+    "S314",
+    # We prefer the best practice to not use a shell for executing subprocess calls. The risk that we execute an invalid
+    # command is low given our integration tests
+    "S603",
+    # We want the flexibility that the requested binary can be located at any path.
+    "S607",
+    # We prefer verbose exceptions
+    "TRY003",
+]
+unfixable = [
+    # Removing unused imports while writing new code is annoying when execting Ruff via the IDE
+    "F401",
+]

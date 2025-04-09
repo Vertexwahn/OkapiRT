@@ -1,0 +1,17 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2024 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "test_logger",
+    srcs = ["test_logger.cpp"],
+    hdrs = ["test_logger.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core:logging",
+        "@spdlog",
+    ],
+)

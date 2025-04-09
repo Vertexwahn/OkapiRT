@@ -1,0 +1,28 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+
+cc_binary(
+    name = "flatland.cli",
+    srcs = ["main.cpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//flatland/rendering",
+        "//flatland/rendering/scene:load_scene",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@fmt",
+    ],
+)
+
+pkg_tar(
+    name = "deploy_flatland",
+    srcs = [
+        ":flatland.cli",
+    ],
+    extension = "tar.gz",
+)

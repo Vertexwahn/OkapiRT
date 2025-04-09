@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+
+    The scene file format schema is the same as used in Mitsuba Renderer 3
+    (https://github.com/mitsuba-renderer/mitsuba2) with minor adaptions.
+-->
+<scene version='3.0.0'>
+    <integrator type="normal">
+        <boolean name="abs_normals" value="false"/>
+    </integrator>
+
+    <sensor type="perspective">
+        <float name="fov" value="30"/>
+
+        <transform>
+            <lookat origin="0, 0, 100" target="0, 0, 0" up="0, 1, 0" />
+        </transform>
+
+        <film>
+            <rfilter type="gaussian">
+                <vector name="radius" value="2, 2" />
+            </rfilter>
+            <integer name="width" value="800" />
+            <integer name="height" value="600" />
+            <string name="filename" value="sphere_no_abs_normals.normal.exr" />
+        </film>
+
+        <sampler type="independent">
+            <integer name="sample_count" value="1024"/>
+        </sampler>
+    </sensor>
+
+    <shape type="sphere">
+        <float name="radius" value="10"/>
+
+        <transform>
+            <translate x="0" y="0" z="0" />
+        </transform>
+
+    </shape>
+</scene>

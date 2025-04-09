@@ -1,0 +1,8 @@
+
+devertexwahn/okapi/scenes/cornell_box/README.md
+devertexwahn/okapi/scenes/cornell_box/original/cbox.exr
+devertexwahn/okapi/scenes/cornell_box/original/box.rgbe
+devertexwahn/okapi/scenes/cornell_box/original/box.jpg
+devertexwahn/okapi/scenes/cornell_box/mitsuba_reference_spectral.py
+devertexwahn/okapi/scenes/cornell_box/mitsuba_reference.py
+devertexwahn/okapi/scenes/cornell_box/mitsuba_mirror_reference.py

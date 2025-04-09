@@ -1,0 +1,59 @@
+#
+#   SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+#   SPDX-License-Identifier: Apache-2.0
+#
+---
+okapiSceneFileFormatVersion: v1
+integrator:
+  type: naive_diffuse
+sensor:
+  fov: 39.3077
+  nearClipPlaneDistance: 10
+  farClipPlaneDistance: 2080
+  transform:
+    name: to_world
+    lookAt:
+      target: [278, 273, 800]
+      origin: [278, 273, 799]
+      up: [0, 1, 0]
+  film:
+    reconstructionFilter:
+      type: "gaussian"
+      width: 1024
+      height: 1024
+      filename: cornel_box.naive_diffuse.spp1.embree.exr
+  sampler:
+    type: independent
+    sampleCount: 1
+intersector:
+  type: embree
+shape:
+  type: obj
+  filename: meshes/cbox_luminaire.obj
+  transform:
+    name: to_world
+    translate: [0, -0.5, 0]
+  emitter:
+    type: area
+    radiance:
+      rgb: [17, 12, 4]
+  bsdf:
+    type: diffuse
+    id: light
+    reflectance:
+      rgb: [0.725, 0.71, 0.68]
+shape:
+  type: indexedTriangleMesh
+  indexBuffer: [0, 1, 2]
+  vertexBuffer: [[0, 0, 0], [1, 0, 0], [0, 1, 0]]
+  bsdf:
+    type: diffuse
+    id: light
+    reflectance:
+      rgb: [ 0.725, 0.71, 0.68 ]
+---
+okapiSceneFileFormatVersion: v1
+integrator:
+  type: ambient_occlusion
+  propertySet: # above the propertySet is not explicit
+    length: 30

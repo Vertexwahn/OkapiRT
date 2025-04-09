@@ -1,0 +1,45 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "scenes",
+    srcs = [
+        # BEGIN-INTERNAL
+        "ajax/ajax.ao.okapi.xml",
+        "ajax/ajax.obj",
+        "ajax/plane.obj",
+        "bunny/bunny.ao.okapi.xml",
+        "bunny/bunny.hit.okapi.xml",
+        "bunny/bunny.normal.okapi.xml",
+        "bunny/bunny.obj",
+        # END-INTERNAL
+        #"cube/cube.normal.okapi.xml",
+        #"cube/cube.obj",
+        # BEGIN-INTERNAL
+        "cornell_box/cornell_box.naive.diffuse.aovs.okapi.xml",
+        "cornell_box/cornell_box.naive.diffuse.okapi.ci.xml",
+        "cornell_box/cornell_box.naive.diffuse.okapi.xml",
+        "cornell_box/cornell_box.okapi.xml",
+        "cornell_box/meshes/cbox_back.obj",
+        "cornell_box/meshes/cbox_ceiling.obj",
+        "cornell_box/meshes/cbox_floor.obj",
+        "cornell_box/meshes/cbox_greenwall.obj",
+        "cornell_box/meshes/cbox_largebox.obj",
+        "cornell_box/meshes/cbox_luminaire.obj",
+        "cornell_box/meshes/cbox_redwall.obj",
+        "cornell_box/meshes/cbox_smallbox.obj",
+        "sphere/sphere.ao.okapi.xml",
+        "sphere/sphere.hit.okapi.xml",
+        "sphere/sphere.normal.okapi.xml",
+        "sphere/sphere.simple.missing_position_attribute.okapi.xml",
+        "sphere/sphere.simple.okapi.xml",
+        # END-INTERNAL
+    ],
+)
+

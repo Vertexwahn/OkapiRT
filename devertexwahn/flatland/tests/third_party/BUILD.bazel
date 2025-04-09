@@ -1,0 +1,102 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+cc_test(
+    name = "boost_algorithm_test",
+    size = "small",
+    srcs = [
+        "boost_algorithm_test.cpp",
+    ],
+    deps = [
+        "@boost.algorithm//:boost.algorithm",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "boost_predef_test",
+    size = "small",
+    srcs = [
+        "boost_predef_test.cpp",
+    ],
+    deps = [
+        "@boost.predef//:boost.predef",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "catch2_test",
+    size = "small",
+    srcs = [
+        "catch2_test.cpp",
+    ],
+    defines = ["CATCH_CONFIG_MAIN"],
+    deps = [
+        "@catch2//:catch2_main",
+    ],
+)
+
+cc_test(
+    name = "eigen_test",
+    size = "small",
+    srcs = [
+        "eigen_test.cpp",
+    ],
+    deps = [
+        "@eigen",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "fmt_test",
+    size = "small",
+    srcs = [
+        "fmt_test.cpp",
+    ],
+    deps = [
+        "@fmt",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "pcg_test",
+    size = "small",
+    srcs = [
+        "pcg_test.cpp",
+    ],
+    deps = [
+        "@googletest//:gtest_main",
+        "@pcg",
+    ],
+)
+
+cc_test(
+    name = "pugixml_test",
+    size = "small",
+    srcs = [
+        "pugixml_test.cpp",
+    ],
+    data = ["//flatland/scenes"],
+    deps = [
+        "@googletest//:gtest_main",
+        "@pugixml",
+    ],
+)
+
+cc_test(
+    name = "stl_test",
+    size = "small",
+    srcs = [
+        "stl_test.cpp",
+    ],
+    deps = [
+        "@googletest//:gtest_main",
+    ],
+)

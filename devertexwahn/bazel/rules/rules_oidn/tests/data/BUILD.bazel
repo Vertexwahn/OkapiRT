@@ -1,0 +1,18 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "data",
+    srcs = [
+        "albedo_10spp.exr",
+        "cornel_box.naive_diffuse.box_filter.spp128.embree.exr",
+        "noisy_10spp.exr",
+        "normal_10spp.exr",
+    ],
+)

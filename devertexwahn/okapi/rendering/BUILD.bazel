@@ -1,0 +1,29 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "rendering",
+    srcs = [
+        "rendering.cpp",
+    ],
+    hdrs = [
+        "rendering.hpp",
+    ],
+    deps = [
+        "//core:logging",
+        "//core:timer",
+        "//core/stl:format",
+        "//core/stl:string",
+        "//flatland/rendering/bsdf",
+        "//flatland/rendering/scene",
+        "//okapi/rendering/sensor",
+        "//okapi/rendering/sensor:film",
+        "//okapi/rendering/sensor:tile_generator",
+        "@boost.algorithm//:boost.algorithm",
+        "@oneTBB//:tbb",
+    ],
+)

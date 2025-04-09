@@ -1,0 +1,107 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "fresnel",
+    srcs = ["fresnel.hpp"],
+    deps = [
+        "//core:namespace",
+        "//math:vector",
+    ],
+)
+
+cc_test(
+    name = "fresnel_test",
+    size = "small",
+    srcs = [
+        "fresnel_test.cpp",
+    ],
+    deps = [
+        ":fresnel",
+        "//math:normal",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "property_set",
+    hdrs = [
+        "property_set.h",
+        "property_set_formatter.hpp",
+    ],
+    deps = [
+        "//core:object",
+        "//core:property_set",
+        "//core:reference_counted",
+        "//imaging:color",
+        "//math:point",
+        "//math:transform",
+    ],
+)
+
+cc_test(
+    name = "property_set_test",
+    size = "small",
+    srcs = [
+        "property_set_test.cpp",
+    ],
+    deps = [
+        ":property_set",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "property_set_formatter_test",
+    size = "small",
+    srcs = [
+        "property_set_formatter_test.cpp",
+    ],
+    deps = [
+        ":property_set",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "rendering",
+    srcs = [
+        "rendering.cpp",
+        "rendering.hpp",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//flatland/rendering:property_set",
+        "//flatland/rendering/scene:load_scene",
+    ],
+)
+
+cc_library(
+    name = "sampler",
+    hdrs = ["sampler.hpp"],
+    deps = [
+        "//core:object",
+        "//flatland/rendering:property_set",
+        "//math:point",
+        "@pcg",
+    ],
+)
+
+cc_test(
+    name = "sampler_test",
+    size = "small",
+    srcs = [
+        "sampler_test.cpp",
+    ],
+    deps = [
+        ":sampler",
+        "@googletest//:gtest_main",
+        "@hypothesis",
+    ],
+)

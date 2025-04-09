@@ -1,0 +1,17 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+sh_test(
+    name = "acceptance_test",
+    size = "small",
+    srcs = ["test_render_scenes.sh"],
+    data = [
+        "//flatland/cli:flatland.cli",
+        "//flatland/scenes",
+        "//flatland/scenes:reference_images",
+        "//flatland/scenes/bunny:scenes",
+        "//flatland/scenes/quadtree:scenes",
+    ],
+)

@@ -1,0 +1,29 @@
+cc_library(
+    name = "command_line_arguments",
+    srcs = ["command_line_arguments.cpp"],
+    hdrs = ["command_line_arguments.hpp"],
+    visibility = ["//okapi:__subpackages__"],
+    deps = [
+        "//core:exception",
+        "//core:logging",
+        "//core:namespace",
+        "//core/stl:string",
+        "//flatland/rendering:property_set",
+        "@boost.program_options//:boost.program_options",
+    ],
+)
+
+cc_library(
+    name = "print_version",
+    srcs = ["print_version.cpp"],
+    hdrs = ["print_version.hpp"],
+    visibility = ["//okapi:__subpackages__"],
+    deps = [
+        "//core:logging",
+        "//core:namespace",
+        "@boost.core//:boost.core",
+        "@embree",
+        "@oneTBB//:tbb",
+        "@openexr//:OpenEXR",
+    ],
+)

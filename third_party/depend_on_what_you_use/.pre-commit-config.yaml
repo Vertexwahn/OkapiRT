@@ -1,0 +1,66 @@
+minimum_pre_commit_version: 4.0.0
+
+define: &generated_doc_files "^docs/(cc_info_mapping|dwyu_aspect).md"
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Repository hygiene
+      - id: check-added-large-files
+      # Sane files
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: check-toml
+      - id: check-json
+      - id: mixed-line-ending
+        args: [ --fix=lf ]
+      # Code style
+      - id: end-of-file-fixer
+        exclude: *generated_doc_files
+      - id: trailing-whitespace
+      # Python code quality
+      - id: debug-statements
+
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.22
+    hooks:
+      - id: mdformat
+        exclude: *generated_doc_files
+        additional_dependencies:
+          - mdformat-gfm
+
+  # Ground truth for available checks: https://github.com/bazelbuild/buildtools/blob/main/warn/warn.go
+  # Documentation for checks: https://github.com/bazelbuild/buildtools/blob/main/WARNINGS.md?plain=1
+  # An example config file can be generated with command 'buildifier --config=example'
+  # We use all checks, even non default ones with those exceptions:
+  # - function-docstring: Not all functions require a docstring. If a docstring exists other checks ensure its sanity.
+  # - function-docstring-header: A dedicated docstring header often provides no added value.
+  # - module-docstring: Too noisy, not all modules require a docstring
+  # - naive-<some_language>: The auto fix uses the deprecated defs.bzl approach
+  - repo: https://github.com/keith/pre-commit-buildifier
+    rev: 7.3.1
+    hooks:
+      - id: buildifier
+        args: [ "--config=.buildifier.json" ]
+      - id: buildifier-lint
+        args: [
+          "--diff_command='diff'",
+          "--config=.buildifier.json",
+        ]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.9
+    hooks:
+      - id: ruff-format
+      # Linting
+      - id: ruff
+        args: [ --fix ]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        name: "mypy"
+        # We overwrite the args as we configure mypy via our mypy.ini
+        args: [ ]

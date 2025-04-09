@@ -1,0 +1,99 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "ambient_occlusion",
+    hdrs = ["ambient_occlusion.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core:namespace",
+        "//flatland/rendering/integrator",
+        "//math:sampling",
+    ],
+)
+
+cc_test(
+    name = "ambient_occlusion_test",
+    size = "small",
+    srcs = [
+        "ambient_occlusion_test.cpp",
+    ],
+    data = ["//flatland/scenes"],
+    deps = [
+        "//flatland/rendering",
+        "//flatland/rendering/integrator:ambient_occlusion",
+        "//flatland/rendering/scene:load_scene",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "integrator",
+    srcs = ["integrator.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core:logging",
+        "//core:object",
+        "//flatland/rendering:sampler",
+        "//flatland/rendering/canvas:svg_canvas",
+        "//imaging:color",
+    ],
+)
+
+cc_library(
+    name = "path_mirror_reflection",
+    hdrs = ["path_mirror_reflection.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//flatland/rendering/integrator",
+        "//math:refract",
+    ],
+)
+
+cc_test(
+    name = "path_mirror_reflection_test",
+    size = "small",
+    srcs = [
+        "path_mirror_reflection_test.cpp",
+    ],
+    data = ["//flatland/scenes"],
+    deps = [
+        ":path_mirror_reflection",
+        "//flatland/rendering",
+        "//flatland/rendering/scene:load_scene",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "path_specular_transmission",
+    srcs = ["path_specular_transmission.cpp"],
+    hdrs = ["path_specular_transmission.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//flatland/rendering/scene",
+        "//math:refract",
+    ],
+)
+
+cc_test(
+    name = "path_specular_transmission_test",
+    size = "small",
+    srcs = [
+        "path_specular_transmission_test.cpp",
+    ],
+    data = [
+        "//flatland/scenes",
+        "//flatland/scenes/bunny:scenes",
+    ],
+    deps = [
+        ":path_specular_transmission",
+        "//flatland/rendering",
+        "//flatland/rendering/scene:load_scene",
+        "@googletest//:gtest_main",
+    ],
+)

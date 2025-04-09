@@ -1,0 +1,32 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+package(default_visibility = ["//visibility:public"])
+
+
+cc_library(
+    name = "embree_intersector",
+    hdrs = ["embree_intersector.hpp"],
+    deps = [
+        "//flatland/rendering/intersector",
+        "//flatland/rendering/scene",
+        "//okapi/rendering/shape:triangle_mesh",
+        "@boost.predef//:boost.predef",
+        "@embree",
+    ],
+)
+
+cc_test(
+    name = "embree_intersector_test",
+    size = "small",
+    srcs = [
+        "embree_intersector_test.cpp",
+    ],
+    deps = [
+        ":embree_intersector",
+        "@googletest//:gtest_main",
+    ],
+)
+

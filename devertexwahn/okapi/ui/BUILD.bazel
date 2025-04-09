@@ -1,0 +1,411 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
+#load("@rules_license//rules:compliance.bzl", "licenses_used")
+#load("@rules_license//rules:license.bzl", "license")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library", "qt_resource", "qt_resource_via_qrc", "qt_ui_library")
+load("//okapi/res:win_res.bzl", "windows_resources")
+
+package(
+    #default_applicable_licenses = [":license"],
+    default_visibility = ["//visibility:public"],
+)
+
+#license(
+#    name = "license",
+#    copyright_notice = "Copyright 2025 Julian Amann",
+#    license_kinds = ["@rules_license//licenses/spdx:Apache-2.0"],
+#    license_text = "//:LICENSE",
+#)
+
+cc_library(
+    name = "camera",
+    srcs = ["camera.cpp"],
+    hdrs = ["camera.hpp"],
+    deps = [
+        "//core:logging",
+        "//core:namespace",
+        "//core:reference_counted",
+        "//math:constants",
+        "//math:matrix",
+        "//math:util",
+        "//math:vector",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "camera_test",
+    srcs = ["camera_test.cpp"],
+    deps = [":camera"],
+)
+
+# https://github.com/bazelbuild/bazel/pull/8907/files
+windows_resources(
+    name = "win_resources",
+    rc_files = [
+        "okapi.ui.rc",
+    ],
+    resources = [
+        "okapi.ui.ico",
+    ],
+)
+
+qt_resource(
+    name = "about_dialog_qrc",
+    files = [
+        "license_notes.txt",
+    ],
+)
+
+qt_resource(
+    name = "main_qrc",
+    files = [
+        "okapi.ui.ico",
+        "okapi.ui.qss",
+    ],
+)
+
+qt_resource_via_qrc(
+    name = "resource2",
+    files = [
+        "okapi.ui.ico",
+        "okapi.ui.qss",
+        "widgets/checkbox_checked_disabled.png",
+        "widgets/checkbox_checked_enabled.png",
+        "widgets/checkbox_indeterminate_disabled.png",
+        "widgets/checkbox_indeterminate_enabled.png",
+        "widgets/checkbox_unchecked_disabled.png",
+        "widgets/checkbox_unchecked_enabled.png",
+        "widgets/combobox_arrow_down.png",
+        "widgets/combobox_arrow_down_selected.png",
+        "widgets/menu_arrow_right.png",
+        "widgets/menu_arrow_right_selected.png",
+        "widgets/radiobutton_checked_disabled.png",
+        "widgets/radiobutton_checked_enabled.png",
+        "widgets/radiobutton_unchecked_disabled.png",
+        "widgets/radiobutton_unchecked_enabled.png",
+        "widgets/scrollbar_arrow_down_disabled.png",
+        "widgets/scrollbar_arrow_down_enabled.png",
+        "widgets/scrollbar_arrow_left_disabled.png",
+        "widgets/scrollbar_arrow_left_enabled.png",
+        "widgets/scrollbar_arrow_right_disabled.png",
+        "widgets/scrollbar_arrow_right_enabled.png",
+        "widgets/scrollbar_arrow_up_disabled.png",
+        "widgets/scrollbar_arrow_up_enabled.png",
+    ],
+    qrc_file = "okapi.ui.qrc",
+)
+
+qt_ui_library(
+    name = "about_dialog_ui",
+    ui = "about_dialog.ui",
+    deps = ["@rules_qt//:qt_widgets"],
+)
+
+qt_cc_library(
+    name = "about_dialog",
+    srcs = [
+        "about_dialog.cpp",
+    ],
+    hdrs = ["about_dialog.hpp"],
+    data = ["license_notes.txt"],
+    deps = [
+        ":about_dialog_qrc",
+        ":about_dialog_ui",
+        "//core:logging",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_ui_library(
+    name = "settings_dialog_ui",
+    ui = "settings_dialog.ui",
+    deps = ["@rules_qt//:qt_widgets"],
+)
+
+qt_cc_library(
+    name = "settings_dialog",
+    srcs = [
+        "settings_dialog.cpp",
+    ],
+    hdrs = ["settings_dialog.hpp"],
+    deps = [
+        ":settings_dialog_ui",
+        "//okapi:command_line_arguments",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_ui_library(
+    name = "main_window_ui",
+    ui = "main_window.ui",
+    deps = [
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "main_window",
+    srcs = [
+        "main_window.cpp",
+    ],
+    hdrs = ["main_window.hpp"],
+    deps = [
+        ":about_dialog",
+        ":main_window_ui",
+        ":render_state",
+        ":settings_dialog",
+        ":viewport",
+        "//imaging/io",
+        "//okapi:command_line_arguments",
+        "//okapi/rendering",
+        "//okapi/rendering/scene:load_scene",
+        "//okapi/rendering/sensor",
+        "@oidn//:OpenImageDenoise",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+config_setting(
+    name = "windows_x86_64",
+    values = {"cpu": "x64_windows"},
+    visibility = ["//visibility:public"],
+)
+
+qt_cc_binary(
+    name = "okapi.ui",
+    srcs = [
+        "main.cpp",
+    ],
+    data = [
+        "license_notes.txt",
+        "okapi.ui.ico",
+        "okapi.ui.qss",
+        "okapi.ui.rc",
+        "scenes/cornell_box/cornell_box.naive.diffuse.box_filter.okapi.xml",
+        "scenes/cornell_box/cornell_box_wood_texture.next.okapi.xml",
+        "scenes/cornell_box/meshes/cbox_back.obj",
+        "scenes/cornell_box/meshes/cbox_ceiling.obj",
+        "scenes/cornell_box/meshes/cbox_floor.obj",
+        "scenes/cornell_box/meshes/cbox_floor3.obj",
+        "scenes/cornell_box/meshes/cbox_greenwall.obj",
+        "scenes/cornell_box/meshes/cbox_largebox.obj",
+        "scenes/cornell_box/meshes/cbox_luminaire.obj",
+        "scenes/cornell_box/meshes/cbox_redwall.obj",
+        "scenes/cornell_box/meshes/cbox_smallbox.obj",
+        "scenes/cornell_box/meshes/sphere2.obj",
+        "scenes/cornell_box/textures/WoodFloor007_1K-JPG_Color.jpg",
+        "scenes/cornell_box_with_spheres/cornell_box_with_spheres.next.okapi.xml",
+        "scenes/cornell_box_with_spheres/cornell_box_with_spheres.next.okapi_v2.xml",
+        "scenes/cornell_box_with_spheres/cornell_box_with_spheres.next.okapi_v3.xml",
+        "scenes/cornell_box_with_spheres/meshes/cbox_back.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_ceiling.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_floor.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_greenwall.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_largebox.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_luminaire.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_redwall.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_smallbox.obj",
+        "scenes/cornell_box_with_spheres/meshes/sphere1.obj",
+        "scenes/cornell_box_with_spheres/meshes/sphere2.obj",
+        "scenes/default/default_scene.okapi.xml",
+        "scenes/logo/logo.mtl",
+        "scenes/logo/logo.obj",
+        "scenes/logo/logo.okapi.xml",
+    ],
+    deps = [
+        ":main_qrc",
+        ":main_window",
+        ":resource2",
+        "//okapi:command_line_arguments",
+        "//okapi:print_version",
+        "@cpuinfo",
+        "@rules_qt//:qt_core",
+        "@rules_qt//:qt_qml",
+        "@rules_qt//:qt_widgets",
+    ] + select({
+        ":windows_x86_64": [":win_resources"],
+        "//conditions:default": [],
+    }),
+)
+
+'''
+licenses_used(
+    name = "okapi.gui_licenses",
+    out = "okapi.gui_licenses.json",
+    deps = [":okapi"],
+)
+'''
+
+qt_cc_library(
+    name = "render_preview_thread",
+    srcs = [
+        "render_preview_thread.cpp",
+    ],
+    hdrs = [
+        "render_preview_thread.hpp",
+    ],
+    deps = [
+        ":render_scene_thread",
+        ":render_state",
+        "//core:logging",
+        "//core/stl:string",
+        "//imaging/io",
+        "//okapi/rendering",
+        "@oidn//:OpenImageDenoise",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "render_scene_thread",
+    srcs = [
+        "render_scene_thread.cpp",
+    ],
+    hdrs = [
+        "render_scene_thread.hpp",
+    ],
+    deps = [
+        ":render_state",
+        "//core:exception",
+        "//core:logging",
+        "//core:namespace",
+        "//core:timer",
+        "//core/stl:filesystem",
+        "//flatland/rendering/scene",
+        "//imaging:image",
+        "//imaging/io",
+        "//okapi:command_line_arguments",
+        "//okapi/rendering",
+        "//okapi/rendering/scene:load_scene",
+        "//okapi/rendering/sensor",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "render_state",
+    hdrs = ["render_state.hpp"],
+    deps = [
+        "//core:namespace",
+    ],
+)
+
+qt_cc_library(
+    name = "viewport",
+    srcs = [
+        "viewport.cpp",
+    ],
+    hdrs = [
+        "viewport.hpp",
+    ],
+    deps = [
+        ":camera",
+        ":render_preview_thread",
+        ":render_scene_thread",
+        ":render_state",
+        ":viewport_camera_transform",
+        "//core:exception",
+        "//core:logging",
+        "//core:timer",
+        "//imaging/io",
+        "//imaging/io:io_openexr",
+        "//imaging/io:io_pfm",
+        "//okapi:command_line_arguments",
+        "//okapi/rendering",
+        "//okapi/rendering/scene:load_scene",
+        "//okapi/rendering/sensor",
+        "@oidn//:OpenImageDenoise",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "viewport_camera_transform",
+    srcs = ["viewport_camera_transform.cpp"],
+    hdrs = ["viewport_camera_transform.hpp"],
+    deps = [
+        ":camera",
+        "//math:matrix",
+        "//math:point",
+        "//math:quaternion",
+    ],
+)
+
+cc_test(
+    name = "viewport_test",
+    srcs = ["viewport_tests.cpp"],
+    data = [
+        "scenes/cornell_box/cornell_box.naive.diffuse.box_filter.okapi.xml",
+        "scenes/cornell_box/cornell_box_wood_texture.next.okapi.xml",
+        "scenes/cornell_box/meshes/cbox_back.obj",
+        "scenes/cornell_box/meshes/cbox_ceiling.obj",
+        "scenes/cornell_box/meshes/cbox_floor.obj",
+        "scenes/cornell_box/meshes/cbox_floor3.obj",
+        "scenes/cornell_box/meshes/cbox_greenwall.obj",
+        "scenes/cornell_box/meshes/cbox_largebox.obj",
+        "scenes/cornell_box/meshes/cbox_luminaire.obj",
+        "scenes/cornell_box/meshes/cbox_redwall.obj",
+        "scenes/cornell_box/meshes/cbox_smallbox.obj",
+        "scenes/cornell_box/meshes/sphere2.obj",
+        "scenes/cornell_box/textures/WoodFloor007_1K-JPG_Color.jpg",
+        "scenes/cornell_box_with_spheres/cornell_box_with_spheres.next.okapi.xml",
+        "scenes/cornell_box_with_spheres/cornell_box_with_spheres.next.okapi_v2.xml",
+        "scenes/cornell_box_with_spheres/cornell_box_with_spheres.next.okapi_v3.xml",
+        "scenes/cornell_box_with_spheres/meshes/cbox_back.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_ceiling.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_floor.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_greenwall.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_largebox.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_luminaire.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_redwall.obj",
+        "scenes/cornell_box_with_spheres/meshes/cbox_smallbox.obj",
+        "scenes/cornell_box_with_spheres/meshes/sphere1.obj",
+        "scenes/cornell_box_with_spheres/meshes/sphere2.obj",
+        "//okapi/scenes",
+    ],
+    deps = [
+        ":camera",
+        ":viewport_camera_transform",
+        "//math:quaternion",
+        "//okapi/rendering/scene:load_scene",
+    ],
+)
+
+#-----------------------------------------------------------
+# Deployment
+#-----------------------------------------------------------
+
+# Currently not satisfied with the deployment
+# Nevertheless, this is a start point
+
+pkg_tar(
+    name = "app_runfiles",
+    srcs = [
+        ":okapi.ui",
+    ],
+    extension = "tar.gz",
+    include_runfiles = True,
+    package_dir = "okapi.ui.runfiles/__main__/" + package_name(),
+    strip_prefix = ".",
+    tags = ["manual"],
+)
+
+pkg_tar(
+    name = "deploy",
+    srcs = [
+        ":okapi.ui",
+    ],
+    extension = "tar.gz",
+    include_runfiles = False,  #True,
+    #strip_prefix = strip_prefix.files_only(),
+    tags = ["manual"],
+    deps = [
+        ":app_runfiles",
+    ],
+)

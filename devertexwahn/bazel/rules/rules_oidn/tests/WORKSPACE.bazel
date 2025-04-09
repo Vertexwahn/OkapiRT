@@ -1,0 +1,68 @@
+"""
+    SPDX-FileCopyrightText: 2022 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+#-------------------------------------------------------------------------------------
+# rules_oidn
+#-------------------------------------------------------------------------------------
+
+#local_repository(
+#    name = "rules_ispc",
+#    path = "../../rules_ispc",
+#)
+
+local_repository(
+    name = "rules_oidn",
+    path = "..",
+)
+
+load("@rules_oidn//third_party/oidn:deps.bzl", "oidn_deps")
+
+oidn_deps()
+
+#-------------------------------------------------------------------------------------
+# rules_ispc
+#-------------------------------------------------------------------------------------
+
+load("@rules_ispc//:fetch_ispc.bzl", "fetch_ispc")
+
+fetch_ispc()
+
+load("@rules_ispc//tools:ispc_toolchain.bzl", "register_ispc_toolchains")
+
+register_ispc_toolchains()
+
+#-------------------------------------------------------------------------------------
+# OpenEXR
+#-------------------------------------------------------------------------------------
+
+git_repository(
+    name = "com_openexr",
+    commit = "af87558c603b41d0ce6a233f9c845c99924b9168",
+    remote = "https://github.com/AcademySoftwareFoundation/openexr/",
+)
+
+load("@com_openexr//:bazel/third_party/openexr_deps.bzl", "openexr_deps")
+
+openexr_deps()
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+#-------------------------------------------------------------------------------------
+# Boost
+#-------------------------------------------------------------------------------------
+
+http_archive(
+    name = "com_github_nelhage_rules_boost",
+    sha256 = "ef70e7f187a148441067cbd02e8198d959897b615c0edbbf288efe7369505c35",
+    strip_prefix = "rules_boost-fbfb6c665cfe223e9da343779c9da1a48e79e8c3",
+    url = "https://github.com/nelhage/rules_boost/archive/fbfb6c665cfe223e9da343779c9da1a48e79e8c3.tar.gz",
+)
+
+load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+
+boost_deps()

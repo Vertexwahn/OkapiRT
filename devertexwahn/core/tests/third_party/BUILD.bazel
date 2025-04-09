@@ -1,0 +1,30 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+cc_test(
+    name = "fmt_test",
+    size = "small",
+    srcs = [
+        "fmt_test.cpp",
+    ],
+    deps = [
+        "@fmt",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "spdlog_test",
+    size = "small",
+    srcs = [
+        "spdlog_test.cpp",
+    ],
+    deps = [
+        "@googletest//:gtest_main",
+        "@spdlog",
+    ],
+)

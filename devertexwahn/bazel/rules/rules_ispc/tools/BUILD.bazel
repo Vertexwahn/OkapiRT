@@ -1,0 +1,101 @@
+load(":ispc_toolchain.bzl", "ispc_toolchain")
+
+package(default_visibility = ["//visibility:public"])
+
+toolchain_type(name = "toolchain_type")
+
+ispc_toolchain(
+    name = "ispc_linux",
+    data = [
+        "@ispc_linux_x86_64//:ispc",
+    ],
+    default_arch = "x86-64",
+    default_target = "avx2",
+    default_target_os = "linux",
+    ispc_cmd = "$(location @ispc_linux_x86_64//:ispc)",
+)
+
+ispc_toolchain(
+    name = "ispc_windows",
+    data = [
+        "@ispc_windows_x86_64//:ispc",
+    ],
+    default_arch = "x86-64",
+    default_target = "avx2",
+    default_target_os = "windows",
+    ispc_cmd = "$(location @ispc_windows_x86_64//:ispc)",
+)
+
+ispc_toolchain(
+    name = "ispc_osx_arm64",
+    data = [
+        "@ispc_osx_arm64//:ispc",
+    ],
+    default_arch = "aarch64",
+    default_target = "neon",
+    default_target_os = "macos",
+    ispc_cmd = "$(location @ispc_osx_arm64//:ispc)",  #"/opt/homebrew/bin/ispc",#
+)
+
+ispc_toolchain(
+    name = "ispc_osx_x86_64",
+    data = [
+        "@ispc_osx_x86_64//:ispc",
+    ],
+    default_arch = "x86-64",
+    default_target = "sse2",
+    default_target_os = "macos",
+    ispc_cmd = "$(location @ispc_osx_x86_64//:ispc)",
+)
+
+toolchain(
+    name = "ispc_linux_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+    ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":ispc_linux",
+    toolchain_type = "@rules_ispc//tools:toolchain_type",
+)
+
+toolchain(
+    name = "ispc_windows_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:windows",
+    ],
+    target_compatible_with = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":ispc_windows",
+    toolchain_type = "@rules_ispc//tools:toolchain_type",
+)
+
+toolchain(
+    name = "ispc_osx_arm64_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:osx",
+    ],
+    target_compatible_with = [
+        "@platforms//os:osx",
+        "@platforms//cpu:arm64",
+    ],
+    toolchain = ":ispc_osx_arm64",
+    toolchain_type = "@rules_ispc//tools:toolchain_type",
+)
+
+toolchain(
+    name = "ispc_osx_toolchain",
+    exec_compatible_with = [
+        "@platforms//os:osx",
+    ],
+    target_compatible_with = [
+        "@platforms//os:osx",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":ispc_osx_x86_64",
+    toolchain_type = "@rules_ispc//tools:toolchain_type",
+)

@@ -1,0 +1,56 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+cc_test(
+    name = "medium_event_test",
+    size = "small",
+    srcs = [
+        "medium_event_test.cpp",
+    ],
+    data = ["//flatland/scenes"],
+    deps = [
+        "//flatland/rendering/scene:load_scene",
+        "//flatland/rendering/shape",
+        "//flatland/rendering/shape:medium_event",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "moeller_trumbore",
+    hdrs = ["moeller_trumbore.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//math:point",
+        "//math:ray",
+    ],
+)
+
+
+cc_library(
+    name = "sphere",
+    hdrs = ["sphere.h"],
+    visibility = ["//visibility:public"],
+    deps = ["//flatland/rendering/shape"],
+)
+
+
+cc_library(
+    name = "triangle_mesh",
+    srcs = [
+        "tiny_obj_loader_impl.cpp",
+    ],
+    hdrs = ["triangle_mesh.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":moeller_trumbore",
+        "//core:logging",
+        "//flatland/rendering/shape",
+        "//math:geometry",
+        "//math:intersection",
+        "@tinyobjloader",
+    ],
+)
+

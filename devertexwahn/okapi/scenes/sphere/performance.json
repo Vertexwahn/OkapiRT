@@ -1,0 +1,15 @@
+{
+    "application": "okapi.cli",
+    "compilation_mode": "opt_or_fastbuild",
+    "compiler_name": "Clang version 13.1.6 (clang-1316.0.21.2)",
+    "cpu_avx_support": true,
+    "cpu_name": "Intel Core i7-9750H",
+    "git_commit_hash": "4d18c24d22f915b81724aeec6be56d1e7f29f366",
+    "git_is_workspace_dirty": true,
+    "os_name": "macOS",
+    "render_time": 0.080217,
+    "scene": "/Users/vertexwahn/dev/Piper/devertexwahn/okapi/scenes/sphere/sphere.normal.okapi.xml",
+    "ssp": 1,
+    "start_time": "Tue May  3 16:59:20 2022\n",
+    "uuid": "7c4df8f9-545f-4ca9-b70d-d5591c7dcd9c"
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+
+    The scene file format schema is the same as used in Mitsuba Renderer 3
+    (https://github.com/mitsuba-renderer/mitsuba2) with minor adaptions.
+-->
+<scene>
+	<!-- Use the average visibility integrator -->
+	<integrator type="normal">
+		<float name="length" value="10"/>
+	</integrator>
+
+	<!-- Render the scene as viewed by a perspective camera -->
+	<sensor type="perspective">
+		<transform name="to_world">
+			<lookat target="-40.4632853386, 43.4968674997, -28.9039342736" origin="-52.0518243138, 51.4398222998, -43.1382320598" up="0.250740348753, 0.917754690867, 0.307986371289" />
+		</transform>
+
+		<!-- Field of view: 30 degrees -->
+		<float name="fov" value="30"/>
+
+		<film>
+			<integer name="width" value="768" />
+			<integer name="height" value="768" />
+			<string name="filename" value="ajax.normal.exr" />
+		</film>
+	</sensor>
+
+	<intersector type="embree" />
+
+	<!-- Load the Ajax bust (a freely available scan from the Jotero forum) -->
+	<shape type="obj">
+		<string name="filename" value="ajax.obj"/>
+
+		<bsdf type="diffuse"/>
+	</shape>
+
+	<!-- Ground plane -->
+	<mesh type="obj">
+		<string name="filename" value="plane.obj"/>
+
+		<bsdf type="diffuse"/>
+
+		<transform name="to_world">
+			<scale value="100,1,100"/>
+		</transform>
+
+	</mesh>
+</scene>

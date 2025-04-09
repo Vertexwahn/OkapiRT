@@ -1,0 +1,15 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "generate_bunny_frustum",
+    srcs = ["main.cpp"],
+    deps = [
+        "//flatland/rendering",
+        "@hypothesis",
+    ],
+)

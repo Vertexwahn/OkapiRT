@@ -1,0 +1,9 @@
+{
+  "defines": [],
+  "includes": [],
+  "quote_includes": [],
+  "external_includes": [],
+  "system_includes": [],
+  "header_files": [],
+  "target": "//:foo"
+}

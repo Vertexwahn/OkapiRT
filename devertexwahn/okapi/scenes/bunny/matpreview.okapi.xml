@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+
+    The scene file format schema is the same as used in Mitsuba Renderer 3
+    (https://github.com/mitsuba-renderer/mitsuba2) with minor adaptions.
+-->
+<scene version='3.0.0'>
+
+    <sensor type="perspective">
+        <string name="fov_axis" value="smaller" />
+        <float name="focus_distance" value="6.0" />
+        <float name="fov" value="28.8415" />
+
+        <transform name="to_world">
+            <lookat target="3.04072, -2.85176, 2.80939"
+                    origin="3.69558, -3.46243, 3.25463"
+                    up="-0.317366, 0.312466, 0.895346" />
+        </transform>
+
+        <sampler type="static">
+            <integer name="sample_count" value="1"/>
+        </sampler>
+
+        <film>
+            <integer name="width" value="683" />
+            <integer name="height" value="512" />
+            <string name="filename" value="matpreview.exr" />
+
+            <rfilter type="tent">
+                <vector name="radius" value="1.0, 1.0" />
+            </rfilter>
+        </film>
+    </sensor>
+
+    <integrator type="normal" />
+
+    <intersector type="embree" />
+
+    <shape type="serialized" id="shape-plane">
+        <string name="filename" value="matpreview.serialized" />
+        <integer name="shape_index" value="0" />
+        <transform name="to_world">
+            <rotate z="1" angle="-4.3" />
+            <matrix value="3.38818 -4.06354 0 -1.74958 4.06354 3.38818 0 1.43683 0 0 5.29076 -0.0120714 0 0 0 1" />
+        </transform>
+        <ref name="bsdf" id="bsdf-plane" />
+
+        <bsdf type="diffuse">
+            <rgb name="stroke_color" value="0.0, 0.682, 0.937" />
+            <float name="stroke_width" value="3.0" />
+            <rgb name="fill_color" value="1.0, 1.0, 1.0" />
+            <string name="interface_interaction" value= "specular_transmission" />
+        </bsdf>
+    </shape>
+
+    <shape type="serialized" id="shape-matpreview-interior">
+        <string name="filename" value="matpreview.serialized" />
+        <integer name="shape_index" value="1" />
+        <transform name="to_world">
+            <matrix value="1 0 0 0 0 1 0 0 0 0 1 0.0252155 0 0 0 1" />
+        </transform>
+
+        <bsdf type="diffuse">
+            <rgb name="stroke_color" value="0.0, 0.682, 0.937" />
+            <float name="stroke_width" value="3.0" />
+            <rgb name="fill_color" value="1.0, 1.0, 1.0" />
+            <string name="interface_interaction" value= "specular_transmission" />
+        </bsdf>
+    </shape>
+
+    <shape type="serialized" id="shape-matpreview-exterior">
+        <string name="filename" value="matpreview.serialized" />
+        <integer name="shape_index" value="2" />
+        <transform name="to_world">
+            <matrix value="0.614046 0.614047 0 -1.78814e-07 -0.614047 0.614046 0 2.08616e-07 0 0 0.868393 1.02569 0 0 0 1" />
+            <translate z="0.01" />
+        </transform>
+
+        <bsdf type="diffuse">
+            <rgb name="stroke_color" value="0.0, 0.682, 0.937" />
+            <float name="stroke_width" value="3.0" />
+            <rgb name="fill_color" value="1.0, 1.0, 1.0" />
+            <string name="interface_interaction" value= "specular_transmission" />
+        </bsdf>
+    </shape>
+
+    <shape type="obj">
+        <string name="filename" value="bunny.obj"/>
+
+        <bsdf type="diffuse">
+            <rgb name="stroke_color" value="0.0, 0.682, 0.937" />
+            <float name="stroke_width" value="3.0" />
+            <rgb name="fill_color" value="1.0, 1.0, 1.0" />
+            <string name="interface_interaction" value= "specular_transmission" />
+        </bsdf>
+    </shape>
+</scene>

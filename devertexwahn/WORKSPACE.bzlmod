@@ -1,0 +1,58 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+workspace(name = "de_vertexwahn")
+
+load("//okapi/third_party:okapi_deps.bzl", "okapi_deps")
+
+okapi_deps()
+
+
+
+#-------------------------------------------------------------------------------------
+# Qt6
+#-------------------------------------------------------------------------------------
+#"""
+local_repository(
+    name = "rules_qt",
+    path = "bazel/rules/rules_qt6",
+)
+
+load("@rules_qt//:fetch_qt.bzl", "fetch_qt6")
+
+fetch_qt6()
+
+load("@rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchains")
+
+register_qt_toolchains()
+#"""
+
+# BEGIN-INTERNAL
+
+#-------------------------------------------------------------------------------------
+# OpenImageDenoise
+#-------------------------------------------------------------------------------------
+
+local_repository(
+    name = "rules_ispc",
+    path = "bazel/rules/rules_ispc",
+)
+
+local_repository(
+    name = "rules_oidn",
+    path = "bazel/rules/rules_oidn",
+)
+
+load("@rules_oidn//third_party/oidn:deps.bzl", "oidn_deps")
+
+oidn_deps()
+
+load("@rules_ispc//:fetch_ispc.bzl", "fetch_ispc")
+
+fetch_ispc()
+
+load("@rules_ispc//tools:ispc_toolchain.bzl", "register_ispc_toolchains")
+
+register_ispc_toolchains()

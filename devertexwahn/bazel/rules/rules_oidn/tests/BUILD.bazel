@@ -1,0 +1,15 @@
+"""
+    SPDX-FileCopyrightText: 2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+cc_binary(
+    name = "example",
+    srcs = ["example.cpp"],
+    data = ["//data"],
+    deps = [
+        "@boost//:program_options",
+        "@com_openexr//:OpenEXR",
+        "@oidn//:OpenImageDenoise",
+    ],
+)
