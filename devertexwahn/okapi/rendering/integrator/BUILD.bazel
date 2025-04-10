@@ -5,6 +5,7 @@
 
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
+
 cc_library(
     name = "rtiow_integrator",
     srcs = ["rtiow_integrator.hpp"],
@@ -30,3 +31,4 @@ cc_test(
         "@googletest//:gtest_main",
     ],
 )
+

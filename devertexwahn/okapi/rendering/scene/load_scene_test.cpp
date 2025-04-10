@@ -5,8 +5,8 @@
 
 #include "flatland/rendering/scene/load_scene.hpp"
 #include "flatland/rendering/integrator/path_mirror_reflection.hpp"
-#include "okapi/rendering/integrator/ambient_occlusion.h"
-#include "okapi/rendering/scene/load_scene.h"
+#include "okapi/rendering/integrator/ambient_occlusion.hpp"
+#include "okapi/rendering/scene/load_scene.hpp"
 #include "okapi/rendering/shape/sphere.h"
 #include "okapi/rendering/sensor/sensor.hpp"
 

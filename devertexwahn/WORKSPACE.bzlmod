@@ -10,7 +10,6 @@ load("//okapi/third_party:okapi_deps.bzl", "okapi_deps")
 okapi_deps()
 
 
-
 #-------------------------------------------------------------------------------------
 # Qt6
 #-------------------------------------------------------------------------------------
@@ -29,7 +28,7 @@ load("@rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchains")
 register_qt_toolchains()
 #"""
 
-# BEGIN-INTERNAL
+# BEGIN-EXCLUDE-FROM-FLATLAND
 
 #-------------------------------------------------------------------------------------
 # OpenImageDenoise
@@ -56,3 +55,6 @@ fetch_ispc()
 load("@rules_ispc//tools:ispc_toolchain.bzl", "register_ispc_toolchains")
 
 register_ispc_toolchains()
+
+# END-EXCLUDE-FROM-FLATLAND
+
