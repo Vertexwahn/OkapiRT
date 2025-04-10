@@ -38,6 +38,7 @@ steps:
       clang --version
     displayName: "Show Clang version"
 
+  # BEGIN-EXCLUDE-FROM-FLATLAND
   - script: |
       brew install qt@6
       brew link qt@6
@@ -46,7 +47,9 @@ steps:
   - script: |
       /usr/local/opt/qt@6/share/qt/libexec/uic --version # rules_qt6 depend on the availability of uic on exactly this path
     displayName: "Show Qt uic version"
+  # END-EXCLUDE-FROM-FLATLAND
 
+  
   # fastbuild
   # Exclude okapi.cli for now, since it depends on boringssl - there seems to be a workaround for that https://github.com/bazelbuild/bazel/issues/10472 but it leads to Qt6 dependency issues
   - script: |
