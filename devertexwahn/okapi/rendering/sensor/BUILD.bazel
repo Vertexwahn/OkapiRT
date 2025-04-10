@@ -1,14 +1,15 @@
 """
-    SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+    SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
     SPDX-License-Identifier: Apache-2.0
 """
 
-package(default_visibility = ["//visibility:public"])
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 cc_library(
     name = "film",
     srcs = ["film.cpp"],
     hdrs = ["film.hpp"],
+    visibility = ["//visibility:public"],
     deps = [":film_tile"],
 )
 
@@ -32,6 +33,7 @@ cc_test(
 cc_library(
     name = "film_tile",
     hdrs = ["film_tile.hpp"],
+    visibility = ["//visibility:public"],
     deps = [
         ":reconstruction_filter",
         "//core:reference_counted",
@@ -62,6 +64,7 @@ cc_test(
 cc_library(
     name = "reconstruction_filter",
     hdrs = ["reconstruction_filter.hpp"],
+    visibility = ["//visibility:public"],
     deps = [
         "//core:object",
         "//flatland/rendering:property_set",
@@ -89,6 +92,7 @@ cc_test(
 cc_library(
     name = "sensor",
     hdrs = ["sensor.hpp"],
+    visibility = ["//visibility:public"],
     deps = [
         ":film",
         "//core:exception",
@@ -116,6 +120,7 @@ cc_test(
 cc_library(
     name = "tile_generator",
     hdrs = ["tile_generator.hpp"],
+    visibility = ["//visibility:public"],
     deps = [
         "//math:point",
         "//math:vector",

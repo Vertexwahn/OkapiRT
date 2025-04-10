@@ -5,7 +5,7 @@
 
 #include "flatland/rendering/shape/shape.hpp"
 #include "math/transform.hpp"
-#include "okapi/rendering/scene/load_scene.h"
+#include "okapi/rendering/scene/load_scene.hpp"
 #include "okapi/rendering/shape/sphere.h"
 
 #include "gmock/gmock.h"

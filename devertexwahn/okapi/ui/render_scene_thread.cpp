@@ -10,7 +10,7 @@
 #include "core/stl/string.hpp"
 #include "core/timer.hpp"
 #include "imaging/io/io.hpp"
-#include "okapi/rendering/scene/load_scene.h"
+#include "okapi/rendering/scene/load_scene.hpp"
 #include "okapi/rendering/sensor/sensor.hpp"
 
 using namespace de_vertexwahn;
