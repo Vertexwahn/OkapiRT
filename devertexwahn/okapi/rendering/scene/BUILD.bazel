@@ -8,7 +8,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "load_scene",
     srcs = ["load_scene.cpp"],
-    hdrs = ["load_scene.h"],
+    hdrs = ["load_scene.hpp"],
     deps = [
         "//core:exception",
         "//core:object_factory",

@@ -5,7 +5,7 @@
 
 #include "okapi/ui/camera.hpp"
 #include "okapi/ui/viewport_camera_transform.hpp"
-#include "okapi/rendering/scene/load_scene.h"
+#include "okapi/rendering/scene/load_scene.hpp"
 #include "math/quaternion.hpp"
 
 #include "gmock/gmock.h"

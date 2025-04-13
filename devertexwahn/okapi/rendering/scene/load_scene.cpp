@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "okapi/rendering/scene/load_scene.h"
+#include "okapi/rendering/scene/load_scene.hpp"
 
 #include "okapi/rendering/integrator/rtiow_integrator.hpp"
 #include "okapi/rendering/intersector/embree_intersector.hpp"

@@ -1,3 +1,11 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@doxygen//:doxygen.bzl", "doxygen")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
 cc_library(
     name = "command_line_arguments",
     srcs = ["command_line_arguments.cpp"],
@@ -10,6 +18,18 @@ cc_library(
         "//core/stl:string",
         "//flatland/rendering:property_set",
         "@boost.program_options//:boost.program_options",
+    ],
+)
+
+cc_test(
+    name = "command_line_arguments_test",
+    size = "small",
+    srcs = [
+        "command_line_arguments_test.cpp",
+    ],
+    deps = [
+        ":command_line_arguments",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -26,4 +46,31 @@ cc_library(
         "@oneTBB//:tbb",
         "@openexr//:OpenEXR",
     ],
+)
+
+
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "*.hpp",
+        "*.cpp",
+    ]),
+)
+
+doxygen(
+    name = "doxygen",
+    srcs = [
+        "README.md",
+        ":sources",
+        "//okapi/rendering:sources",
+    ],
+    configurations = [
+        "GENERATE_HTML = YES",
+        "GENERATE_LATEX = NO",
+        "USE_MDFILE_AS_MAINPAGE = README.md",
+        "EXTRACT_ALL=YES",
+    ],
+    project_brief = "Example project for doxygen",
+    project_name = "Okapi",
+    tags = ["manual"],
 )
