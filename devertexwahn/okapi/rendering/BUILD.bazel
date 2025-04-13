@@ -28,3 +28,11 @@ cc_library(
     ],
 )
 
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "*.hpp",
+        "*.cpp",
+    ]),
+    visibility = ["//visibility:public"],
+)
