@@ -52,39 +52,39 @@ steps:
 
   - script: |
       cd devertexwahn
-      bazel run --config=macos  -- //tools/compiler_feature_dump
+      bazel run --config=macos --config=buildbuddy_remote_cache -- //tools/compiler_feature_dump
     displayName: "Compiler feature dump"
 
 
   # fastbuild
   - script: |
       cd devertexwahn
-      bazel build --config=macos  -- //...    #
+      bazel build --config=macos --config=buildbuddy_remote_cache -- //...    #
     displayName: "Bazel build macos-fastbuild"
 
   - script: |
       cd devertexwahn
-      bazel test --config=macos  -- //...    #
+      bazel test --config=macos --config=buildbuddy_remote_cache -- //...    #
     displayName: "Bazel test macos-fastbuild"
 
   # dbg
   - script: |
       cd devertexwahn
-      bazel build --config=macos  --compilation_mode=dbg -- //...    #
+      bazel build --config=macos --config=buildbuddy_remote_cache --compilation_mode=dbg -- //...    #
     displayName: "Bazel build macos-dbg"
 
   - script: |
       cd devertexwahn
-      bazel test --config=macos  --compilation_mode=dbg -- //...    #
+      bazel test --config=macos --config=buildbuddy_remote_cache --compilation_mode=dbg -- //...    #
     displayName: "Bazel test macos-dbg"
 
   # opt
   - script: |
       cd devertexwahn
-      bazel build --config=macos  --compilation_mode=opt -- //...    #
+      bazel build --config=macos --config=buildbuddy_remote_cache --compilation_mode=opt -- //...    #
     displayName: "Bazel build macos-opt"
 
   - script: |
       cd devertexwahn
-      bazel test --config=macos  --compilation_mode=opt -- //...    #
+      bazel test --config=macos --config=buildbuddy_remote_cache --compilation_mode=opt -- //...    #
     displayName: "Bazel test macos-opt"

@@ -1268,28 +1268,8 @@ class tm_writer {
     write_utc_offset(tm.tm_gmtoff, ns);
   }
   template <typename T, FMT_ENABLE_IF(!has_member_data_tm_gmtoff<T>::value)>
-  void format_utc_offset_impl(const T& tm, numeric_system ns) {
-#if defined(_WIN32) && defined(_UCRT)
-    tzset_once();
-    long offset = 0;
-    _get_timezone(&offset);
-    if (tm.tm_isdst) {
-      long dstbias = 0;
-      _get_dstbias(&dstbias);
-      offset += dstbias;
-    }
-    write_utc_offset(-offset, ns);
-#else
-    if (ns == numeric_system::standard) return format_localized('z');
-
-    // Extract timezone offset from timezone conversion functions.
-    std::tm gtm = tm;
-    std::time_t gt = std::mktime(&gtm);
-    std::tm ltm = gmtime(gt);
-    std::time_t lt = std::mktime(&ltm);
-    long long offset = gt - lt;
-    write_utc_offset(offset, ns);
-#endif
+  void format_utc_offset_impl(const T&, numeric_system ns) {
+    write_utc_offset(0, ns);
   }
 
   template <typename T, FMT_ENABLE_IF(has_member_data_tm_zone<T>::value)>
@@ -1413,7 +1393,7 @@ class tm_writer {
   }
 
   void on_utc_offset(numeric_system ns) { format_utc_offset_impl(tm_, ns); }
-  void on_tz_name() { format_tz_name_impl(tm_); }
+  void on_tz_name() { out_ = std::copy_n("UTC", 3, out_); }
 
   void on_year(numeric_system ns, pad_type pad) {
     if (is_classic_ || ns == numeric_system::standard)
@@ -2226,7 +2206,8 @@ template <typename Char> struct formatter<std::tm, Char> {
   detail::arg_ref<Char> width_ref_;
 
  protected:
-  basic_string_view<Char> fmt_;
+  basic_string_view<Char> fmt_ =
+      detail::string_literal<Char, '%', 'F', ' ', '%', 'T'>();
 
   template <typename Duration, typename FormatContext>
   auto do_format(const std::tm& tm, FormatContext& ctx,
@@ -2281,10 +2262,6 @@ template <typename Char> struct formatter<std::tm, Char> {
 
 template <typename Char, typename Duration>
 struct formatter<sys_time<Duration>, Char> : formatter<std::tm, Char> {
-  FMT_CONSTEXPR formatter() {
-    this->fmt_ = detail::string_literal<Char, '%', 'F', ' ', '%', 'T'>();
-  }
-
   template <typename FormatContext>
   auto format(sys_time<Duration> val, FormatContext& ctx) const
       -> decltype(ctx.out()) {
@@ -2323,10 +2300,6 @@ struct formatter<utc_time<Duration>, Char>
 
 template <typename Duration, typename Char>
 struct formatter<local_time<Duration>, Char> : formatter<std::tm, Char> {
-  FMT_CONSTEXPR formatter() {
-    this->fmt_ = detail::string_literal<Char, '%', 'F', ' ', '%', 'T'>();
-  }
-
   FMT_CONSTEXPR auto parse(parse_context<Char>& ctx) -> const Char* {
     return this->do_parse(ctx, true);
   }

@@ -44,39 +44,39 @@ steps:
 
   - script: |
       cd devertexwahn
-      bazel run --config=macos  -- //tools/compiler_feature_dump
+      bazel run --config=macos --config=buildbuddy_remote_cache -- //tools/compiler_feature_dump
     displayName: "Compiler feature dump"
 
   
   # fastbuild
   - script: |
       cd devertexwahn
-      bazel build --config=clang14_macos  -- //... 
+      bazel build --config=clang14_macos --config=buildbuddy_remote_cache -- //... 
     displayName: "Bazel build clang14-fastbuild"
 
   - script: |
       cd devertexwahn
-      bazel test --config=clang14_macos  -- //...   
+      bazel test --config=clang14_macos --config=buildbuddy_remote_cache -- //...   
     displayName: "Bazel test clang14-fastbuild"
 
   # dbg
   - script: |
       cd devertexwahn
-      bazel build --config=clang14_macos  --compilation_mode=dbg -- //... 
+      bazel build --config=clang14_macos --config=buildbuddy_remote_cache --compilation_mode=dbg -- //... 
     displayName: 'Bazel build clang14-dbg'
 
   - script: |
       cd devertexwahn
-      bazel test --config=clang14_macos  --compilation_mode=dbg -- //...    
+      bazel test --config=clang14_macos --config=buildbuddy_remote_cache --compilation_mode=dbg -- //...    
     displayName: 'Bazel test clang14-dbg'
 
   # opt
   - script: |
       cd devertexwahn
-      bazel build --config=clang14_macos  --compilation_mode=opt -- //... 
+      bazel build --config=clang14_macos --config=buildbuddy_remote_cache --compilation_mode=opt -- //... 
     displayName: 'Bazel build clang14-opt'
 
   - script: |
       cd devertexwahn
-      bazel test --config=clang14_macos  --compilation_mode=opt -- //...   
+      bazel test --config=clang14_macos --config=buildbuddy_remote_cache --compilation_mode=opt -- //...   
     displayName: 'Bazel test clang14-opt'

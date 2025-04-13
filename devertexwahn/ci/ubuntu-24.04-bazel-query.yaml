@@ -39,7 +39,7 @@ steps:
 
   - script: |
       cd devertexwahn
-      bazel run --config=gcc13  -- //tools/compiler_feature_dump
+      bazel run --config=gcc13 --config=buildbuddy_remote_cache -- //tools/compiler_feature_dump
     displayName: "Compiler feature dump"
 
   - script: |

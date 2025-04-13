@@ -24,23 +24,23 @@ steps:
 
   - script: |
       cd devertexwahn
-      bazel --output_base=C:/bazel_output_base run --config=vs2019  --compilation_mode=opt -- //tools/compiler_feature_dump
+      bazel --output_base=C:/bazel_output_base run --config=vs2019 --config=buildbuddy_remote_cache --compilation_mode=opt -- //tools/compiler_feature_dump
     displayName: "Compiler feature dump"
 
   - script: |
       cd devertexwahn
-      bazel --output_base=C:/bazel_output_base run --config=vs2019  --compilation_mode=opt -- //tools/cpu_info:cpu_info
+      bazel --output_base=C:/bazel_output_base run --config=vs2019 --config=buildbuddy_remote_cache --compilation_mode=opt -- //tools/cpu_info:cpu_info
     displayName: "Show CPU information"
 
   # opt
   - script: |    
       cd devertexwahn
-      bazel --output_base=C:/bazel_output_base build --config=vs2019  --compilation_mode=opt -- //...
+      bazel --output_base=C:/bazel_output_base build --config=vs2019 --config=buildbuddy_remote_cache --compilation_mode=opt -- //...
     displayName: "Bazel build vs2019-opt"
 
   - script: |
       cd devertexwahn
-      bazel --output_base=C:/bazel_output_base test --config=vs2019  --compilation_mode=opt -- //... 
+      bazel --output_base=C:/bazel_output_base test --config=vs2019 --config=buildbuddy_remote_cache --compilation_mode=opt -- //... 
     displayName: "Bazel test vs2019-opt"
 
   - pwsh: |

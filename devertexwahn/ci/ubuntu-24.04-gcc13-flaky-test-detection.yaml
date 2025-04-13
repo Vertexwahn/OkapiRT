@@ -39,12 +39,12 @@ steps:
 
   - script: |
       cd devertexwahn
-      bazel run --config=gcc13  -- //tools/compiler_feature_dump
+      bazel run --config=gcc13 --config=buildbuddy_remote_cache -- //tools/compiler_feature_dump
     displayName: "Compiler feature dump"
 
   - script: |
       cd devertexwahn
-      bazel test --config=gcc13 --compilation_mode=opt  --cache_test_results=no --runs_per_test=20 -- //core/...
+      bazel test --config=gcc13 --compilation_mode=opt --config=buildbuddy_remote_cache --cache_test_results=no --runs_per_test=20 -- //core/...
     displayName: "Bazel build gcc11-fastbuild"
 
   - script: |

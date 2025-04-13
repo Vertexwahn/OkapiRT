@@ -1,0 +1,12 @@
+#
+#   SPDX-FileCopyrightText: Copyright 2022-2025 Julian Amann <dev@vertexwahn.de>
+#   SPDX-License-Identifier: Apache-2.0
+#
+
+# BuildBuddy remote cache
+build:buildbuddy_remote_cache --bes_results_url=https://app.buildbuddy.io/invocation/
+build:buildbuddy_remote_cache --bes_backend=grpcs://remote.buildbuddy.io
+
+
+# Local buchgr remote cache
+build:buchgr_remote_cache --remote_cache=http://localhost:9090

@@ -38,7 +38,7 @@ steps:
 
   - script: |
       cd devertexwahn
-      ./coverage.sh
+      ./coverage.sh --additional_bazel_config=buildbuddy_remote_cache
     displayName: 'Bazel coverage'
 
   #- task: PublishBuildArtifacts@1
