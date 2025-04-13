@@ -245,8 +245,6 @@ include("//bazel/module/cpp:Cpp.MODULE.bazel")
 
 include("//bazel/module/python:Python.MODULE.bazel")
 
-# BEGIN-INTERNAL
-
 include("//bazel/module/oci:Oci.MODULE.bazel")
 
 #-------------------------------------------------------------------------------------

@@ -8,6 +8,8 @@ build:buildbuddy_remote_cache --bes_results_url=https://app.buildbuddy.io/invoca
 build:buildbuddy_remote_cache --bes_backend=grpcs://remote.buildbuddy.io
 build:buildbuddy_remote_cache --remote_cache=grpcs://remote.buildbuddy.io
 build:buildbuddy_remote_cache --remote_timeout=3600
+build:buildbuddy_remote_cache --build_metadata=ROLE=CI
+#build:buildbuddy_remote_cache --experimental_remote_cache_compression # seem not to work with Windows
 
 
 # Local buchgr remote cache
