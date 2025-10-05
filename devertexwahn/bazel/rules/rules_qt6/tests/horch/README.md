@@ -1,7 +1,14 @@
-# Readme
+# How to run?
 
 ## macOS
 
+```shell
+bazel run --config=macos //horch:main
 ```
-bazel run --config=macos //hello_world:hello_world
+
+## Windows
+
+```shell
+bazel run --config=vs2022 //horch:main
 ```
+
