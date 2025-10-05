@@ -40,46 +40,55 @@ struct ColorTypeRGB : public Eigen::Matrix<ScalarType, Dimension, 1> {
 
     using Base::operator=;
 
+    [[nodiscard]]
     Scalar &red() {
         static_assert(Dimension > 0);
         return Base::x();
     }
 
+    [[nodiscard]]
     Scalar &green() {
         static_assert(Dimension > 1);
         return Base::y();
     }
 
+    [[nodiscard]]
     Scalar &blue() {
         static_assert(Dimension > 2);
         return Base::z();
     }
 
+    [[nodiscard]]
     Scalar &alpha() {
         static_assert(Dimension > 3);
         return (*this)[3];
     }
 
+    [[nodiscard]]
     const Scalar &red() const {
         static_assert(Dimension > 0);
         return Base::x();
     }
 
+    [[nodiscard]]
     const Scalar &green() const {
         static_assert(Dimension > 1);
         return Base::y();
     }
 
+    [[nodiscard]]
     const Scalar &blue() const {
         static_assert(Dimension > 2);
         return Base::z();
     }
 
+    [[nodiscard]]
     const Scalar &alpha() const {
         static_assert(Dimension > 3);
         return (*this)[3];
     }
 
+    [[nodiscard]]
     const ColorTypeRGB<Scalar,3> rgb() const {
         return ColorTypeRGB<Scalar,3>{red(), green(), blue()};
     }
@@ -87,6 +96,14 @@ struct ColorTypeRGB : public Eigen::Matrix<ScalarType, Dimension, 1> {
     ColorTypeRGB &clamp(const ScalarType min = ScalarType{0}, const ScalarType max = ScalarType{1}) {
         for (long int i = 0; i < Base::size(); ++i) {
             (*this)[i] = std::clamp((*this)[i], min, max);
+        }
+
+        return *this;
+    }
+
+    ColorTypeRGB& clamp_negative() {
+        for (long int i = 0; i < Base::size(); ++i) {
+            (*this)[i] = std::max(Scalar{0}, (*this)[i]);
         }
 
         return *this;

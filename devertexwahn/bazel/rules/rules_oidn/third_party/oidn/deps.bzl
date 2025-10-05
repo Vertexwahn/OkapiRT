@@ -100,11 +100,3 @@ def oidn_deps():
         ],
         sha256 = "37941f260af212183579efb6b1e07e4075e3ab9cbd63120afd007e62367efef6",
     )
-
-    maybe(
-        http_archive,
-        name = "rules_ispc",
-        sha256 = "3a90eac643926017defa5e95a7addfd77e278787f244b0722019766727141ad2",
-        strip_prefix = "rules_ispc-0.0.3",
-        url = "https://github.com/Vertexwahn/rules_ispc/releases/download/v0.0.3/rules_ispc-v0.0.3.tar.gz",
-    )

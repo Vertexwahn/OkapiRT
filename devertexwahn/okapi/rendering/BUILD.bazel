@@ -3,6 +3,8 @@
     SPDX-License-Identifier: Apache-2.0
 """
 
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -14,6 +16,7 @@ cc_library(
         "rendering.hpp",
     ],
     deps = [
+        "@onetbb//:tbb",
         "//core:logging",
         "//core:timer",
         "//core/stl:format",
@@ -24,7 +27,6 @@ cc_library(
         "//okapi/rendering/sensor:film",
         "//okapi/rendering/sensor:tile_generator",
         "@boost.algorithm//:boost.algorithm",
-        "@oneTBB//:tbb",
     ],
 )
 

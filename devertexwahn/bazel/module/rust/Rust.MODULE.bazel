@@ -1,14 +1,18 @@
-bazel_dep(name = "rules_rust", version = "0.56.0")
+"""
+    SPDX-FileCopyrightText: Copyright 2025 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+bazel_dep(name = "rules_rust", version = "0.65.0")
+
+# Rust toolchain
+RUST_EDITION = "2024"
+RUST_VERSION = "1.87.0"
 
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
-    edition = "2021",
-    versions = [
-        "1.79.0",
-    ],
+    edition = RUST_EDITION,
+    versions = [RUST_VERSION],
 )
 use_repo(rust, "rust_toolchains")
-
-register_toolchains(
-    "@rust_toolchains//:all",
-)
+register_toolchains("@rust_toolchains//:all")

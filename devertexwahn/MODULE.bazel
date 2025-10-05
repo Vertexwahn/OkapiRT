@@ -62,7 +62,7 @@ bazel_dep(name = "boost.uuid", version = "1.87.0")
 bazel_dep(name = "cpuinfo", version = "0.0.0-20240417-3c8b153")
 bazel_dep(name = "eigen", version = "3.4.0.bcr.2")  #bazel_dep(name = "eigen", version = "4.0.0-20241125") #bazel_dep(name = "eigen", version = "3.4.0.bcr.1")#
 bazel_dep(name = "embree", version = "4.3.1")
-bazel_dep(name = "flip", version = "1.4")
+bazel_dep(name = "flip", version = "1.6")
 bazel_dep(name = "fmt", version = "11.1.4")
 
 bazel_dep(name = "glog", version = "0.7.1")
@@ -89,7 +89,7 @@ bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
 
 bazel_dep(name = "catch2", version = "3.8.0", dev_dependency = True)
 bazel_dep(name = "google_benchmark", version = "1.9.2", dev_dependency = True)
-bazel_dep(name = "googletest", version = "1.16.0", dev_dependency = True)
+bazel_dep(name = "googletest", version = "1.16.0.bcr.1", dev_dependency = True)
 
 include("//bazel/module/go:Go.MODULE.bazel")
 include("//bazel/module/java:Java.MODULE.bazel")
@@ -131,6 +131,11 @@ local_path_override(
 #)
 
 local_path_override(
+    module_name = "eigen",
+    path = "../third_party/eigen-3.4.0",
+)
+
+local_path_override(
     module_name = "flip",
     path = "../third_party/flip-1.4",
 )
@@ -162,7 +167,7 @@ local_path_override(
 
 local_path_override(
     module_name = "libwebp",
-    path = "../third_party/libwebp-1.5.0",
+    path = "../third_party/libwebp-1.6.0",
 )
 
 local_path_override(

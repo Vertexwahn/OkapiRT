@@ -3,7 +3,7 @@
     SPDX-License-Identifier: Apache-2.0
 """
 
-bazel_dep(name = "rules_oci", version = "2.2.3")
+bazel_dep(name = "rules_oci", version = "2.2.6")
 bazel_dep(name = "container_structure_test", version = "1.19.1", dev_dependency = True)
 
 oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")

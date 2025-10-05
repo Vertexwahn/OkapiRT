@@ -23,7 +23,7 @@ CommandLineArguments::CommandLineArguments() {
         ("store_benchmark_json_data", value<bool>()->default_value(false), "Determines if benchmark data such as render time should be uploaded.")
         ("thread_count", value<int>()->default_value(0), "Number of thread that should be used for rendering")
         ("upload_benchmark_data", value<bool>()->default_value(false), "Determines if benchmark data such as render time should be uploaded.")
-        ("show_maximized", value<bool>()->default_value(false), "Specifiy if render windows should be shown maximaized" )
+        ("show_maximized", value<bool>()->default_value(false), "Specify if render windows should be shown maximaized" )
         ("version,v", "print version string");
 }
 

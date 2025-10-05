@@ -134,7 +134,7 @@ cc_library(
     defines = COMMON_DEFINES,
     includes = ["include/OpenImageDenoise"],
     deps = [
-        "@oneTBB//:tbb",
+        "@onetbb//:tbb",
     ] + select({
         "@rules_oidn//:osx_arm64": [],
         "//conditions:default": ["@onednn"],
