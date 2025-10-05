@@ -19,7 +19,7 @@ cmd.exe (on Windows). '_copy_xfile' marks the resulting file executable,
 '_copy_file' does not.
 """
 
-load(":copy_common.bzl", "COPY_EXECUTION_REQUIREMENTS")
+load(":copy_common.bzl", "COPY_EXECUTION_REQUIREMENTS", "OsInfo")
 
 def copy_cmd(ctx, src, dst):
     # Most Windows binaries built with MSVC use a certain argument quoting
@@ -68,7 +68,7 @@ def _copy_file_impl(ctx):
             target_file = ctx.file.src,
             is_executable = ctx.attr.is_executable,
         )
-    elif ctx.attr.is_windows:
+    elif ctx.attr._exec_is_windows[OsInfo].is_windows:
         copy_cmd(ctx, ctx.file.src, ctx.outputs.out)
     else:
         copy_bash(ctx, ctx.file.src, ctx.outputs.out)
@@ -86,9 +86,14 @@ def _copy_file_impl(ctx):
 _ATTRS = {
     "src": attr.label(mandatory = True, allow_single_file = True),
     "out": attr.output(mandatory = True),
-    "is_windows": attr.bool(mandatory = True),
     "is_executable": attr.bool(mandatory = True),
     "allow_symlink": attr.bool(mandatory = True),
+    "_exec_is_windows": attr.label(
+        default = ":is_windows",
+        # The exec transition must match the exec group of the actions, which in
+        # this case is the default exec group.
+        cfg = "exec",
+    ),
 }
 
 _copy_file = rule(
@@ -137,10 +142,6 @@ def copy_file(name, src, out, is_executable = False, allow_symlink = False, **kw
         name = name,
         src = src,
         out = out,
-        is_windows = select({
-            "@bazel_tools//src/conditions:host_windows": True,
-            "//conditions:default": False,
-        }),
         is_executable = is_executable,
         allow_symlink = allow_symlink,
         **kwargs

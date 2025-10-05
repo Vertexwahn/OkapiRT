@@ -8,6 +8,8 @@ from pathlib import Path
 
 from test.support.result import Error, Result
 
+log = logging.getLogger()
+
 
 class TestCaseBase(ABC):
     def __init__(self, name: str, test_sources: Path, bazel_binary: Path) -> None:
@@ -98,7 +100,7 @@ class TestCaseBase(ABC):
         """
         Execute the applying fixes script for the Bazel target associated with the test case
         """
-        verbosity = ["--verbose"] if logging.getLogger().isEnabledFor(logging.DEBUG) else []
+        verbosity = ["--verbose"] if log.isEnabledFor(logging.DEBUG) else []
         cmd_extra_args = extra_args if extra_args else []
 
         self._run_cmd(
@@ -114,6 +116,15 @@ class TestCaseBase(ABC):
             check=True,
         )
 
+    def _get_target_deps(self, target: str) -> set[str]:
+        deps = self._get_target_attribute(target=target, attribute="deps")
+        # cc_binary and cc_test rules automatically depend on this, bit it is irrelevant for our analysis
+        # Since, this is added in macro scope to the deps list, query options like '--noimplicit_deps' do not work
+        return deps - {"@rules_cc//:link_extra_lib"}
+
+    def _get_target_impl_deps(self, target: str) -> set[str]:
+        return self._get_target_attribute(target=target, attribute="implementation_deps")
+
     def _get_target_attribute(self, target: str, attribute: str) -> set[str]:
         """
         Returns a set to ensure ordering is no issue
@@ -124,22 +135,22 @@ class TestCaseBase(ABC):
         return {dep for dep in process.stdout.split("\n") if dep}
 
     def _run_cmd(self, cmd: list[str], **kwargs) -> None:
-        logging.debug(f"Executing command: {shlex.join(cmd)}")
+        log.debug(f"Executing command: {shlex.join(cmd)}")
         check = kwargs.pop("check", True)
-        if logging.getLogger().isEnabledFor(logging.DEBUG):
+        if log.isEnabledFor(logging.DEBUG):
             subprocess.run(cmd, cwd=self._workspace, check=check, **kwargs)
         else:
             subprocess.run(cmd, cwd=self._workspace, capture_output=True, check=check, **kwargs)
 
     def _run_and_capture_cmd(self, cmd: list[str], **kwargs) -> subprocess.CompletedProcess:
-        logging.debug(f"Executing command: {shlex.join(cmd)}")
+        log.debug(f"Executing command: {shlex.join(cmd)}")
         check = kwargs.pop("check", True)
         process = subprocess.run(cmd, cwd=self._workspace, capture_output=True, text=True, check=check, **kwargs)
-        logging.debug("===== stdout =====")
-        logging.debug(process.stdout)
-        logging.debug("----- stderr -----")
-        logging.debug(process.stderr)
-        logging.debug("==================")
+        log.debug("===== stdout =====")
+        log.debug(process.stdout)
+        log.debug("----- stderr -----")
+        log.debug(process.stderr)
+        log.debug("==================")
         return process
 
     @staticmethod

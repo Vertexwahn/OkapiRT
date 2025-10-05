@@ -1,3 +1,0 @@
-# Ignore some directories for 'git archive', aka release cutting
-.bcr export-ignore
-.github export-ignore

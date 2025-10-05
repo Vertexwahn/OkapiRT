@@ -15,6 +15,7 @@ from execution_logic import main
 from test_case import CompatibleVersions, TestedVersions
 
 logging.basicConfig(format="%(message)s", level=logging.INFO)
+log = logging.getLogger()
 
 # Test matrix. We don't combine each Bazel version with each Python version as there is no significant benefit. We
 # manually define pairs which make sure each Bazel and Python version we care about is used at least once.
@@ -29,9 +30,11 @@ TESTED_VERSIONS = [
 ]
 
 VERSION_SPECIFIC_ARGS = {
-    "--enable_bzlmod=true": CompatibleVersions(minimum="6.2.0", before="7.0.0"),
+    "--enable_bzlmod": CompatibleVersions(minimum="6.2.0", before="7.0.0"),
+    # Reduce noise in test logs
+    "--check_direct_dependencies=off": CompatibleVersions(minimum="6.0.0"),
     # Experimental changes we want to be compatible for
-    "--noexperimental_python_import_all_repositories": CompatibleVersions(minimum="1.0.0"),
+    "--experimental_python_import_all_repositories=false": CompatibleVersions(minimum="1.0.0"),
     # Preparation for incompatible changes
     "--incompatible_legacy_local_fallback=false": CompatibleVersions(minimum="5.0.0"),  # false is the forward path
     "--incompatible_enforce_config_setting_visibility": CompatibleVersions(minimum="5.0.0"),
@@ -46,9 +49,8 @@ VERSION_SPECIFIC_ARGS = {
     "--incompatible_exclusive_test_sandboxed": CompatibleVersions(minimum="5.0.0"),
     "--incompatible_strict_action_env": CompatibleVersions(minimum="5.0.0"),
     "--incompatible_disable_starlark_host_transitions": CompatibleVersions(minimum="6.0.0"),
-    "--incompatible_sandbox_hermetic_tmp": CompatibleVersions(minimum="6.0.0"),
+    "--incompatible_sandbox_hermetic_tmp": CompatibleVersions(minimum="6.0.0", before="9.0.0"),
     "--incompatible_check_testonly_for_output_files": CompatibleVersions(minimum="6.0.0"),
-    "--incompatible_check_visibility_for_toolchains": CompatibleVersions(minimum="7.0.0"),
     "--incompatible_auto_exec_groups": CompatibleVersions(minimum="7.0.0"),
     "--incompatible_disable_non_executable_java_binary": CompatibleVersions(minimum="7.0.0"),
     "--incompatible_python_disallow_native_rules": CompatibleVersions(minimum="7.0.0"),
@@ -57,13 +59,18 @@ VERSION_SPECIFIC_ARGS = {
     "--incompatible_disable_native_repo_rules": CompatibleVersions(minimum="7.2.0"),
     # Theoretically of interest for us, but rules_python does not comply to this.
     # "--incompatible_stop_exporting_language_modules": CompatibleVersions(minimum="6.0.0"),
-    # "--noincompatible_enable_deprecated_label_apis": CompatibleVersions(minimum="7.0.0"),  # false is the forward path
+    # "--incompatible_enable_deprecated_label_apis=false": CompatibleVersions(minimum="7.0.0"),  # false is the forward path
 }
 
 
 def cli() -> Namespace:
     parser = ArgumentParser()
-    parser.add_argument("--verbose", "-v", action="store_true", help="Show output of test runs.")
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Show output of test runs.",
+    )
     parser.add_argument(
         "--bazel",
         "-b",
@@ -83,17 +90,41 @@ def cli() -> Namespace:
         action="store_true",
         help="Execute tests only for the default Bazel and Python version.",
     )
-    parser.add_argument("--list", "-l", action="store_true", help="List all available test cases and return.")
+    parser.add_argument(
+        "--list",
+        "-l",
+        action="store_true",
+        help="List all available test cases and return.",
+    )
     parser.add_argument(
         "--test",
         "-t",
         nargs="+",
         help="Run the specified test cases. Substrings will match against all test names including them.",
     )
+    parser.add_argument(
+        "--cpp_impl_based",
+        "-cpp",
+        action="store_true",
+        help="""
+        We have a new C++ based implementation of DWYU. Since, this a change involving almost all DWYU aspects we cannot just create dedicated test cases without duplicating most things uselessly.
+        Thus, we use this central switch to either test legacy default DWYU or the new C++ based implementation on all existing test cases.
+        """,
+    )
+    parser.add_argument(
+        "--no_output_base",
+        action="store_true",
+        help="Do not create a dedicated output base per test. Optimizes CI runs for which dedicated outout bases are a slowdown, as the system is either way thrown away.",
+    )
+    parser.add_argument(
+        "--no_extra_args",
+        action="store_true",
+        help="Do not add the various arguments for experimental and incompatible changes.",
+    )
 
     parsed_args = parser.parse_args()
     if (parsed_args.bazel and not parsed_args.python) or (not parsed_args.bazel and parsed_args.python):
-        logging.error("ERROR: '--bazel' and '--python' have to be used together")
+        log.error("ERROR: '--bazel' and '--python' have to be used together")
         sys.exit(1)
 
     return parsed_args
@@ -102,19 +133,22 @@ def cli() -> Namespace:
 if __name__ == "__main__":
     args = cli()
     if args.verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
+        log.setLevel(logging.DEBUG)
 
     # Ensure we can invoke the script from various places
     chdir(Path(__file__).parent)
 
+    bazel_args = VERSION_SPECIFIC_ARGS if not args.no_extra_args else {}
     sys.exit(
         main(
             tested_versions=TESTED_VERSIONS,
-            version_specific_args=VERSION_SPECIFIC_ARGS,
+            version_specific_args=bazel_args,
             bazel=args.bazel,
             python=args.python,
             requested_tests=args.test,
             list_tests=args.list,
+            cpp_impl_based=args.cpp_impl_based,
             only_default_version=args.only_default_version,
+            no_output_base=args.no_output_base,
         )
     )

@@ -85,6 +85,62 @@ build:clang-tidy --@bazel_clang_tidy//:clang_tidy_executable=@local_config_cc//:
 This aspect is not executed on external targets. To exclude other targets,
 users may tag a target with `no-clang-tidy` or `noclangtidy`.
 
+### use with non-system gcc
+
+Create a label to the installation dir of your gcc toolchain, for example with
+skylib's `directory`.
+
+```py
+# BUILD file for gcc
+load("@bazel_skylib//rules/directory:directory.bzl", "directory")
+
+package(default_visibility = ["//visibility:public"])
+
+directory(
+    name = "toolchain_root",
+    srcs = glob([
+        "lib/**",
+        "x86_64-buildroot-linux-gnu/include/**",
+    ]),
+)
+
+directory(
+    name = "x86_64-buildroot-linux-gnu",
+    srcs = ["lib/gcc/x86_64-buildroot-linux-gnu/13.3.0"],
+)
+
+```
+
+then add the toolchain as an additional dependency and set the `clang_tidy_gcc_install_dir` option
+
+```text
+build:clang-tidy --@bazel_clang_tidy//:clang_tidy_gcc_install_dir=@gcc-linux-x86_64//:x86_64-buildroot-linux-gnu
+build:clang-tidy --@bazel_clang_tidy//:clang_tidy_additional_deps=@gcc-linux-x86_64//:toolchain_root
+```
+
+### use with a vendored clang-tidy
+
+In the case you vendor clang-tidy, potentially alongside clang itself,
+it's possible clang-tidy cannot automatically find the `-resource-dir`
+path to the builtin headers. In this case, you can use skylib's
+`directory` rule to create a target to the clang resource directory.
+
+```bzl
+load("@bazel_skylib//rules/directory:directory.bzl", "directory")
+
+directory(
+    name = "resource_dir",
+    srcs = glob(["lib/clang/*/include/**"]),
+    visibility = ["//visibility:public"],
+)
+```
+
+Then pass the `resource_dir` with a flag in your `.bazelrc`:
+
+```
+build:clang-tidy --@bazel_clang_tidy//:clang_tidy_resource_dir=//path/to:resource_dir
+```
+
 ## Features
 
 - Run clang-tidy on any C/C++ target

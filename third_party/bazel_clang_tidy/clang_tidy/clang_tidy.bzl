@@ -3,8 +3,11 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 def _run_tidy(
         ctx,
+        cc_toolchain,
         wrapper,
         exe,
+        gcc_install_dir,
+        resource_dir,
         additional_deps,
         config,
         flags,
@@ -12,7 +15,6 @@ def _run_tidy(
         discriminator,
         additional_files,
         additional_inputs):
-    cc_toolchain = find_cpp_toolchain(ctx)
     direct_inputs = (
         [infile, config] +
         additional_deps.files.to_list() +
@@ -23,7 +25,7 @@ def _run_tidy(
 
     inputs = depset(
         direct = direct_inputs,
-        transitive = [additional_files, cc_toolchain.all_files],
+        transitive = [additional_files, cc_toolchain.all_files, resource_dir.files],
     )
 
     args = ctx.actions.args()
@@ -50,6 +52,17 @@ def _run_tidy(
 
     # start args passed to the compiler
     args.add("--")
+
+    if len(gcc_install_dir.files.to_list()) >= 2:
+        fail("clang_tidy_gcc_install_dir must contain at most one directory")
+
+    for dir in gcc_install_dir.files.to_list():
+        args.add("--gcc-install-dir=%s" % dir.path)
+
+    resource_dir_files = resource_dir.files.to_list()
+    if resource_dir_files:
+        directory = resource_dir_files[0].path.split("/include/")[0]
+        args.add("-resource-dir", directory)
 
     ctx.actions.run(
         inputs = inputs,
@@ -102,8 +115,7 @@ def rule_sources(attr, include_headers):
     else:
         return [src for src in srcs if not src.basename.endswith(header_extensions)]
 
-def toolchain_flags(ctx, action_name = ACTION_NAMES.cpp_compile):
-    cc_toolchain = find_cpp_toolchain(ctx)
+def toolchain_flags(ctx, cc_toolchain, action_name = ACTION_NAMES.cpp_compile):
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
@@ -206,6 +218,8 @@ def _clang_tidy_aspect_impl(target, ctx):
 
     wrapper = ctx.attr._clang_tidy_wrapper.files_to_run
     exe = ctx.attr._clang_tidy_executable
+    gcc_install_dir = ctx.attr._clang_tidy_gcc_install_dir
+    resource_dir = ctx.attr._clang_tidy_resource_dir
     additional_deps = ctx.attr._clang_tidy_additional_deps
     config = ctx.attr._clang_tidy_config.files.to_list()[0]
 
@@ -219,8 +233,9 @@ def _clang_tidy_aspect_impl(target, ctx):
             {},
         ))
 
-    c_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
-    cxx_flags = safe_flags(toolchain_flags(ctx, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
+    cc_toolchain = find_cpp_toolchain(ctx)
+    c_flags = safe_flags(toolchain_flags(ctx, cc_toolchain, ACTION_NAMES.c_compile) + rule_flags) + ["-xc"]
+    cxx_flags = safe_flags(toolchain_flags(ctx, cc_toolchain, ACTION_NAMES.cpp_compile) + rule_flags) + ["-xc++"]
 
     include_headers = "no-clang-tidy-headers" not in ctx.rule.attr.tags
     srcs = rule_sources(ctx.rule.attr, include_headers)
@@ -228,8 +243,11 @@ def _clang_tidy_aspect_impl(target, ctx):
     outputs = [
         _run_tidy(
             ctx,
+            cc_toolchain,
             wrapper,
             exe,
+            gcc_install_dir,
+            resource_dir,
             additional_deps,
             config,
             c_flags if is_c_translation_unit(src, ctx.rule.attr.tags) else cxx_flags,
@@ -253,6 +271,8 @@ clang_tidy_aspect = aspect(
         "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
         "_clang_tidy_wrapper": attr.label(default = Label("//clang_tidy:clang_tidy")),
         "_clang_tidy_executable": attr.label(default = Label("//:clang_tidy_executable")),
+        "_clang_tidy_gcc_install_dir": attr.label(default = Label("//:clang_tidy_gcc_install_dir")),
+        "_clang_tidy_resource_dir": attr.label(default = Label("//:clang_tidy_resource_dir")),
         "_clang_tidy_additional_deps": attr.label(default = Label("//:clang_tidy_additional_deps")),
         "_clang_tidy_config": attr.label(default = Label("//:clang_tidy_config")),
     },

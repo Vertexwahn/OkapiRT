@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 import logging
+import shutil
 import subprocess
 from dataclasses import dataclass
 from importlib.machinery import SourceFileLoader
-from pathlib import Path, PosixPath
+from pathlib import Path
 from platform import system
-from shutil import copytree, rmtree
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING
 
+from test.apply_fixes.test_case import TestCaseBase
 from test.support.bazel import get_bazel_binary, get_current_workspace
+from test.support.platform import path_to_starlark_format
 from test.support.result import Error
 
-if TYPE_CHECKING:
-    from test.apply_fixes.test_case import TestCaseBase
+log = logging.getLogger()
 
 MODULE_FILE_TEMPLATE = """
 bazel_dep(name = "depend_on_what_you_use")
@@ -26,9 +26,14 @@ local_path_override(module_name = "depend_on_what_you_use", path = "{dwyu_path}"
 
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
 
+# We specify by design an outdated rules_cc version.
+# bzlmod resolves dependencies to the maximum of all requested versions for all involved modules.
+# Specifying an ancient version here gives us in the end at least whatever rules_cc version DWYU defines as dependency.
+bazel_dep(name = "rules_cc", version = "0.0.1")
+
 # We specify by design an outdated rules_python version.
 # bzlmod resolves dependencies to the maximum of all requested versions for all involved modules.
-# Specifying an ancient version here gives us in the end whatever rules_python version DWYU defines as dependency.
+# Specifying an ancient version here gives us in the end at least whatever rules_python version DWYU defines as dependency.
 bazel_dep(name = "rules_python", version = "0.12.0")
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(python_version = "3.8")
@@ -43,15 +48,6 @@ common --lockfile_mode=off
 # Some users require this setting to mitigate issues due to a large PYTHONPATH created by rules_python
 build --noexperimental_python_import_all_repositories
 """
-
-BAZEL_VERSION = "8.0.1"
-
-
-def dwyu_path_as_string(dwyu_path: Path) -> str:
-    """
-    We can't use the path directly on Windows as we need escaped backslashes
-    """
-    return str(dwyu_path) if isinstance(dwyu_path, PosixPath) else str(dwyu_path).replace("\\", "\\\\")
 
 
 @dataclass
@@ -70,8 +66,8 @@ class ApplyFixesIntegrationTestsExecutor:
         self.test_definitions = self._get_test_definitions()
 
     def list_tests(self) -> None:
-        logging.info("Available test cases:")
-        logging.info("\n".join(f"- {t.name}" for t in self.test_definitions))
+        log.info("Available test cases:")
+        log.info("\n".join(f"- {t.name}" for t in self.test_definitions))
 
     def execute_tests(self) -> list[str]:
         """
@@ -87,10 +83,10 @@ class ApplyFixesIntegrationTestsExecutor:
 
     def _execute_test(self, test: TestCaseBase) -> bool:
         if not test.windows_compatible and system() == "Windows":
-            logging.info(f"--- Skipping Test due to Windows incompatibility '{test.name}'")
+            log.info(f"--- Skipping Test due to Windows incompatibility '{test.name}'")
             return True
 
-        logging.info(f">>> Test '{test.name}'")
+        log.info(f">>> Test '{test.name}'")
         succeeded = False
         result = None
 
@@ -100,7 +96,7 @@ class ApplyFixesIntegrationTestsExecutor:
                 self._setup_test_workspace(test=test, test_workspace=workspace_path)
                 result = test.execute_test(workspace_path)
             except Exception:
-                logging.exception("Test failed due to exception:")
+                log.exception("Test failed due to exception:")
             self._cleanup(workspace_path)
 
         if result is None:
@@ -108,24 +104,21 @@ class ApplyFixesIntegrationTestsExecutor:
         if result.is_success():
             succeeded = True
         else:
-            logging.info(result.error)
-        logging.info(f"<<< {'OK' if succeeded else 'FAILURE'}\n")
+            log.info(result.error)
+        log.info(f"<<< {'OK' if succeeded else 'FAILURE'}\n")
 
         return succeeded
 
     def _setup_test_workspace(self, test: TestCaseBase, test_workspace: Path) -> None:
-        copytree(src=test.test_sources, dst=str(test_workspace), dirs_exist_ok=True)
-        with test_workspace.joinpath("MODULE.bazel").open(mode="w", encoding="utf-8") as ws_file:
-            ws_file.write(
-                MODULE_FILE_TEMPLATE.format(
-                    dwyu_path=dwyu_path_as_string(self.origin_workspace),
-                    extra_content=test.extra_workspace_file_content,
-                )
+        shutil.copytree(src=test.test_sources, dst=str(test_workspace), dirs_exist_ok=True)
+        shutil.copy(self.origin_workspace / ".bazelversion", test_workspace / ".bazelversion")
+        (test_workspace / "MODULE.bazel").write_text(
+            MODULE_FILE_TEMPLATE.format(
+                dwyu_path=path_to_starlark_format(self.origin_workspace),
+                extra_content=test.extra_workspace_file_content,
             )
-        with test_workspace.joinpath(".bazelversion").open(mode="w", encoding="utf-8") as ws_file:
-            ws_file.write(BAZEL_VERSION)
-        with test_workspace.joinpath(".bazelrc").open(mode="w", encoding="utf-8") as ws_file:
-            ws_file.write(BAZEL_RC_FILE)
+        )
+        (test_workspace / ".bazelrc").write_text(BAZEL_RC_FILE)
 
     def _cleanup(self, test_workspace: Path) -> None:
         """
@@ -146,7 +139,7 @@ class ApplyFixesIntegrationTestsExecutor:
 
         # The hermetic Python toolchain contains read oly files which we can't remove without making them writable
         subprocess.run(["chmod", "-R", "+rw", output_base], check=True)
-        rmtree(output_base)
+        shutil.rmtree(output_base)
 
     def _get_test_definitions(self) -> list[TestDefinition]:
         tests_search_dir = self.origin_workspace / "test/apply_fixes"
@@ -169,10 +162,10 @@ def main(requested_tests: list[str] | None = None, list_tests: bool = False) -> 
         return 0
 
     failed_tests = executor.execute_tests()
-    logging.info(f"Running tests {'FAILED' if failed_tests else 'SUCCEEDED'}")
+    log.info(f"Running tests {'FAILED' if failed_tests else 'SUCCEEDED'}")
     if failed_tests:
-        logging.info("\nFailed tests:")
-        logging.info("\n".join(f"- '{test}'" for test in failed_tests))
+        log.info("\nFailed tests:")
+        log.info("\n".join(f"- '{test}'" for test in failed_tests))
         return 1
 
     return 0

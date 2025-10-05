@@ -10,7 +10,7 @@
   - [Use DWYU](#use-dwyu)
 - [Applying automatic fixes](#applying-automatic-fixes)
 - [Assumptions of use](#assumptions-of-use)
-- [Known problems](#known-problems)
+- [Known limitations](#known-limitations)
 - [Supported Platforms](#supported-platforms)
 - [Alternatives to DWYU](#alternatives-to-dwyu)
 - [Versioning](#versioning)
@@ -29,7 +29,8 @@ The main features are:
 - Finding include statements which are not available through a direct dependency, aka **preventing to rely on transitive dependencies for includes**.
 - Finding unused dependencies.
 - Given one uses [`implementation_deps`](https://bazel.build/reference/be/c-cpp#cc_library.implementation_deps), making sure one distinguishes properly between public and private dependencies for `cc_library` targets.
-  For more details see [features chapter Implementation_deps](#Implementation_deps).
+  This has to be explicitly enabled.
+  See the [aspect documentation](docs/dwyu_aspect.md) for further details.
 
 More information about the idea behind DWYU and the implementation of the project is available in [the docs](docs).
 
@@ -171,7 +172,7 @@ For example, including header files which do not exist at the expected path.
 There shall not be multiple header files in the dependency tree of a target matching an include statement.
 Even if analysing the code works initially, it might break at any time if the ordering of paths in the analysis changes.
 
-# Known problems
+# Known limitations
 
 ## Preprocessor statements
 
@@ -191,6 +192,14 @@ DWYU can only forward defined values to `pcpp` which are part of the compiler co
 Some values are however set internally by the compiler while processing files and are unknown to DWYU.<br>
 Common cases for such macros can be seen at [cppreference.com](https://en.cppreference.com/w/cpp/preprocessor/replace#Predefined_macros).
 While DWYU cannot generally know the values of all those compiler defined macros, we offer a feature to set `__cplusplus` based on a heuristic.
+
+## Specifying include paths via `copts` and similar
+
+Using the C/C++ rules attributes \[`copts`, `conlyopts`, `cxxopts`\] or the command line options \[`--copt`, `--copnlyopt`, `--cxxopt`\] to specify include paths is not supported.
+DWYU relies on the information in the `CcInfo` provider to analyze available include paths from dependencies, which does not include information provided via the copt options.
+
+If a targets has to define special include paths, it should use the proper Bazel API via the C/C++ rules attributes \[`includes`, `include_prefix`, `strip_include_prefix`\].
+Include paths specified by those attributes are respected by DWYU.
 
 # Supported Platforms
 
@@ -215,25 +224,26 @@ While DWYU cannot generally know the values of all those compiler defined macros
 
 ## Layering check
 
-To make sure no headers from transitive dependencies or private headers from dependencies are used you can use [Layering check with Clang](https://maskray.me/blog/2022-09-25-layering-check-with-clang) which is natively supported by Bazel.
+To make sure no headers from transitive are used you can use [Layering check with Clang](https://maskray.me/blog/2022-09-25-layering-check-with-clang), which is natively supported by Bazel.
+An example for a CC toolchain supporting this feature is https://github.com/bazel-contrib/toolchains_llvm.
 The main benefit of this approach is it being directly integrated into Bazel without need of further tooling like DWYU.
 
-Still, there are reasons to use DWYU instead of or in addition to layering_check:
+Still, there are reasons to consider using DWYU instead of or in addition to layering_check:
 
-- DWYU does not require a compiler, it works purely by text parsing.
-  The only requirement towards your platform is the availability of a Python interpreter.
+- DWYU does not require a full compilation, it only executes the preprocessing step.
 - DWYU is able to analyze header only libraries.
+- DWYU is not limited to LLVM based toolchains (`layering_check` is based on LLVM's implementation of modules).
 - DWYU detects unused dependencies.
-- DWYU allows optimizing [implementation_deps](#implementation_deps).
+- DWYU allows optimizing the usage of [implementation_deps](#implementation_deps).
 - DWYU offers automatic fixes for detected issues.
 
 ## Gazelle
 
 [Gazelle](https://github.com/bazelbuild/bazel-gazelle) is a tool automatically creating `BUILD` files for your code.
-It seems there is no public and established C++ extension for gazelle.
+Unfortunately, it seems there is no public and established C++ extension for gazelle.
 
-Still, if one agrees with the best practices enforced by DWYU but cannot use it, investing time into a gazelle C++ extension might be worth it.
-Automatically generating correct BUILD files based on your source code is a more efficient approach compared to having to manually execute DWYU regularly to make sure no error was introduced.
+Still, if one agrees with the best practices enforced by DWYU, investing time into a gazelle C++ extension might be worth it.
+Automatically generating correct BUILD files based on your source code is a more efficient approach compared to executing DWYU regularly to make sure no error was introduced.
 
 # Versioning
 

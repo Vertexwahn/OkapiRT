@@ -14,7 +14,12 @@ echo ""
 bazel test //...
 
 echo ""
-echo "Aspect integration tests scripts unittests"
+echo "Ensure our C++ code is compliant to the desired C++ versions range"
+echo ""
+./scripts/test_cpp_version_compliance.sh
+
+echo ""
+echo "Aspect integration tests scripts unit tests"
 echo ""
 ./scripts/test_aspect_tests_scripts.sh
 
@@ -22,3 +27,8 @@ echo ""
 echo "Build examples"
 echo ""
 ./scripts/build_examples.sh
+
+echo ""
+echo "Execute mocked CC toolchain tests"
+echo ""
+./scripts/test_mocked_cc_toolchains.sh

@@ -39,6 +39,9 @@ IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 template <class T> class IMATH_EXPORT_TEMPLATE_TYPE Frustum
 {
 public:
+    using BaseType = T;
+    using value_type = T;
+
     /// @{
     /// @name Constructors and Assignment
     ///

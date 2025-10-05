@@ -1,3 +1,6 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_shell//shell:sh_library.bzl", "sh_library")
+
 cc_library(
     name = "a",
     hdrs = ["a.h"],
