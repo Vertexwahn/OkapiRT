@@ -11,21 +11,31 @@ set -o errexit -o nounset -o pipefail
 # https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 TAG=${GITHUB_REF_NAME}
 # The prefix is chosen to match what GitHub generates for source archives
-PREFIX="rules_ispc-${TAG:1}"
+PREFIX="rules_ispc-${TAG}"
 ARCHIVE="rules_ispc-$TAG.tar.gz"
 git archive --format=tar --prefix=${PREFIX}/ ${TAG} | gzip > $ARCHIVE
 SHA=$(shasum -a 256 $ARCHIVE | awk '{print $1}')
 
 cat << EOF
-## Using WORKSPACE
-Paste this snippet into your `WORKSPACE.bazel` file:
+## Using Bzlmod
+Add to your `MODULE.bazel` file:
 \`\`\`starlark
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-http_archive(
-    name = "rules_ispc",
-    sha256 = "${SHA}",
-    strip_prefix = "${PREFIX}",
-    url = "https://github.com/Vertexwahn/rules_ispc/releases/download/${TAG}/${ARCHIVE}",
+bazel_dep(name = "rules_ispc", version = "${TAG}")
+
+ispc = use_extension("@rules_ispc//:extensions.bzl", "ispc")
+ispc.download()
+
+use_repo(
+    ispc,
+    "ispc_linux_x86_64",
+    "ispc_windows_x86_64",
+    "ispc_osx_x86_64",
+    "ispc_osx_arm64"
+)
+
+register_toolchains(
+    "@rules_ispc//tools:all",
+    dev_dependency = True,
 )
 EOF
 
