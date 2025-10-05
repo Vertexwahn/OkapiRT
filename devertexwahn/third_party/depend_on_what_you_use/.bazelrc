@@ -1,0 +1,5 @@
+# Always tell why tests fail
+test --test_output=errors
+
+# Allow users to provide their own workspace settings
+try-import %workspace%/user.bazelrc

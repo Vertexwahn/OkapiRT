@@ -1,0 +1,12 @@
+---
+IndentWidth: 4
+ColumnLimit: 120
+PointerAlignment: Left
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortBlocksOnASingleLine: Empty
+BinPackParameters: OnePerLine
+BreakBeforeBraces: Custom
+BreakAfterReturnType: None
+AlwaysBreakTemplateDeclarations: true
+BraceWrapping:
+    BeforeElse: true

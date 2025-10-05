@@ -1,0 +1,33 @@
+# Software bill of materials (SBOM)
+
+In this folder (`third_party`) you can find different libraries.
+Usually, those libraries are just copied into the project and used as is.
+This file documents the commit hash of each library if it is not given in the filename of the directory of the third party dependency itself.
+
+
+# Flatland dependencies
+
+```text
+abseil-cpp-0c01ee18955da5a25fe4ef60784775176d9f9987
+bazel_clang_tidy-496018e020cf0a7d813a2b5a9d246ec55340a7ed
+bazel-skylib-ac4372fef4f1dee37ef1fa16f807a1120224d47c
+bazel-toolchain-795d76fd03e0b17c0961f0981a8512a00cba4fa2
+boringssl-fcf70a1a66f4cd000ab9acefb91e3b380fe0984b
+Catch2-33e6fd217aee285eca97bef175df716264088b8a
+cpuinfo-877328f188a3c7d1fa855871a278eb48d530c4c0
+fmt-486e7ba579a2c677772d004ecd0311142ba481be
+gflags-03a4842c9c6aaef438d7bf0c84e8a62c8064992b
+glog-570c7e4e1dd197e9ae2777152b87a5ea9e06bcac
+googletest-9706f75b8f91c52a3840cf5d878a7f37ea10ef00
+hypothesis-3acfea6c14078203802b417b61ad161111106fe4
+Imath-6677acbe5e20aac60403e178204d9b6d78f2bb9d
+openexr-74a0f59390eaa4a50c6853ad9fd9c4b1073f805c
+pbrt-v4-f140d7cba5dc7b941f9346d6b7d1476a05c28c37
+pcg-cpp-428802d1a5634f96bcd0705fab379ff0113bcf13
+pugixml-61c944895e071872370219cadade8423dc6e04dc
+rules_cc-0b3cceb4d701f87397f2360627c1fcaecd7c6267
+spdlog-f1d748e5e3edfa4b1778edea003bac94781bc7b7
+xtensor-47886141576e34f0354a8481151b9f359f4b8c80
+xtl-d11fb6b5f4c417025124ed2c62175284846a1914
+```
+
