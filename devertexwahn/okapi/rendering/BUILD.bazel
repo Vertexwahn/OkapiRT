@@ -16,7 +16,6 @@ cc_library(
         "rendering.hpp",
     ],
     deps = [
-        "@onetbb//:tbb",
         "//core:logging",
         "//core:timer",
         "//core/stl:format",
@@ -27,6 +26,7 @@ cc_library(
         "//okapi/rendering/sensor:film",
         "//okapi/rendering/sensor:tile_generator",
         "@boost.algorithm//:boost.algorithm",
+        "@onetbb//:tbb",
     ],
 )
 
