@@ -1,21 +1,20 @@
 module(
     name = "rules_ispc",
-    version = "0.0.5",
+    version = "0.0.6",
     compatibility_level = 1,
 )
 
 bazel_dep(name = "platforms", version = "1.0.0")
-bazel_dep(name = "rules_cc", version = "0.2.5")
+bazel_dep(name = "rules_cc", version = "0.2.11")
 
 ispc = use_extension("@rules_ispc//:extensions.bzl", "ispc")
 ispc.download()
-
 use_repo(
     ispc,
     "ispc_linux_x86_64",
-    "ispc_windows_x86_64",
+    "ispc_osx_arm64",
     "ispc_osx_x86_64",
-    "ispc_osx_arm64"
+    "ispc_windows_x86_64",
 )
 
 register_toolchains(
