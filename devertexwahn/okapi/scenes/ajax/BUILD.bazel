@@ -1,0 +1,40 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2025 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_python//python:defs.bzl", "py_binary")
+
+exports_files(
+    [
+        "ajax.ao.okapi.xml",
+        "ajax.obj",
+        "plane.obj",
+    ],
+)
+
+#py_binary(
+#    name = "imagegen",
+#    srcs = ["imagegen.py"],
+#    deps = [
+#        #"@pypi//matplotlib",
+#        #"@pypi//pyqt6",
+#        #"@pypi//pyside6",
+#        "@pypi//simpleimageio",  # it seem that this does currently not wor k with Python 3.12.2
+#        "@pypi//figuregen",
+#    ],
+#)
+
+py_binary(
+    name = "mitsuba_reference",
+    srcs = ["mitsuba_reference.py"],
+    data = [
+        "ajax.constant_emitter.mitsuba.xml",
+        "ajax.obj",
+        "plane.obj",
+    ],
+    deps = [
+        "@pypi//drjit",
+        "@pypi//mitsuba",
+    ],
+)
