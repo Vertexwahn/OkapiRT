@@ -33,9 +33,9 @@ The following tools should be installed:
 *All platforms:*
 
 ```shell
-git clone https://github.com/Vertexwahn/Piper.git # clone the repository
-cd Piper # change directory to cloned repository
-cd devertexwahn # switch to the location where the WORKSPACE.bazel file is located
+git clone https://github.com/Vertexwahn/OkapiRT.git # clone the repository
+cd OkapiRT # change directory to cloned repository
+cd devertexwahn # switch to the location where the MODULE.bazel file is located
 ```
 
 ### Command line interface
@@ -104,19 +104,19 @@ bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui
 
 ## Building
 
-### Ubuntu 22.04
+### Ubuntu 24.04
 
 #### Command line (bash/zsh)
 
 ```shell
-# Run all tests using GCC 11.2
-bazel test --config=gcc11 //...
-# Build all targets using GCC 11.2
-bazel build --config=gcc11 //... 
+# Run all tests using GCC 13
+bazel test --config=gcc13 //...
+# Build all targets using GCC 13
+bazel build --config=gcc13 //... 
 # Run all tests using Clang14 (ree can not be build using Clang14)
-bazel test --config=clang14 -- //... 
+bazel test --config=clang14 -- //... -//ree/...
 # Build all targets using Clang14 (ree can not be build using Clang14)
-bazel build --config=clang14 -- //... 
+bazel build --config=clang14 -- //... -//ree/...
 ```
 
 #### CLion
