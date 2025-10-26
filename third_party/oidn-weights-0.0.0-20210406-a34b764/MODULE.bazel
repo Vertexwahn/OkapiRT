@@ -1,0 +1,5 @@
+module(
+    name = "oidn-weights",
+    version = "0.0.0-20210406-a34b764",
+    compatibility_level = 1,
+)

@@ -246,6 +246,18 @@ local_path_override(
     path = "../third_party/googletest",
 )
 
+bazel_dep(name = "oidn-weights", version = "0.0.0-20210406-a34b764")
+local_path_override(
+    module_name = "oidn-weights",
+    path = "../third_party/oidn-weights-0.0.0-20210406-a34b764",
+)
+
+bazel_dep(name = "oidn", version = "1.4.3")
+local_path_override(
+    module_name = "oidn",
+    path = "../third_party/oidn-1.4.3",
+)
+
 #-------------------------------------------------------------------------------------
 # Windows Resource files
 #-------------------------------------------------------------------------------------
