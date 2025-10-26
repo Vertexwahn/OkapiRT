@@ -16,6 +16,35 @@ module(
 bazel_dep(name = "apple_support", version = "1.24.1")
 
 #-------------------------------------------------------------------------------------
+# rules_ispc
+#-------------------------------------------------------------------------------------
+
+bazel_dep(name = "rules_ispc")
+local_path_override(
+    module_name = "rules_ispc",
+    path = "bazel/rules/rules_ispc",
+)
+
+ispc = use_extension("@rules_ispc//:extensions.bzl", "ispc")
+
+# on Windows there are some errors with 1.28.2 - there seem to be some things that are not supported by ISPC + VS2022
+# maybe test 1.24.0, etc. to find out when things break and why
+#ispc.download(version = "1.28.2")
+ispc.download(version = "1.23.0")
+use_repo(
+    ispc,
+    "ispc_linux_x86_64",
+    "ispc_osx_arm64",
+    "ispc_osx_x86_64",
+    "ispc_windows_x86_64",
+)
+
+register_toolchains(
+    "@rules_ispc//tools:all",
+    dev_dependency = True,
+)
+
+#-------------------------------------------------------------------------------------
 # rules_qt
 #-------------------------------------------------------------------------------------
 
