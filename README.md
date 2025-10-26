@@ -36,46 +36,12 @@ cd OkapiRT # change directory to cloned repository
 cd devertexwahn # switch to the location where the MODULE.bazel file is located
 ```
 
-### Command line interface
-
-You can use the Okapi Renderer command line interface by invoking one of the following commands:
-
 *Render a scene with macOS 11/12:*
 
 ```shell
-bazel run --config=macos --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=${HOME}/dev/Piper/devertexwahn/okapi/scenes/ajax/ajax.ao.okapi.xml
-```
-
-*Render a scene with Ubuntu 22.04:*
-
-```shell
-bazel run --config=gcc11 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=$(pwd)/okapi/scenes/ajax/ajax.ao.okapi.xml
-```
-
-*Render a scene with Ubuntu 24.04:*
-
-```shell
-bazel run --config=gcc13 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=$(pwd)/okapi/scenes/ajax/ajax.ao.okapi.xml
-```
-
-*Render a scene with Windows 10/11 x64 with Visual Studio 2019:*
-
-```shell
-bazel run --config=vs2019 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=C:\scenes\okapi\scenes\ajax\ajax.ao.okapi.xml
-```
-
-*Render a scene with Windows 10/11 x64 with Visual Studio 2022:*
-
-```shell
-bazel run --config=vs2022 --compilation_mode=opt //okapi/cli:okapi.cli -- --scene_filename=C:\scenes\okapi\scenes\ajax\ajax.ao.okapi.xml
-```
-
-### User Interface
-
-*Render a scene with macOS 11/12:*
-
-```shell
-bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui
+bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui -- \
+--scene_filename=$(pwd)//okapi/scenes/ajax/ajax.normal.okapi.xml \
+--samples_per_pixel=100
 ```
 
 *Render a scene with Ubuntu 22.04:*
