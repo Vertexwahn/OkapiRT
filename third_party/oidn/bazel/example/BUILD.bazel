@@ -1,0 +1,9 @@
+cc_binary(
+    name = "example",
+    srcs = ["example.cpp"],
+    data = ["//data"],
+    deps = [
+        "//:OpenImageDenoise",
+        "@com_openexr//:OpenEXR",
+    ],
+)

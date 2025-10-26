@@ -1,0 +1,66 @@
+## Copyright 2018-2021 Intel Corporation
+## SPDX-License-Identifier: Apache-2.0
+
+## DISCLAIMER: Bazel support is community-based. The maintainers do not
+## use Bazel internally. The Bazel build can have security risks or
+## optimization gaps.
+
+workspace(name = "oidn")
+
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("//:bazel/odin_deps.bzl", "odin_deps")
+
+odin_deps()
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+local_repository(
+    name = "rules_ispc",
+    path = "../../devertexwahn/rules_ispc",
+)
+
+#git_repository(
+#    name = "rules_ispc",
+#    commit = "0deccfa15c73ce93d3850e618cf647fe979d6fbc",
+#    #branch = "main",
+#    remote = "https://github.com/Vertexwahn/rules_ispc",
+#    shallow_since = "1669327440 +0100",
+#)
+
+load("@rules_ispc//:fetch_ispc.bzl", "fetch_ispc")
+
+fetch_ispc()
+
+load("@rules_ispc//tools:ispc_toolchain.bzl", "register_ispc_toolchains")
+
+register_ispc_toolchains()
+
+#-------------------------------------------------------------------------------------
+# OpenEXR
+#-------------------------------------------------------------------------------------
+
+git_repository(
+    name = "com_openexr",
+    commit = "436fcd2829ae9a8965af1db15ac8531fdc8b96ce",
+    remote = "https://github.com/AcademySoftwareFoundation/openexr/",
+    shallow_since = "1673573251 -0800",
+)
+
+load("@com_openexr//:bazel/third_party/openexr_deps.bzl", "openexr_deps")
+
+openexr_deps()
+
+#-------------------------------------------------------------------------------------
+# Catch2
+#-------------------------------------------------------------------------------------
+
+http_archive(
+    name = "catch2",
+    sha256 = "d90351cdc55421f640c553cfc0875a8c834428679444e8062e9187d05b18aace",
+    strip_prefix = "Catch2-3.3.1",
+    url = "https://github.com/catchorg/Catch2/archive/refs/tags/v3.3.1.tar.gz",
+)
