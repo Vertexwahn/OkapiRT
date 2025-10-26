@@ -63,13 +63,13 @@ bazel run --config=gcc13 --compilation_mode=opt //okapi/ui:okapi.ui -- \
 *Render a scene with Windows 10/11 x64 with Visual Studio 2019:*
 
 ```shell
-bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui
+bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui -- --scene_filename=okapi/scenes/ajax/ajax.normal.okapi.xml
 ```
 
 *Render a scene with Windows 10/11 x64 with Visual Studio 2022:*
 
 ```shell
-bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui
+bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui -- --scene_filename=okapi/scenes/ajax/ajax.normal.okapi.xml
 ```
 
 ## Building
