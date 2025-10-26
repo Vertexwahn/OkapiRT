@@ -3,10 +3,10 @@
     SPDX-License-Identifier: Apache-2.0
 """
 
-"""de_vertexwahn build and test dependencies."""
+"""okapi build and test dependencies."""
 
 module(
-    name = "de_vertexwahn",
+    name = "okapi",
     version = "0.0.0",
     compatibility_level = 1,
 )

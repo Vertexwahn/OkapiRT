@@ -32,8 +32,7 @@ public:
     Sphere(const PropertySet& ps) : Shape3<Scalar>(ps) {
         radius_ = ps.get_property<Scalar>("radius");
     }
-    virtual ~Sphere() {
-    }
+    virtual ~Sphere() {}
 
     // it is assumed that the direction of the ray is normalized
     // this will not be explicitly checked in release mode and will lead to false unreported results
