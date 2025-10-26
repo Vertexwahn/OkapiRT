@@ -34,14 +34,14 @@
 	<shape type="obj">
 		<string name="filename" value="ajax.obj"/>
 
-		<bsdf type="diffuse"/>
+		<!-- <bsdf type="diffuse" /> -->
 	</shape>
 
 	<!-- Ground plane -->
 	<mesh type="obj">
 		<string name="filename" value="plane.obj"/>
 
-		<bsdf type="diffuse"/>
+		<!-- <bsdf type="diffuse" /> -->
 
 		<transform name="to_world">
 			<scale value="100,1,100"/>

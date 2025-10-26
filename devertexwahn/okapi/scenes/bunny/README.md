@@ -44,6 +44,6 @@ bazel run --config=gcc11 --compilation_mode=opt //okapi/ui:okapi.ui -- \
 
 ```shell
 bazel run --config=gcc13 --compilation_mode=opt //okapi/ui:okapi.ui -- \
---scene_filename=${HOME}/dev/Piper/devertexwahn/okapi/scenes/bunny/bunny.ao.okapi.xml \
+--scene_filename=${HOME}/dev/OkapiRT/devertexwahn/okapi/scenes/bunny/bunny.ao.okapi.xml \
 --samples_per_pixel=100
 ```

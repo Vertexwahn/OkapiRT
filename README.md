@@ -10,11 +10,9 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Description
 
-Okapi is a 3D ray tracer. 
-The following image has been rendered with Okapi
-(Modeled by Mac Ptaszynski. Model available [here](https://www.behance.net/gallery/20046385/BMW-315-DA2))
+Okapi is a 3D ray tracer.
 
-![BMW 315 DA2](screenshots/BMW_315_DA2.ao_9f93bf4.png)
+![OkapiRT](OkapiRT.png)
 
 ## Quickstart
 
@@ -74,6 +72,28 @@ bazel run --config=macos --compilation_mode=opt //okapi/cli:okapi.cli -- --scene
 
 ### User Interface
 
+*Render a scene with macOS 11/12:*
+
+```shell
+bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui
+```
+
+*Render a scene with Ubuntu 22.04:*
+
+```shell
+bazel run --config=gcc11 --compilation_mode=opt //okapi/ui:okapi.ui -- \
+--scene_filename=$(pwd)//okapi/scenes/ajax/ajax.normal.okapi.xml \
+--samples_per_pixel=100
+```
+
+*Render a scene with Ubuntu 24.04:*
+
+```shell
+bazel run --config=gcc13 --compilation_mode=opt //okapi/ui:okapi.ui -- \
+--scene_filename=$(pwd)//okapi/scenes/ajax/ajax.normal.okapi.xml \
+--samples_per_pixel=100
+```
+
 *Render a scene with Windows 10/11 x64 with Visual Studio 2019:*
 
 ```shell
@@ -85,22 +105,6 @@ bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=
 ```shell
 bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui
 ```
-
-*Render a scene with Ubuntu 22.04:*
-
-```shell
-bazel run --config=gcc11 --compilation_mode=opt //okapi/ui:okapi.ui
-```
-
-![UI Ubuntu 20.04](screenshots/Screenshot%20from%202022-01-23%2015-02-35.png)
-
-*Render a scene with macOS 11/12:*
-
-```shell
-bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui
-```
-
-![UI Ubuntu 20.04](screenshots/macos%202022-02-16.png)
 
 ## Building
 

@@ -5,6 +5,30 @@
 
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
+cc_library(
+    name = "normal_integrator",
+    srcs = ["normal_integrator.hpp"],
+    visibility = ["//visibility:public"],
+    deps = ["//flatland/rendering/integrator"],
+)
+
+'''
+cc_test(
+    name = "normal_integrator_test",
+    size = "small",
+    srcs = [
+        "normal_integrator_test.cpp",
+    ],
+    data = ["//okapi/scenes"],
+    deps = [
+        ":normal_integrator",
+        "//flatland/rendering/integrator",
+        "//okapi/rendering/scene:load_scene",
+        "//okapi/rendering/sensor",
+        "@googletest//:gtest_main",
+    ],
+)
+'''
 
 cc_library(
     name = "rtiow_integrator",

@@ -12,6 +12,7 @@ filegroup(
     srcs = [
         "cube/cube.normal.okapi.xml",
         "cube/cube.obj",
+        "sphere/sphere.normal.okapi.xml",
     ],
 )
 

@@ -24,7 +24,7 @@ cc_library(
         #"//okapi/rendering/integrator:aov",
         #"//okapi/rendering/integrator:hit_integrator",
         #"//okapi/rendering/integrator:next_integrator",
-        #"//okapi/rendering/integrator:normal_integrator",
+        "//okapi/rendering/integrator:normal_integrator",
         #"//okapi/rendering/integrator:path_tracing_diffuse",
         #"//okapi/rendering/integrator:path_tracing_naive_diffuse",
         #"//okapi/rendering/integrator:simple_integrator",

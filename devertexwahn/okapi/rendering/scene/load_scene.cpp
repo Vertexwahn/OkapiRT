@@ -6,6 +6,8 @@
 #include "okapi/rendering/scene/load_scene.hpp"
 
 #include "okapi/rendering/integrator/rtiow_integrator.hpp"
+#include "okapi/rendering/integrator/normal_integrator.hpp"
+
 #include "okapi/rendering/intersector/embree_intersector.hpp"
 
 #include "okapi/rendering/shape/sphere.h"
@@ -77,6 +79,7 @@ ReferenceCounted<Scene3f> load_scene3f(std::string_view filename, const Property
 
     // integrator
     sf.register_class<RtiowIntegrator3f>("rtiow");
+    sf.register_class<NormalIntegrator3f>("normal");
 
     // shapes
     sf.register_class<Sphere3f>("sphere");

@@ -84,7 +84,7 @@ bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui -- \
 
 ```shell
 bazel run --config=gcc13 --compilation_mode=opt //okapi/ui:okapi.ui -- \
---scene_filename=${HOME}/dev/Piper/devertexwahn/okapi/scenes/ajax/ajax.sky_emitter.okapi.xml \
+--scene_filename=${HOME}/dev/OkapiRT/devertexwahn/okapi/scenes/ajax/ajax.normal.okapi.xml \
 --samples_per_pixel=100
 ```
 
