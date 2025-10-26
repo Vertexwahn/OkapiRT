@@ -6,7 +6,7 @@
 """okapi build and test dependencies."""
 
 module(
-    name = "okapi",
+    name = "de_vertexwahn",
     version = "0.0.0",
     compatibility_level = 1,
 )
