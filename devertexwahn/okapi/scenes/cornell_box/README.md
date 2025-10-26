@@ -170,10 +170,10 @@ bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui -- \
 --film_filename=cornell_box.naive.diffuse.box_filter.spp100.next.exr
 ```
 
-*Ubuntu 22.04*
+*Ubuntu 24.04*
 
 ```shell
-bazel run --config=gcc11 --compilation_mode=opt //okapi/ui:okapi.ui -- \
+bazel run --config=gcc13 --compilation_mode=opt //okapi/ui:okapi.ui -- \
 --scene_filename=${HOME}/dev/Piper/devertexwahn/okapi/scenes/cornell_box/cornell_box.naive.diffuse.okapi.xml \
 --samples_per_pixel=1
 ```
@@ -181,7 +181,7 @@ bazel run --config=gcc11 --compilation_mode=opt //okapi/ui:okapi.ui -- \
 With denoising:
 
 ```shell
-bazel run --config=gcc11 --compilation_mode=opt //okapi/ui:okapi.ui -- \
+bazel run --config=gcc13 --compilation_mode=opt //okapi/ui:okapi.ui -- \
 --scene_filename=${HOME}/dev/Piper/devertexwahn/okapi/scenes/cornell_box/cornell_box.naive.diffuse.box_filter.okapi.xml \
 --samples_per_pixel=100 \
 --integrator=next \

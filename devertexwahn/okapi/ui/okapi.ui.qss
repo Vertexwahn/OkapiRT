@@ -259,6 +259,7 @@ QMenuBar#transparent
 QMenuBar::item
 {
     background-color: transparent;
+    padding: 5px 10px 5px 10px;
 }
 
 QMenuBar::item:selected
@@ -286,7 +287,7 @@ QMenu
 QMenu::item
 {
     background-color: transparent;
-    padding: 3px 20px 3px 20px;
+    padding: 5px 20px 5px 20px;
 }
 
 QMenu::item:selected
@@ -517,7 +518,7 @@ QListWidget:read-only
 
 QListWidget:focus:!read-only
 {
-    border-color: palette(highlight);
+    border-color: rgb(72, 183, 231);
 }
 
 QTreeView::item:hover,
@@ -525,13 +526,15 @@ QListView::item:hover
 {
     background-color: rgb(72, 183, 231);
     color: rgb(255, 255, 255);
+    border: 1px solid rgb(72, 183, 231);
 }
 
 QTreeView::item:selected,
 QListView::item:selected
 {
-    background-color: rgb(80, 80, 80);
-    color: rgb(255, 255, 255);
+    background-color: rgb(72, 183, 231);
+    color: rgb(51, 51, 51);
+    outline: none;
 }
 
 QTreeView::item:disabled,
@@ -752,10 +755,10 @@ QToolBar#sidebar > QToolButton
 {
     color: rgb(51, 51, 51);
     border-color: 1px solid qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                                      stop:0 rgb(222, 126, 9),
+                                      stop:0 rgb(72, 183, 231),
                                       stop:1 palette(highlight));
     background-color: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                                      stop:0 rgb(222, 126, 9),
+                                      stop:0 rgb(72, 183, 231),
                                       stop:1 palette(highlight));
 }
 
@@ -770,10 +773,10 @@ QToolBar#sidebar > .QToolButton:checked:!pressed
 {
     color: rgb(51, 51, 51);
     border: 1px solid qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                                      stop:0 rgb(222, 126, 9),
+                                      stop:0 rgb(72, 183, 231),
                                       stop:1 palette(highlight));
     background-color: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                                      stop:0 rgb(222, 126, 9),
+                                      stop:0 rgb(72, 183, 231),
                                       stop:1 palette(highlight));
 }
 
@@ -809,7 +812,7 @@ QLineEdit:read-only
 
 QLineEdit:focus:!read-only
 {
-    border-color: palette(highlight);
+    border-color: rgb(72, 183, 231);
 }
 
 /*===========================================================================
@@ -836,7 +839,7 @@ QPlainTextEdit:read-only
 QTextEdit:focus:!read-only,
 QPlainTextEdit:focus:!read-only
 {
-    border-color: palette(highlight);
+    border-color: rgb(72, 183, 231);
 }
 
 
@@ -852,7 +855,7 @@ QComboBox
 
 QComboBox:focus, QComboBox:on
 {
-    border-color: palette(highlight);
+    border-color: rgb(72, 183, 231);
 }
 
 
@@ -887,9 +890,9 @@ QComboBox::down-arrow
 QComboBox QAbstractItemView
 {
     border: 1px solid rgb(81, 81, 81);
-    border-top: 1px solid palette(highlight);
+    border-top: 1px solid rgb(72, 183, 231);
     background-color: rgb(51, 51, 51);
-    selection-background-color: palette(highlight);
+    selection-background-color: rgb(72, 183, 231);
     selection-color: rgb(51, 51, 51);
     padding: 1px;
 }
@@ -941,7 +944,7 @@ QAbstractSpinBox
 
 QAbstractSpinBox:focus:!read-only
 {
-	border-color: palette(highlight);
+	border-color: rgb(72, 183, 231);
 }
 
 QAbstractSpinBox:disabled,
@@ -1086,7 +1089,7 @@ QSlider::handle:vertical:disabled
 
 QSlider::add-page:vertical
 {
-    background: palette(highlight);
+    background: rgb(72, 183, 231);
     border: 1px solid rgb(81, 81, 81);
 }
 
@@ -1142,7 +1145,7 @@ QSlider::handle:horizontal:disabled
 
 QSlider::sub-page:horizontal
 {
-    background: palette(highlight);
+    background: rgb(72, 183, 231);
     border: 1px solid rgb(81, 81, 81);
 }
 
@@ -1262,12 +1265,6 @@ QAbstractItemView::item:hover:!selected
 {
    background-color: rgb(102, 102, 102);
    color: rgb(51, 51, 51);
-}
-
-QAbstractItemView::item:selected
-{
-    background-color: palette(highlight);
-    color: rgb(51, 51, 51);
 }
 
 QListView::item QLineEdit
@@ -1976,11 +1973,6 @@ QTreeView::branch:open:has-children:!has-siblings,QTreeView::branch:open:has-chi
         /*image: url(images/TreeView_Branch_Open.png);*/
 		image: url(":/widgets/scrollbar_arrow_down_enabled.png");
 }
-
-QTreeView::branch:hover, QTreeView::item:hover {
-        background-color: rgb(64, 64, 64);
-}
-
 
 QTreeView::branch:open:has-children {
         border-image: none;
