@@ -19,7 +19,7 @@ cmd.exe (on Windows). '_copy_xfile' marks the resulting file executable,
 '_copy_file' does not.
 """
 
-load(":copy_common.bzl", "COPY_EXECUTION_REQUIREMENTS", "OsInfo")
+load(":copy_common.bzl", "OsInfo")
 
 def copy_cmd(ctx, src, dst):
     # Most Windows binaries built with MSVC use a certain argument quoting
@@ -46,7 +46,6 @@ def copy_cmd(ctx, src, dst):
         mnemonic = "CopyFile",
         progress_message = "Copying files",
         use_default_shell_env = True,
-        execution_requirements = COPY_EXECUTION_REQUIREMENTS,
     )
 
 def copy_bash(ctx, src, dst):
@@ -58,7 +57,6 @@ def copy_bash(ctx, src, dst):
         mnemonic = "CopyFile",
         progress_message = "Copying files",
         use_default_shell_env = True,
-        execution_requirements = COPY_EXECUTION_REQUIREMENTS,
     )
 
 def _copy_file_impl(ctx):

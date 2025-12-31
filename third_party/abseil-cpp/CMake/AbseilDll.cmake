@@ -6,6 +6,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "algorithm/container.h"
   "base/attributes.h"
   "base/call_once.h"
+  "base/casts.cc"
   "base/casts.h"
   "base/config.h"
   "base/const_init.h"
@@ -95,6 +96,8 @@ set(ABSL_INTERNAL_DLL_FILES
   "container/internal/raw_hash_set.h"
   "container/internal/raw_hash_set_resize_impl.h"
   "container/internal/tracked.h"
+  "container/linked_hash_map.h"
+  "container/linked_hash_set.h"
   "container/node_hash_map.h"
   "container/node_hash_set.h"
   "crc/crc32c.cc"
@@ -128,6 +131,8 @@ set(ABSL_INTERNAL_DLL_FILES
   "debugging/internal/address_is_readable.h"
   "debugging/internal/addresses.h"
   "debugging/internal/bounded_utf8_length_sequence.h"
+  "debugging/internal/borrowed_fixup_buffer.h"
+  "debugging/internal/borrowed_fixup_buffer.cc"
   "debugging/internal/decode_rust_punycode.cc"
   "debugging/internal/decode_rust_punycode.h"
   "debugging/internal/demangle.cc"
@@ -175,6 +180,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "log/internal/conditions.cc"
   "log/internal/conditions.h"
   "log/internal/config.h"
+  "log/internal/container.h"
   "log/internal/fnmatch.h"
   "log/internal/fnmatch.cc"
   "log/internal/globals.cc"
@@ -211,6 +217,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "log/vlog_is_on.h"
   "memory/memory.h"
   "meta/type_traits.h"
+  "meta/internal/requires.h"
   "numeric/bits.h"
   "numeric/int128.cc"
   "numeric/int128.h"
@@ -293,6 +300,7 @@ set(ABSL_INTERNAL_DLL_FILES
   "strings/cord_buffer.h"
   "strings/escaping.cc"
   "strings/escaping.h"
+  "strings/internal/append_and_overwrite.h"
   "strings/internal/charconv_bigint.cc"
   "strings/internal/charconv_bigint.h"
   "strings/internal/charconv_parse.cc"
@@ -324,6 +332,9 @@ set(ABSL_INTERNAL_DLL_FILES
   "strings/internal/cordz_update_tracker.h"
   "strings/internal/damerau_levenshtein_distance.h"
   "strings/internal/damerau_levenshtein_distance.cc"
+  "strings/internal/generic_printer.cc"
+  "strings/internal/generic_printer.h"
+  "strings/internal/generic_printer_internal.h"
   "strings/internal/stl_type_traits.h"
   "strings/internal/string_constant.h"
   "strings/internal/stringify_sink.h"
@@ -342,8 +353,6 @@ set(ABSL_INTERNAL_DLL_FILES
   "strings/str_replace.h"
   "strings/str_split.cc"
   "strings/str_split.h"
-  "strings/string_view.cc"
-  "strings/string_view.h"
   "strings/strip.h"
   "strings/substitute.cc"
   "strings/substitute.h"
@@ -443,9 +452,15 @@ set(ABSL_INTERNAL_DLL_FILES
   "types/variant.h"
   "utility/utility.h"
   "debugging/leak_check.cc"
+  "strings/string_view.h"
 )
 
-if(NOT MSVC)
+if(MSVC)
+  list(APPEND ABSL_INTERNAL_DLL_FILES
+    "time/internal/cctz/src/time_zone_name_win.cc"
+    "time/internal/cctz/src/time_zone_name_win.h"
+  )
+else()
   list(APPEND ABSL_INTERNAL_DLL_FILES
     "flags/commandlineflag.cc"
     "flags/commandlineflag.h"

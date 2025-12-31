@@ -101,6 +101,7 @@ void cpuinfo_arm_linux_decode_isa_from_proc_cpuinfo(
 				case UINT32_C(0x4100D470): /* Cortex-A710 */
 				case UINT32_C(0x4100D480): /* Cortex-X2 */
 				case UINT32_C(0x4100D490): /* Neoverse N2 */
+				case UINT32_C(0x4100D4B0): /* Cortex-A78C */
 				case UINT32_C(0x4100D4D0): /* Cortex-A715 */
 				case UINT32_C(0x4100D4E0): /* Cortex-X3 */
 				case UINT32_C(0x4100D4F0): /* Neoverse V2 */
@@ -149,8 +150,6 @@ void cpuinfo_arm_linux_decode_isa_from_proc_cpuinfo(
 			cpuinfo_log_warning("VDOT instructions disabled: cause occasional SIGILL on Unisoc T310");
 		} else if (chipset->series == cpuinfo_arm_chipset_series_unisoc_ums && chipset->model == 312) {
 			cpuinfo_log_warning("VDOT instructions disabled: cause occasional SIGILL on Unisoc UMS312");
-		} else if (chipset->vendor == cpuinfo_arm_chipset_vendor_unknown) {
-			cpuinfo_log_warning("VDOT instructions disabled: unknown chipset");
 		} else {
 			switch (midr & (CPUINFO_ARM_MIDR_IMPLEMENTER_MASK | CPUINFO_ARM_MIDR_PART_MASK)) {
 				case UINT32_C(0x4100D0B0): /* Cortex-A76 */
@@ -164,6 +163,7 @@ void cpuinfo_arm_linux_decode_isa_from_proc_cpuinfo(
 				case UINT32_C(0x4100D470): /* Cortex-A710 */
 				case UINT32_C(0x4100D480): /* Cortex-X2 */
 				case UINT32_C(0x4100D490): /* Neoverse N2 */
+				case UINT32_C(0x4100D4B0): /* Cortex-A78C */
 				case UINT32_C(0x4100D4D0): /* Cortex-A715 */
 				case UINT32_C(0x4100D4E0): /* Cortex-X3 */
 				case UINT32_C(0x4100D4F0): /* Neoverse V2 */

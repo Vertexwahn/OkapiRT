@@ -510,6 +510,8 @@ enum cpuinfo_uarch {
 	cpuinfo_uarch_cortex_x3 = 0x00300503,
 	/** ARM Cortex-X4. */
 	cpuinfo_uarch_cortex_x4 = 0x00300504,
+	/** ARM Cortex-X925. */
+	cpuinfo_uarch_cortex_x925 = 0x00300505,
 
 	/** ARM Cortex-A510. */
 	cpuinfo_uarch_cortex_a510 = 0x00300551,
@@ -521,6 +523,8 @@ enum cpuinfo_uarch {
 	cpuinfo_uarch_cortex_a715 = 0x00300572,
 	/** ARM Cortex-A720. */
 	cpuinfo_uarch_cortex_a720 = 0x00300573,
+	/** ARM Cortex-A725. */
+	cpuinfo_uarch_cortex_a725 = 0x00300574,
 
 	/** Qualcomm Scorpion. */
 	cpuinfo_uarch_scorpion = 0x00400100,
@@ -534,6 +538,8 @@ enum cpuinfo_uarch {
 	cpuinfo_uarch_saphira = 0x00400104,
 	/** Qualcomm Oryon. */
 	cpuinfo_uarch_oryon = 0x00400105,
+	/** Qualcomm Oryon V3. */
+	cpuinfo_uarch_oryon_v3 = 0x00400106,
 
 	/** Nvidia Denver. */
 	cpuinfo_uarch_denver = 0x00500100,
@@ -607,6 +613,11 @@ enum cpuinfo_uarch {
 	cpuinfo_uarch_tahiti_everest = 0x00700206,
 	/** Apple A18 pro processor (little cores). */
 	cpuinfo_uarch_tahiti_sawtooth = 0x00700207,
+
+	/** Apple M4 processor (big cores). */
+	cpuinfo_uarch_donan_everest = 0x00700308,
+	/** Apple M4 processor (little cores). */
+	cpuinfo_uarch_donan_sawtooth = 0x00700309,
 
 	/** Cavium ThunderX. */
 	cpuinfo_uarch_thunderx = 0x00800100,
@@ -732,7 +743,7 @@ struct cpuinfo_cluster {
 	uint64_t frequency;
 };
 
-#define CPUINFO_PACKAGE_NAME_MAX 48
+#define CPUINFO_PACKAGE_NAME_MAX 64
 
 struct cpuinfo_package {
 	/** SoC or processor chip model name */
