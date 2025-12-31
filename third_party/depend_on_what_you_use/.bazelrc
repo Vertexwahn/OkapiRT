@@ -1,5 +1,75 @@
+# Ensure we are using the hermetic C++ toolchain
+build --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+build --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+
 # Always tell why tests fail
 test --test_output=errors
+
+# We are not interested in warnings from external headers outside our own control
+# Thus, we want them included via 'isystem'
+build --features=external_include_paths
+build --host_features=external_include_paths
+
+# https://clang.llvm.org/docs/DiagnosticsReference.html
+# Most common warnings
+build --cxxopt=-Wall
+build --cxxopt=-Wextra
+# Further warnings for modern style and preventing bugs
+build --cxxopt=-Wcast-qual
+build --cxxopt=-Wconversion
+build --cxxopt=-Wgnu-zero-variadic-macro-arguments
+build --cxxopt=-Wimplicit-fallthrough
+build --cxxopt=-Wnon-virtual-dtor
+build --cxxopt=-Wnull-dereference
+build --cxxopt=-Wold-style-cast
+build --cxxopt=-Wpedantic
+build --cxxopt=-Wshadow-all
+build --cxxopt=-Wsign-conversion
+build --cxxopt=-Wvla
+# Ensure our Code is C++11 compatible
+build --cxxopt=-Wc++11-compat
+build --cxxopt=-Wc++11-compat-pedantic
+# Ensure we do not miss a warning by accident
+build --cxxopt=-Werror
+# Ignore compiler warnings in external code outside our control
+build --per_file_copt=boost.wave/src/.*@-w
+build --per_file_copt=googletest/src/.*@-w
+build --per_file_copt=src/google/protobuf/.*@-w
+build --host_per_file_copt=boost.wave/src/.*@-w
+build --host_per_file_copt=googletest/src/.*@-w
+build --host_per_file_copt=src/google/protobuf/.*@-w
+
+build:clang_tidy --aspects=//tools/clang_tidy:aspect.bzl%clang_tidy
+build:clang_tidy --output_groups=clang_tidy
+
+build:dwyu --aspects=//tools/dwyu:aspect.bzl%dwyu
+build:dwyu --output_groups=dwyu
+
+# https://clang.llvm.org/docs/AddressSanitizer.html
+# https://clang.llvm.org/docs/LeakSanitizer.html
+# https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
+#
+# We are not using the memory sanitizer as it fails in gtest itself
+# We are not sing the thread sanitizer, as we are not using multi threading
+test:sanitize --compilation_mode=dbg
+test:sanitize --cxxopt=-fsanitize=address
+test:sanitize --cxxopt=-fsanitize=leak
+# We want to use 'implicit-conversion', but can't due to boost::regex failing this.
+test:sanitize --cxxopt=-fsanitize=undefined,float-divide-by-zero,unsigned-integer-overflow,local-bounds,vptr,nullability
+test:sanitize --cxxopt=-fno-sanitize-recover=all
+test:sanitize --cxxopt=-O0
+test:sanitize --cxxopt=-g
+test:sanitize --cxxopt=-fno-omit-frame-pointer
+test:sanitize --cxxopt=-fno-sanitize-merge
+test:sanitize --linkopt=-fsanitize=address,leak,undefined
+test:sanitize --linkopt=-fsanitize-link-c++-runtime
+test:sanitize --action_env="print_stacktrace=1"
+# Also use the debug mode offered by the C++ standard lib itself
+# https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_macros.html
+# https://releases.llvm.org/14.0.0/projects/libcxx/docs/DesignDocs/DebugMode.html
+test:sanitize --cxxopt=-D_GLIBCXX_DEBUG=1
+test:sanitize --cxxopt=-D_GLIBCXX_DEBU_PEDANTIC=1
+test:sanitize --cxxopt=-D_LIBCPP_DEBUG=1
 
 # Allow users to provide their own workspace settings
 try-import %workspace%/user.bazelrc

@@ -3,12 +3,15 @@
 
 #include <nlohmann/json.hpp>
 
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace dwyu {
+namespace {
 
 struct ProgramOptions {
     std::string target{};
@@ -22,7 +25,7 @@ struct ProgramOptions {
     bool verbose{false};
 };
 
-ProgramOptions parseProgramOptions(int argc, char* argv[]) {
+ProgramOptions parseProgramOptions(int argc, ProgramOptionsParser::ConstCharArray argv) {
     ProgramOptions options{};
 
     ProgramOptionsParser parser{};
@@ -49,21 +52,6 @@ ProgramOptions parseProgramOptions(int argc, char* argv[]) {
     return options;
 }
 
-std::string listToStr(const std::vector<std::string>& list) {
-    std::string out{"["};
-    for (const auto& element : list) {
-        out += element + ", ";
-    }
-    if (out.size() > 1) {
-        out.pop_back();
-        out.back() = ']';
-    }
-    else {
-        out += "]";
-    }
-    return out;
-}
-
 void printOptions(const ProgramOptions& options) {
     std::cout << "\nAnalyzing dependency " << options.target << "\n";
     std::cout << "Output               " << options.output << "\n";
@@ -75,11 +63,7 @@ void printOptions(const ProgramOptions& options) {
     std::cout << "Defines              " << listToStr(options.defines) << "\n";
 }
 
-} // namespace dwyu
-
-int main(int argc, char* argv[]) {
-    auto options = dwyu::parseProgramOptions(argc, argv);
-
+int main_impl(ProgramOptions options) {
     if (options.verbose) {
         dwyu::printOptions(options);
     }
@@ -103,4 +87,18 @@ int main(int argc, char* argv[]) {
     }
 
     return 0;
+}
+
+} // namespace
+} // namespace dwyu
+
+int main(int argc, char* argv[]) {
+    try {
+        return main_impl(dwyu::parseProgramOptions(argc, argv));
+    } catch (const std::exception& exception) {
+        dwyu::abortWithError("Aborting due to exception: ", exception.what());
+    } catch (...) {
+        dwyu::abortWithError("Aborting due to an unknown exception");
+    }
+    return 1;
 }

@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import subprocess
 from abc import ABC, abstractmethod
+from enum import Enum, auto
 from pathlib import Path
 from shlex import join as shlex_join
 
@@ -13,6 +14,13 @@ from test.support.bazel import make_bazel_version_env
 from test.support.result import Error, Result, Success
 
 log = logging.getLogger()
+
+
+class DwyuImplCompatibility(Enum):
+    NONE = auto()
+    ALL = auto()
+    CPP_ONLY = auto()
+    LEGACY_ONLY = auto()
 
 
 class TestCaseBase(ABC):
@@ -40,6 +48,13 @@ class TestCaseBase(ABC):
         """
         return CompatibleVersions()
 
+    @property
+    def dwyu_impl_compatibility(self) -> DwyuImplCompatibility:
+        """
+        Overwrite this if the test case works only with the legacy Python based implementation and not the new C++ one
+        """
+        return DwyuImplCompatibility.ALL
+
     #
     # Base Implementation
     #
@@ -59,6 +74,9 @@ class TestCaseBase(ABC):
     def choose_aspect(self, aspect: str) -> str:
         return aspect + "_cpp" if self._cpp_impl_based else aspect
 
+    def choose_target(self, target: str) -> str:
+        return target + "_cpp" if self._cpp_impl_based else target
+
     def execute_test(
         self, version: TestedVersions, bazel_bin: Path, output_base: Path | None, extra_args: list[str]
     ) -> Result:
@@ -68,9 +86,10 @@ class TestCaseBase(ABC):
         self._extra_args = extra_args
         return self.execute_test_logic()
 
-    @staticmethod
-    def _check_result(actual: subprocess.CompletedProcess, expected: ExpectedResult) -> Result:
-        as_expected = expected.matches_expectation(return_code=actual.returncode, dwyu_output=actual.stdout)
+    def _check_result(self, actual: subprocess.CompletedProcess, expected: ExpectedResult) -> Result:
+        as_expected = expected.matches_expectation(
+            return_code=actual.returncode, dwyu_output=actual.stdout, is_cpp_impl=self._cpp_impl_based
+        )
 
         log_level = logging.DEBUG if as_expected else logging.INFO
         log.log(log_level, "----- DWYU stdout -----")

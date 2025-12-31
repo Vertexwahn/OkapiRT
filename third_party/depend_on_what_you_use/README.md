@@ -1,6 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
+[![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)](https://github.com/astral-sh/ty)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 - [Depend on what you use (DWYU)](#depend-on-what-you-use-dwyu)
@@ -170,28 +170,38 @@ For example, including header files which do not exist at the expected path.
 ##### Include paths have to be unambiguous
 
 There shall not be multiple header files in the dependency tree of a target matching an include statement.
-Even if analysing the code works initially, it might break at any time if the ordering of paths in the analysis changes.
+Even if analyzing the code works initially, it might break at any time if the ordering of paths in the analysis changes.
 
 # Known limitations
 
-## Preprocessor statements
+## C++ modules
 
-DWYU does not compile the code, but parses it as text and searches for include statements.
-If preprocessor statements control how the code should be interpreted, this is a flawed approach (e.g. include different headers based on the platform).
-To work around this DWYU uses [`pcpp`](https://github.com/ned14/pcpp) to preprocess files before searching for include statements.
+C++ code using [C++ modules](https://en.cppreference.com/w/cpp/language/modules.html) is not supported by DWYU.
 
-In most cases this approach works as desired.
-There are however some edge cases to be aware of:
+Although, `rules_cc` supports C++ modules by now, this is at the time of writing this a new feature for Bazel C++ projects and not yet widely used.
+Also, the preprocessing library [boost wave](https://github.com/boostorg/wave) we depend on is not supporting C++ modules.
 
-1)<br>
-`pcpp` is not the preprocessor used by your C++ toolchain.
-There is no guarantee that it behaves exactly the same.
+## Some cases of conditional include statements
 
-2)<br>
-DWYU can only forward defined values to `pcpp` which are part of the compiler command build by Bazel.
-Some values are however set internally by the compiler while processing files and are unknown to DWYU.<br>
-Common cases for such macros can be seen at [cppreference.com](https://en.cppreference.com/w/cpp/preprocessor/replace#Predefined_macros).
-While DWYU cannot generally know the values of all those compiler defined macros, we offer a feature to set `__cplusplus` based on a heuristic.
+DWYU does not compile the code.
+It uses a preprocessor library to parse it and extract the relevant include statements.
+
+This approach is flawed, as this DWYU preprocessing step is not doing the exact same thing as your Bazel CC toolchain preprocessor due to being a different program.
+On top, the DWYU preprocessing step is missing information.
+There are a lot of macros defining the platform behavior and system library capabilities, which are not passed on the command line to the compiler but set internally by the compiler.
+DWYU does not have access to those values.
+For this reason, DWYU skips the Bazel CC toolchain standard library and system headers during reprocessing, as we do not have the information to preprocess them properly.
+
+Consequently, if a project uses conditional include statements based on macros not visible to Bazel, DWYU cannot properly process them.
+We consider this however a rare edge case.
+Most projects use conditional include statements based on macros set by Bazel to accommodate for variation points in the build process, which DWYU can process just fine.
+
+If your project is impacted by this edge case, you can try some mitigation strategies:
+
+- You can use the `experimental_no_preprocessor` DWYU aspect option to disable preprocessing.
+  As long as you don't use select statements to dynamically switch between different dependencies for your targets this still allows a proper DWYU analysis.
+- You can use `--cxxopt=-DSomeMacro=42` to manually set the missing macro via Bazel to make it known to Bazel.
+  This works best if you define a Bazel config for execution the DWYU aspect and make the cxxopt part of the config.
 
 ## Specifying include paths via `copts` and similar
 
@@ -201,24 +211,28 @@ DWYU relies on the information in the `CcInfo` provider to analyze available inc
 If a targets has to define special include paths, it should use the proper Bazel API via the C/C++ rules attributes \[`includes`, `include_prefix`, `strip_include_prefix`\].
 Include paths specified by those attributes are respected by DWYU.
 
+## Framework includes
+
+DWYU considers [framework includes](https://bazel.build/rules/lib/builtins/CompilationContext.html#framework_includes) like system headers or CC toolchain headers and thus does not process them.
+
 # Supported Platforms
 
 ### Aspect
 
-| Platform         | Constraints                                                                         |
-| ---------------- | ----------------------------------------------------------------------------------- |
-| Operating system | Integration tests check [Ubuntu 24.04, Macos 15, Windows 2022].                     |
-| Python           | Minimum version is 3.8. Integration tests check [3.8, 3.9, 3.10, 3.11, 3.12, 3.13]. |
-| Bazel            | Minimum version is 6.4.0. Integration tests check [6.4, 7.x, 8.x, rolling].         |
-
-### Applying fixes
-
 | Platform         | Constraints                                                     |
 | ---------------- | --------------------------------------------------------------- |
 | Operating system | Integration tests check [Ubuntu 24.04, Macos 15, Windows 2022]. |
-| Python           | Minimum version is 3.8. Integration tests check 3.8.            |
-| Bazel            | No known constraint. Integration tests check 7.4.1.             |
-| Buildozer        | No known constraint. Integration tests check 7.3.1.             |
+| Python           | Minimum tested version is 3.8. Maximum tested version is 3.13.  |
+| Bazel            | Minimum tested version is 7.2.1. Maximum tested version is 9.x. |
+
+### Applying fixes
+
+| Platform         | Constraints                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| Operating system | Integration tests check [Ubuntu 24.04, Macos 15, Windows 2022].                                            |
+| Python           | Integration tests check 3.8.                                                                               |
+| Bazel            | No known constraint. Integration tests check the Bazel version defined in [.bazelversion](/.bazelversion). |
+| Buildozer        | No known constraint. Integration tests check 8.2.1.                                                        |
 
 # Alternatives to DWYU
 

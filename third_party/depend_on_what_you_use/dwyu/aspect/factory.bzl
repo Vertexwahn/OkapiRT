@@ -1,4 +1,5 @@
 load("@rules_cc//cc:find_cc_toolchain.bzl", "use_cc_toolchain")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//dwyu/cc_info_mapping:providers.bzl", "DwyuCcInfoMappingInfo")
 load("//dwyu/cc_toolchain_headers:providers.bzl", "DwyuCcToolchainHeadersInfo")
 load(":dwyu.bzl", "dwyu_aspect_impl")
@@ -39,7 +40,8 @@ def dwyu_aspect_factory(
                                       This preprocessor is however slow, when analyzing complex files.
                                       Using this option can speed up the DWYU analysis significantly.
 
-        experimental_set_cplusplus: **Experimental** feature whose behavior is not yet stable and might change at any time.<br>
+        experimental_set_cplusplus: **DEPRECATED**: This feature will be removed in the next release.
+                                    See the [define_macros](/examples/define_macros/) example for the forward path solution.<br><br>
                                     `__cplusplus` is a macro defined by the compiler specifying if C++ is used to compile the file and which C++ standard is used.<br>
                                     DWYU cannot treat this like other preprocessor defines, as this is often not coming from the command line or the Bazel C++ toolchain.
                                     The compiler itself defines the value for `__cplusplus` and sets it internally during preprocessing.<br>
@@ -114,11 +116,12 @@ def dwyu_aspect_factory(
                                    In other words, a list of all possible include statements in your code which would point to CC toolchain headers.
 
         use_cpp_implementation: Switch parts of the internal tools executed by DWYU to a C++ based implementation instead of Python scripting.
-                                This is performance improvement not changing DWYU behavior.
-                                For now only some parts of the implementation are available in C++.
+                                This is mostly a performance improvement and DWYU should not behave significantly different.
+                                That much said, different behavior in certain edge cases is possible.
+                                For now only parts of the implementation are switched to C++.
                                 We will migrate more parts of the implementation step by step in future releases.
                                 Since, the C++ based implementation is new, this is for now an opt-in.
-                                However this will become the default eventually.
+                                However, this will become the default eventually.
 
         use_implementation_deps: `cc_library` offers the attribute [`implementation_deps`](https://bazel.build/reference/be/c-cpp#cc_library.implementation_deps) to distinguish between public (aka interface) and private (aka implementation) dependencies.
                                  Headers from the private dependencies are not made available to users of the library.<br>
@@ -141,18 +144,24 @@ def dwyu_aspect_factory(
         cc_toolchain_headers = cc_toolchain_headers_info if cc_toolchain_headers_info else Label("//dwyu/aspect/private:cc_toolchain_headers")
     else:
         cc_toolchain_headers = Label("//dwyu/aspect/private:cc_toolchain_headers_stub")
-    target_processor = Label("//dwyu/aspect/private/process_target:main_cc") if use_cpp_implementation else Label("//dwyu/aspect/private/process_target:main_py")
+    if use_cpp_implementation:
+        target_processor = Label("//dwyu/aspect/private/process_target:main_cc")
+        tool_preprocessing = Label("//dwyu/aspect/private/preprocessing:main_no_preprocessing") if experimental_no_preprocessor else Label("//dwyu/aspect/private/preprocessing:main")
+        tool_analyze_includes = Label("//dwyu/aspect/private/analyze_includes:main")
+
+        # The C++ based implementation no longer needs the information about the toolchain headers
+        cc_toolchain_headers = Label("//dwyu/aspect/private:cc_toolchain_headers_stub")
+    else:
+        target_processor = Label("//dwyu/aspect/private/process_target:main_py")
+        tool_preprocessing = Label("//dwyu/aspect/private/preprocessing:stub")
+        tool_analyze_includes = Label("//dwyu/aspect/private/preprocessing:stub")
     return aspect(
         implementation = dwyu_aspect_impl,
         attr_aspects = attr_aspects,
         fragments = ["cpp"],
-        # Uncomment when minimum Bazel version is 7.0.0, see https://github.com/bazelbuild/bazel/issues/19609
-        # DWYU is only able to work on targets providing CcInfo. Other targets shall be skipped.
-        # required_providers = [CcInfo],
+        required_providers = [CcInfo],
         toolchains = use_cc_toolchain(mandatory = True),
         attrs = {
-            # Remove after minimum Bazel version is 7, see https://docs.google.com/document/d/14vxMd3rTpzAwUI9ng1km1mp-7MrVeyGFnNbXKF_XhAM/edit?tab=t.0
-            "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
             "_cc_toolchain_headers": attr.label(
                 default = cc_toolchain_headers,
                 providers = [DwyuCcToolchainHeadersInfo],
@@ -191,12 +200,27 @@ def dwyu_aspect_factory(
                 providers = [DwyuCcInfoMappingInfo],
                 default = aspect_target_mapping,
             ),
+            "_tool_analyze_includes": attr.label(
+                default = tool_analyze_includes,
+                executable = True,
+                cfg = "exec",
+                doc = "Main logic for the analysis done by this aspect. This compares the include statements in the code and compares them to the available dependencies.",
+            ),
+            "_tool_preprocessing": attr.label(
+                default = tool_preprocessing,
+                executable = True,
+                cfg = "exec",
+                doc = "Preprocess the source code under inspection to resolve conditional preprocessor statements and discover include statements.",
+            ),
             "_tool_process_target": attr.label(
                 default = target_processor,
                 executable = True,
                 cfg = "exec",
                 doc = "Tool for processing the target under inspection and its dependencies. We have to perform this" +
                       " as separate action, since otherwise we can't look into TreeArtifact sources.",
+            ),
+            "_use_cpp_implementation": attr.bool(
+                default = use_cpp_implementation,
             ),
             "_use_implementation_deps": attr.bool(
                 default = use_implementation_deps,

@@ -38,6 +38,8 @@ python.toolchain(python_version = "3.13")
 bazel_dep(name = "rules_cc", version = "0.0.1")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "rules_shell", version = "0.4.1")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
+bazel_dep(name = "boost.chrono", version = "1.87.0")
 
 ##
 ## Workspaces for test purposes
@@ -53,6 +55,12 @@ bazel_dep(name = "complex_includes_test_repo")
 local_path_override(
     module_name = "complex_includes_test_repo",
     path = "complex_includes/ext_repo",
+)
+
+bazel_dep(name = "impl_deps_external_test_repo")
+local_path_override(
+    module_name = "impl_deps_external_test_repo",
+    path = "implementation_deps/external_repo",
 )
 
 bazel_dep(name = "skip_external_deps_test_repo")

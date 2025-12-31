@@ -60,7 +60,7 @@ TOOLCHAINS = [
     ToolchainConfig(
         name="host_toolchain",
         source="https://github.com/bazelbuild/rules_cc",
-        bazel_versions=[BazelVersion("6.4.0"), BazelVersion("7.0.0"), BazelVersion("8.0.0"), BazelVersion("rolling")],
+        bazel_versions=[BazelVersion("7.2.1"), BazelVersion("8.x"), BazelVersion("9.*")],
         platforms=["Linux", "Darwin", "Windows"],
         extra_args=[],
         module_snippet="",
@@ -68,7 +68,8 @@ TOOLCHAINS = [
     ToolchainConfig(
         name="toolchains_llvm",
         source="https://github.com/bazel-contrib/toolchains_llvm",
-        bazel_versions=[BazelVersion("7.0.0"), BazelVersion("8.0.0"), BazelVersion("rolling")],
+        # There is not yet a version supporting Bazel 9
+        bazel_versions=[BazelVersion("7.2.1"), BazelVersion("8.x")],
         platforms=["Linux", "Darwin"],
         extra_args=["--config=no_default_toolchain"],
         module_snippet="""
@@ -84,7 +85,7 @@ register_toolchains("@llvm_toolchain//:all")
     ToolchainConfig(
         name="toolchains_llvm_bootstrapped",
         source="https://github.com/cerisier/toolchains_llvm_bootstrapped",
-        bazel_versions=[BazelVersion("7.0.0"), BazelVersion("8.0.0")],
+        bazel_versions=[BazelVersion("7.2.1"), BazelVersion("8.x")],
         # Based on the rules_based approach which seems to not properly set the compiler executable in CcToolchainInfo
         platforms=[],
         extra_args=["--config=no_default_toolchain", "--experimental_cc_static_library"],
@@ -97,9 +98,9 @@ register_toolchains("@toolchains_llvm_bootstrapped//toolchain:all")
     ToolchainConfig(
         name="hermetic_cc_toolchain",
         source="https://github.com/uber/hermetic_cc_toolchain",
-        # On GitHub worker das not work with Bazel >= 9.0.0 or 7.0.0 for an unknown reason. Compiler is executable but does provide empty output when called.
-        bazel_versions=[BazelVersion("6.4.0"), BazelVersion("7.1.0"), BazelVersion("8.0.0")],
-        platforms=["Linux", "Darwin", "Windows"],
+        # There is not yet a version supporting Bazel 9
+        bazel_versions=[BazelVersion("7.2.1"), BazelVersion("8.x")],
+        platforms=["Linux", "Darwin"],
         extra_args=["--config=no_default_toolchain"],
         module_snippet="""
 bazel_dep(name = "hermetic_cc_toolchain", version = "3.1.0")
@@ -113,7 +114,8 @@ register_toolchains("@zig_sdk//...")
     ToolchainConfig(
         name="toolchains_musl",
         source="https://github.com/bazel-contrib/musl-toolchain",
-        bazel_versions=[BazelVersion("6.4.0"), BazelVersion("7.0.0"), BazelVersion("8.0.0"), BazelVersion("rolling")],
+        # There is not yet a version supporting Bazel 9
+        bazel_versions=[BazelVersion("7.2.1"), BazelVersion("8.x")],
         # Cannot compile from Darwin to Darwin, just cross compile from Darwin to Linux. Cross compilation is not yet supported/tested though.
         platforms=["Linux"],
         extra_args=["--config=no_default_toolchain"],
@@ -142,7 +144,7 @@ def make_output_base(output_base: Path) -> list[str]:
     return [f"--output_base={output_base}"]
 
 
-def run_tests(workspace: Path, bazel_bin: Path, toolchain: ToolchainConfig, use_output_base: bool) -> list[str]:
+def run_tests(workspace: Path, bazel_bin: Path, toolchain: ToolchainConfig, ci_mode: bool) -> list[str]:
     log.info(f"\n##\n## Testing toolchain '{toolchain.name}'\n##")
     output_root = Path.home() / ".cache" / "bazel" / "dwyu" / "test_cc_toolchain"
     failures = []
@@ -154,8 +156,12 @@ def run_tests(workspace: Path, bazel_bin: Path, toolchain: ToolchainConfig, use_
     for bazel_version in toolchain.bazel_versions:
         log.info(f"\n>> Testing with Bazel '{bazel_version.resolved}'")
 
+        if ci_mode:
+            log.info("\n>> Clean Bazel artifacts\n")
+            subprocess.run(["bazel", "clean", "--expunge"], cwd=workspace, check=True)
+
         output_base_arg = (
-            make_output_base(output_root / f"{toolchain.name}_bazel_{bazel_version.dynamic}") if use_output_base else []
+            make_output_base(output_root / f"{toolchain.name}_bazel_{bazel_version.dynamic}") if not ci_mode else []
         )
         env = make_bazel_version_env(bazel_version.resolved)
         cmd = [
@@ -163,7 +169,6 @@ def run_tests(workspace: Path, bazel_bin: Path, toolchain: ToolchainConfig, use_
             *output_base_arg,
             "--max_idle_secs=10",
             "build",
-            "--enable_bzlmod=true",
             "--config=dwyu",
             *toolchain.extra_args,
             "//:use_toolchain_headers",
@@ -196,9 +201,18 @@ def cli() -> argparse.Namespace:
         help="Instead of running the integration tests, create a permanent workspace for manual testing. Has to be used with '--toolchain'",
     )
     parser.add_argument(
-        "--no_output_base",
+        "--use_cpp_impl",
+        "-cpp",
         action="store_true",
-        help="Do not create a dedicated output base per test. Optimizes CI runs for which dedicated outout bases are a slowdown, as the system is either way thrown away.",
+        help="""
+        We have a new C++ based implementation of DWYU. This is for now a parallel implementation. Use this flag to ensure the C++ based
+        implementation works with extracting header files directly from the CC toolchain.
+        """,
+    )
+    parser.add_argument(
+        "--ci_mode",
+        action="store_true",
+        help="In the CI we have limited disk space. Thus, we do not use output bases and perform cleans in between the tests.",
     )
 
     parsed_args = parser.parse_args()
@@ -227,6 +241,7 @@ def main(args: argparse.Namespace) -> int:
             workspace=args.manifest_repo,
             dwyu_path=dwyu_path,
             module_extra_content=toolchains_under_test[0].module_snippet,
+            use_cpp_impl=args.use_cpp_impl,
         )
         return 0
 
@@ -236,14 +251,17 @@ def main(args: argparse.Namespace) -> int:
         # Ignore cleanup errors as otherwise we have problems in windows CI jobs
         with TemporaryDirectory(ignore_cleanup_errors=True) as tmp_workspace:
             prepare_workspace(
-                workspace=Path(tmp_workspace), dwyu_path=dwyu_path, module_extra_content=toolchain.module_snippet
+                workspace=Path(tmp_workspace),
+                dwyu_path=dwyu_path,
+                module_extra_content=toolchain.module_snippet,
+                use_cpp_impl=args.use_cpp_impl,
             )
             failures.extend(
                 run_tests(
                     workspace=Path(tmp_workspace),
                     bazel_bin=bazel_bin,
                     toolchain=toolchain,
-                    use_output_base=not args.no_output_base,
+                    ci_mode=args.ci_mode,
                 )
             )
 
