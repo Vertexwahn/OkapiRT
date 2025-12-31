@@ -84,10 +84,12 @@ namespace detail {
 template <typename Char, typename PathChar>
 auto get_path_string(const std::filesystem::path& p,
                      const std::basic_string<PathChar>& native) {
-  if constexpr (std::is_same_v<Char, char> && std::is_same_v<PathChar, wchar_t>)
-    return to_utf8<wchar_t>(native, to_utf8_error_policy::replace);
-  else
+  if constexpr (std::is_same_v<Char, char> &&
+                std::is_same_v<PathChar, wchar_t>) {
+    return to_utf8<wchar_t>(native, to_utf8_error_policy::wtf);
+  } else {
     return p.string<Char>();
+  }
 }
 
 template <typename Char, typename PathChar>
@@ -644,6 +646,11 @@ struct formatter<std::atomic_flag, Char> : formatter<bool, Char> {
   }
 };
 #endif  // __cpp_lib_atomic_flag_test
+
+template <typename T> struct is_tuple_like;
+
+template <typename T>
+struct is_tuple_like<std::complex<T>> : std::false_type {};
 
 template <typename T, typename Char> struct formatter<std::complex<T>, Char> {
  private:

@@ -522,7 +522,7 @@ auto format_to_n(OutputIt out, size_t n, const S& fmt, T&&... args)
     -> format_to_n_result<OutputIt> {
   using traits = detail::fixed_buffer_traits;
   auto buf = detail::iterator_buffer<OutputIt, char, traits>(out, n);
-  fmt::format_to(std::back_inserter(buf), fmt, std::forward<T>(args)...);
+  fmt::format_to(appender(buf), fmt, std::forward<T>(args)...);
   return {buf.out(), buf.count()};
 }
 
@@ -559,8 +559,8 @@ template <size_t N> class static_format_result {
     *fmt::format_to(data, fmt, std::forward<T>(args)...) = '\0';
   }
 
-  auto str() const -> fmt::string_view { return {data, N - 1}; }
-  auto c_str() const -> const char* { return data; }
+  FMT_CONSTEXPR auto str() const -> fmt::string_view { return {data, N - 1}; }
+  FMT_CONSTEXPR auto c_str() const -> const char* { return data; }
 };
 
 /**

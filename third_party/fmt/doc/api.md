@@ -321,8 +321,6 @@ parameterized version.
 
 ::: arg(const Char*, const T&)
 
-Named arguments are not supported in compile-time checks at the moment.
-
 ### Compatibility
 
 ::: basic_string_view
@@ -624,6 +622,8 @@ Example:
 
 ::: ostream
 
+::: output_file(cstring_view, T...)
+
 ::: windows_error
 
 <a id="ostream-api"></a>
@@ -706,7 +706,7 @@ following differences:
   precision that provides round-trip guarantees similarly to other languages
   like Java and Python. `std::format` is currently specified in terms of
   `std::to_chars` which tries to generate the smallest number of characters
-  (ignoring redundant digits and sign in exponent) and may procude more
+  (ignoring redundant digits and sign in exponent) and may produce more
   decimal digits than necessary.
 
 ## Configuration Options
@@ -746,7 +746,7 @@ configuring CMake.
     - `0` - off (default)
     - `1` - disables locale support and applies some optimizations
     - `2` - disables some Unicode features, named arguments and applies more
-      aggresive optimizations
+      aggressive optimizations
 
 ### Binary Size Optimization
 
