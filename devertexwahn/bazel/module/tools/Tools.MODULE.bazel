@@ -3,14 +3,14 @@
     SPDX-License-Identifier: Apache-2.0
 """
 
-#bazel_dep(name = "aspect_rules_lint", version = "1.10.2", dev_dependency = True)  # removed since download from GitLab fails often
+#bazel_dep(name = "aspect_rules_lint", version = "2.0.0", dev_dependency = True)  # removed since download from GitLab fails often
 bazel_dep(name = "bazel_clang_tidy", dev_dependency = True)
 bazel_dep(name = "bazel_iwyu", version = "0.0.1", dev_dependency = True)
 bazel_dep(name = "bazel_sonarqube", version = "1.0.3", dev_dependency = True)
-bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.1", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.2", dev_dependency = True)
 bazel_dep(name = "buildozer", version = "8.2.1", dev_dependency = True)
 bazel_dep(name = "cpplint", version = "2.0.2", dev_dependency = True)
-bazel_dep(name = "depend_on_what_you_use", version = "0.11.0", dev_dependency = True)
+bazel_dep(name = "depend_on_what_you_use", version = "0.12.0", dev_dependency = True)
 bazel_dep(name = "rules_doxygen", version = "2.6.1", dev_dependency = True)
 bazel_dep(name = "rules_license", version = "1.0.0", dev_dependency = True)
 
