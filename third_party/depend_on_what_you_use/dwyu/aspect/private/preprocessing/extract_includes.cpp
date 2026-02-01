@@ -1,6 +1,5 @@
 #include "dwyu/aspect/private/preprocessing/extract_includes.h"
 
-#include <climits>
 #include <istream>
 #include <set>
 #include <string>
@@ -62,8 +61,9 @@ class IncludeStatementExtractor {
                 expect_quoting_or_white_space_ = true;
                 return;
             default:
-                // We can never reach here
-                expect_next_ = CHAR_MAX;
+                // Defensive Programming, we cannot reach this point
+                ongoing_extraction_ = false;
+                return;
             }
         }
 
@@ -72,12 +72,14 @@ class IncludeStatementExtractor {
         }
 
         if (expect_quoting_or_white_space_ && (character == '"' || character == '<')) {
+            parsed_include_ += character;
             expect_quoting_or_white_space_ = false;
             expect_path_ = true;
             return;
         }
 
         if (expect_path_ && (character == '"' || character == '>')) {
+            parsed_include_ += character;
             ongoing_extraction_ = false;
             finished_extraction_ = true;
             return;
@@ -88,7 +90,7 @@ class IncludeStatementExtractor {
             return;
         }
 
-        // Reaching here means it is not an include statement
+        // Reaching here means there is unexpected content after '#include', aka no whitespace or quoting
         ongoing_extraction_ = false;
     }
 

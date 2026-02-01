@@ -29,20 +29,21 @@ bazel_dep(name = "zstd", version = "1.5.5.bcr.1")
 ### Development Dependencies
 ###
 
-bazel_dep(name = "aspect_bazel_lib", version = "2.21.2", dev_dependency = True)
+bazel_dep(name = "aspect_bazel_lib", version = "2.22.2", dev_dependency = True)
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2", dev_dependency = True)
+bazel_dep(name = "protobuf", version = "33.4", dev_dependency = True)
+bazel_dep(name = "toolchains_llvm", version = "1.6.0", dev_dependency = True)
+
+###
+### Development Toolchains
+###
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python", dev_dependency = True)
 python.toolchain(python_version = "3.8")
 
-bazel_dep(name = "googletest", version = "1.17.0.bcr.2", dev_dependency = True)
-
-# Too old protobuf causes build failures with abseil
-bazel_dep(name = "protobuf", version = "31.1", dev_dependency = True)
-bazel_dep(name = "toolchains_llvm", version = "1.6.0", dev_dependency = True)
-
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm", dev_dependency = True)
 llvm.toolchain(
-    llvm_version = "20.1.8",
+    llvm_version = "21.1.6",
 )
 use_repo(llvm, "llvm_toolchain")
 

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -35,7 +36,7 @@ struct ProgramOptions {
     bool verbose{false};
 };
 
-ProgramOptions parseProgramOptions(int argc, ProgramOptionsParser::ConstCharArray argv) {
+ProgramOptions parseProgramOptions(const int argc, ProgramOptionsParser::ConstCharArray argv) {
     ProgramOptions options{};
     ProgramOptionsParser parser{};
 
@@ -59,10 +60,12 @@ bw::util::include_paths makeIncludePaths(const ProgramOptions& options) {
     bw::util::include_paths include_paths{};
 
     for (const auto& path : options.include_paths) {
-        include_paths.add_include_path(path.c_str(), false);
+        constexpr bool is_no_system_include{false};
+        std::ignore = include_paths.add_include_path(path.c_str(), is_no_system_include);
     }
     for (const auto& path : options.system_include_paths) {
-        include_paths.add_include_path(path.c_str(), true);
+        constexpr bool is_system_include{true};
+        std::ignore = include_paths.add_include_path(path.c_str(), is_system_include);
     }
 
     return include_paths;
@@ -99,9 +102,11 @@ std::vector<IncludedFile> makeResolvedIncludes(const std::set<std::string>& incl
 
 int main_impl(const ProgramOptions& options) {
     if (options.verbose) {
-        std::cout << "Preprocessing        : " << dwyu::listToStr(options.files) << "\n";
-        std::cout << "Include paths        : " << dwyu::listToStr(options.include_paths) << "\n";
-        std::cout << "System include paths : " << dwyu::listToStr(options.system_include_paths) << "\n";
+        std::cout << "\n";
+        std::cout << ">> Preprocessing " << listToStr(options.files) << "\n";
+        std::cout << "\n";
+        std::cout << "Include paths        : " << listToStr(options.include_paths) << "\n";
+        std::cout << "System include paths : " << listToStr(options.system_include_paths) << "\n";
     }
 
     const auto working_dir = bfs::current_path();
@@ -111,10 +116,10 @@ int main_impl(const ProgramOptions& options) {
     for (const auto& file : options.files) {
         std::ifstream input{file};
         if (!input.is_open()) {
-            dwyu::abortWithError("Could not open input file '", file, "'");
+            abortWithError("Could not open input file '", file, "'");
         }
 
-        auto includes = dwyu::extractIncludes(input);
+        const auto includes = extractIncludes(input);
         updateIncludePathsForRelativeIncludes(file, include_paths);
 
         nlohmann::json entry{};
@@ -129,7 +134,7 @@ int main_impl(const ProgramOptions& options) {
         output.close();
     }
     else {
-        dwyu::abortWithError("Unable to open output file '", options.output, "'");
+        abortWithError("Unable to open output file '", options.output, "'");
     }
 
     return 0;

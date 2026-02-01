@@ -7,10 +7,12 @@ load(":dwyu.bzl", "dwyu_aspect_impl")
 _DEFAULT_SKIPPED_TAGS = ["no-dwyu"]
 
 def dwyu_aspect_factory(
+        analysis_optimizes_impl_deps = False,
         experimental_no_preprocessor = False,
         experimental_set_cplusplus = False,
         ignore_cc_toolchain_headers = False,
         ignored_includes = None,
+        no_preprocessor = False,
         recursive = False,
         skip_external_targets = False,
         skipped_tags = _DEFAULT_SKIPPED_TAGS,
@@ -30,32 +32,30 @@ def dwyu_aspect_factory(
     ```
 
     Args:
-        experimental_no_preprocessor: **Experimental** feature whose behavior is not yet stable and might change at any time.<br>
-                                      This option disables the preprocessing before discovering the include statements in the files under inspection.
-                                      Do not use this option, unless you are sure you really need this performance boost and the downsides are not relevant to your project.
-                                      When the preprocessing is disabled, DWYU still ignores commented include statements.<br>
-                                      When using this option, DWYU will no longer be able to correctly resolve conditional include logic (`#ifdef` around include statements) or any other preprocessor directives and macros influencing include statements.
-                                      A common example requiring preprocessing is having different include statements and Bazel target dependencies depending on whether the host is a Windows or Linux system.<br>
-                                      By default, DWYU uses a preprocessor to resolve such cases.
-                                      This preprocessor is however slow, when analyzing complex files.
-                                      Using this option can speed up the DWYU analysis significantly.
+        analysis_optimizes_impl_deps: Setting this to True will raise an error for `cc_library` targets where headers from a `deps` dependency are used only in private files.
+                                      Such dependencies should be moved from `deps` to [implementation_deps](https://bazel.build/reference/be/c-cpp#cc_library.implementation_deps) to optimize the dependency graph of the project.<br>
+                                      This flag can also be controlled in a Bazel config or on the command line via `--aspects_parameters=dwyu_analysis_optimizes_impl_deps=[True|False]`.<br>
+                                      This feature is demonstrated in the [basic_usage example](/examples/basic_usage).
 
-        experimental_set_cplusplus: **DEPRECATED**: This feature will be removed in the next release.
-                                    See the [define_macros](/examples/define_macros/) example for the forward path solution.<br><br>
+        experimental_no_preprocessor: Deprecated flag.
+                                      This feature is now stable.
+                                      See [no_preprocessor](https://github.com/martis42/depend_on_what_you_use/blob/main/docs/dwyu_aspect.md#dwyu_aspect_factory-no_preprocessor)
+
+        experimental_set_cplusplus: **DEPRECATED**: This flag will be removed together with the Python implementation.
+                                    The new C++ based implementation will always try to set a proper `__cplusplus`.<br><br>
                                     `__cplusplus` is a macro defined by the compiler specifying if C++ is used to compile the file and which C++ standard is used.<br>
                                     DWYU cannot treat this like other preprocessor defines, as this is often not coming from the command line or the Bazel C++ toolchain.
                                     The compiler itself defines the value for `__cplusplus` and sets it internally during preprocessing.<br>
-                                    This option enables a heuristic to set `__cplusplus` for the preprocessor used internally by DWYU:
-                                    <ul><li>
-                                      If at least one source file is not using file extension [`.c`, `.h`], set `__cplusplus` to 1.
-                                    </li><li>
-                                      If a common compiler option is used to set the C++ standard with an unknown value, set `__cplusplus` to 1.
-                                    </li><li>
-                                      If a common compiler option is used to set the C++ standard with an known value, set `__cplusplus` according to [this map](https://en.cppreference.com/w/cpp/preprocessor/replace#Predefined_macros).
-                                    </li></ul>
+                                    This option enables a heuristic to set `__cplusplus` for the preprocessor used internally by DWYU.
+                                    We look at the compilation command one would use to compile the code and look for `-std=..`.
+                                    If it is is present and has a legal value, we deduce `__cplusplus` and set it for the preprocessing.
+                                    If this logic fails, `__cplusplus` is not set.
+                                    Users can provide their own value by setting `__cplusplus` via Bazel (e.g. via `--cxxopt=-D__cplusplus=42`) which will take precedence over the heuristic used by DWYU.
                                     This feature is demonstrated in the [set_cpp_standard example](/examples/set_cpp_standard).
 
-        ignore_cc_toolchain_headers: Infer automatically which header files can be reached through the active CC toolchain without the target under inspection having to declare any explicit dependency.
+        ignore_cc_toolchain_headers: **DEPRECATED**: The new C++ based implementation no longer needs to know the exact toolchain headers.
+                                     Thus, this feature will be removed when the Python implementation is being removed.<br><br>
+                                     Infer automatically which header files can be reached through the active CC toolchain without the target under inspection having to declare any explicit dependency.
                                      Include statements to those headers are ignored when DWYU compares include statements to the dependencies of the target under inspection.
                                      Automatically inferring the toolchain headers will become the default behavior in a future release.<br>
                                      If this option is false, the legacy DWYU behavior is to use a manually maintained list of system headers and standard library headers.
@@ -90,6 +90,12 @@ def dwyu_aspect_factory(
                           </li></ul>
                           This feature is demonstrated in the [ignoring_includes example](/examples/ignoring_includes).
 
+        no_preprocessor: This option disables the preprocessing step before discovering the include statements in the files under inspection.
+                         When the preprocessing is disabled, DWYU still ignores commented include statements.
+                         Using this option can speed up the DWYU analysis.<br>
+                         When using this option, DWYU will no longer be able to correctly resolve conditional include logic (`#ifdef` around include statements) or any other preprocessor directives and macros influencing include statements.
+                         A common example requiring preprocessing is having different include statements and Bazel target dependencies depending on whether the host is a Windows or Linux system.
+
         recursive: By default, the DWYU aspect analyzes only the target it is being applied to.
                    You can change this to recursively analyzing dependencies following the `deps` and `implementation_deps` attributes by setting this to True.<br>
                    This feature is demonstrated in the [recursion example](/examples/recursion).
@@ -108,7 +114,8 @@ def dwyu_aspect_factory(
                         For the full details see the `dwyu_make_cc_info_mapping` documentation.<br>
                         This feature is demonstrated in the [target_mapping example](/examples/target_mapping).
 
-        cc_toolchain_headers_info: Requires setting [ignore_cc_toolchain_headers](https://github.com/martis42/depend_on_what_you_use/blob/main/docs/dwyu_aspect.md#dwyu_aspect_factory-ignore_cc_toolchain_headers) to True.
+        cc_toolchain_headers_info: **DEPRECATED**: See [ignore_cc_toolchain_headers](https://github.com/martis42/depend_on_what_you_use/blob/main/docs/dwyu_aspect.md#dwyu_aspect_factory-ignore_cc_toolchain_headers).<br><br>
+                                   Requires setting [ignore_cc_toolchain_headers](https://github.com/martis42/depend_on_what_you_use/blob/main/docs/dwyu_aspect.md#dwyu_aspect_factory-ignore_cc_toolchain_headers) to True.
                                    Use this option to inject your own analysis of the CC toolchain.
                                    Provide the label to a target offering the provider [DwyuCcToolchainHeadersInfo](/dwyu/cc_toolchain_headers/providers.bzl).
                                    It is your choice if you simply use a hard coded list or implement a logic looking up the information dynamically.
@@ -123,30 +130,36 @@ def dwyu_aspect_factory(
                                 Since, the C++ based implementation is new, this is for now an opt-in.
                                 However, this will become the default eventually.
 
-        use_implementation_deps: `cc_library` offers the attribute [`implementation_deps`](https://bazel.build/reference/be/c-cpp#cc_library.implementation_deps) to distinguish between public (aka interface) and private (aka implementation) dependencies.
-                                 Headers from the private dependencies are not made available to users of the library.<br>
-                                 Setting this to True allows DWYU to raise an error if headers from a `deps` dependency are used only in private files.
-                                 In such a cease the dependency should be moved from `deps` to `implementation_deps`.<br>
-                                 This feature is demonstrated in the [basic_usage example](/examples/basic_usage).
+        use_implementation_deps: Deprecated flag, which will be removed in a future release.
+                                 See [analysis_optimizes_impl_deps](https://github.com/martis42/depend_on_what_you_use/blob/main/docs/dwyu_aspect.md#dwyu_aspect_factory-analysis_optimizes_impl_deps) for the proper flag.
 
-        verbose: If True, print debugging information about what DWYU does.
+        verbose: If True, print debugging information about the individual DWYU actions.<br>
+                 This flag can also be controlled in a Bazel config or on the command line via `--aspects_parameters=dwyu_verbose=[True|False]`.
 
     Returns:
         Configured DWYU aspect
     """
     attr_aspects = []
+    if use_implementation_deps:
+        # buildifier: disable=print
+        print("WARNING: 'use_implementation_deps' is a deprecated flag. Use 'analysis_optimizes_impl_deps' instead.")
+        analysis_optimizes_impl_deps = True
     if recursive:
-        attr_aspects = ["implementation_deps", "deps"] if use_implementation_deps else ["deps"]
+        attr_aspects = ["implementation_deps", "deps"]
     aspect_ignored_includes = [ignored_includes] if ignored_includes else []
     aspect_skipped_tags = _DEFAULT_SKIPPED_TAGS if skipped_tags == _DEFAULT_SKIPPED_TAGS else skipped_tags
     aspect_target_mapping = [target_mapping] if target_mapping else []
+    if experimental_no_preprocessor:
+        # buildifier: disable=print
+        print("WARNING: 'experimental_no_preprocessor' is a deprecated flag due to the feature now being stable. Use 'no_preprocessor' instead.")
+        no_preprocessor = True
     if ignore_cc_toolchain_headers:
         cc_toolchain_headers = cc_toolchain_headers_info if cc_toolchain_headers_info else Label("//dwyu/aspect/private:cc_toolchain_headers")
     else:
         cc_toolchain_headers = Label("//dwyu/aspect/private:cc_toolchain_headers_stub")
     if use_cpp_implementation:
         target_processor = Label("//dwyu/aspect/private/process_target:main_cc")
-        tool_preprocessing = Label("//dwyu/aspect/private/preprocessing:main_no_preprocessing") if experimental_no_preprocessor else Label("//dwyu/aspect/private/preprocessing:main")
+        tool_preprocessing = Label("//dwyu/aspect/private/preprocessing:main_no_preprocessing") if no_preprocessor else Label("//dwyu/aspect/private/preprocessing:main")
         tool_analyze_includes = Label("//dwyu/aspect/private/analyze_includes:main")
 
         # The C++ based implementation no longer needs the information about the toolchain headers
@@ -154,7 +167,7 @@ def dwyu_aspect_factory(
     else:
         target_processor = Label("//dwyu/aspect/private/process_target:main_py")
         tool_preprocessing = Label("//dwyu/aspect/private/preprocessing:stub")
-        tool_analyze_includes = Label("//dwyu/aspect/private/preprocessing:stub")
+        tool_analyze_includes = Label("//dwyu/aspect/private/analyze_includes:analyze_includes")
     return aspect(
         implementation = dwyu_aspect_impl,
         attr_aspects = attr_aspects,
@@ -162,17 +175,15 @@ def dwyu_aspect_factory(
         required_providers = [CcInfo],
         toolchains = use_cc_toolchain(mandatory = True),
         attrs = {
+            "dwyu_analysis_optimizes_impl_deps": attr.bool(
+                default = analysis_optimizes_impl_deps,
+            ),
+            "dwyu_verbose": attr.bool(
+                default = verbose,
+            ),
             "_cc_toolchain_headers": attr.label(
                 default = cc_toolchain_headers,
                 providers = [DwyuCcToolchainHeadersInfo],
-            ),
-            "_dwyu_binary": attr.label(
-                default = Label("//dwyu/aspect/private/analyze_includes:analyze_includes"),
-                allow_files = True,
-                executable = True,
-                cfg = "exec",
-                doc = "Tool Analyzing the include statement in the source code under inspection" +
-                      " and comparing them to the available dependencies.",
             ),
             "_ignore_cc_toolchain_headers": attr.bool(
                 default = ignore_cc_toolchain_headers,
@@ -182,7 +193,7 @@ def dwyu_aspect_factory(
                 allow_files = [".json"],
             ),
             "_no_preprocessor": attr.bool(
-                default = experimental_no_preprocessor,
+                default = no_preprocessor,
             ),
             "_recursive": attr.bool(
                 default = recursive,
@@ -221,12 +232,6 @@ def dwyu_aspect_factory(
             ),
             "_use_cpp_implementation": attr.bool(
                 default = use_cpp_implementation,
-            ),
-            "_use_implementation_deps": attr.bool(
-                default = use_implementation_deps,
-            ),
-            "_verbose": attr.bool(
-                default = verbose,
             ),
         },
     )

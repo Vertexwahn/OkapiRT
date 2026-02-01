@@ -4,7 +4,9 @@
 """
 
 load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_ispc//:ispc.bzl", "ispc_cc_library")
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//:oidn_generate_cpp_from_blob.bzl", "generate_cpp_from_blob_cc_library")
 
 config_setting(

@@ -20,12 +20,14 @@ log = logging.getLogger()
 # Test matrix. We don't combine each Bazel version with each Python version as there is no significant benefit. We
 # manually define pairs which make sure each Bazel and Python version we care about is used at least once.
 # For versions using the legacy WORKSPACE setup we have to specify the patch version for Python
-# Keep this in sync with: test/workspace_integration/test.py, test/cc_toolchains/upstream/test.py, .bcr/presubmit.yml
+#
+# Keep this in sync with: .bcr/presubmit.yml, test/cc_toolchains/upstream/test.py, test/workspace_integration/test.py
 TESTED_VERSIONS = [
     TestedVersions(bazel="7.2.1", python="3.8"),
     TestedVersions(bazel="7.x", python="3.10"),
     TestedVersions(bazel="8.x", python="3.12", is_default=True),
     TestedVersions(bazel="9.*", python="3.13"),
+    TestedVersions(bazel="rolling", python="3.13"),
 ]
 
 VERSION_SPECIFIC_ARGS = {
@@ -59,7 +61,7 @@ def cli() -> Namespace:
         "--verbose",
         "-v",
         action="store_true",
-        help="Show output of test runs.",
+        help="Show output of test runs and DWYU debugging information.",
     )
     parser.add_argument(
         "--bazel",
@@ -140,5 +142,6 @@ if __name__ == "__main__":
             cpp_impl_based=args.cpp_impl_based,
             only_default_version=args.only_default_version,
             no_output_base=args.no_output_base,
+            verbose=args.verbose,
         )
     )

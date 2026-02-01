@@ -44,7 +44,7 @@ def odin_deps():
         strip_prefix = "oneTBB-154cc73ca4d359621202399cc0c3c91058e56e79",
         sha256 = "aa381b093a1149921b23009ce6d4b536c7a29792becb4ea14a47f7bed840b347",
     )
-    
+
     maybe(
         git_repository,
         name = "oidn-weights",

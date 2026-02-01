@@ -1,7 +1,16 @@
+[![GitHub release](https://img.shields.io/github/v/release/martis42/depend_on_what_you_use)](https://github.com/martis42/depend_on_what_you_use/releases)
+[![BCR](https://img.shields.io/badge/BCR-available-green)](https://registry.bazel.build/modules/depend_on_what_you_use)
+[![Bazel](https://img.shields.io/badge/Bazel-7.2.1+-green)](https://bazel.build/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)](<>)
+[![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)](<>)
+[![Windows](https://img.shields.io/badge/Windows-0078D6?logo=windows&logoColor=white)](<>)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)](https://github.com/astral-sh/ty)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![GitHub issues](https://img.shields.io/github/issues/martis42/depend_on_what_you_use)](https://github.com/martis42/depend_on_what_you_use/issues)
+[![Documentation](https://img.shields.io/badge/docs-available-brightgreen)](https://github.com/martis42/depend_on_what_you_use/blob/main/docs)
 
 - [Depend on what you use (DWYU)](#depend-on-what-you-use-dwyu)
 - [Getting started](#getting-started)
@@ -162,10 +171,8 @@ Unfortunately, the tool cannot promise perfect results due to various constraint
 
 ##### The code has to be compilable
 
-DWYU is not performing a compilation.
-It works by statically analyzing the source code and build tree.
-However, non compiling code can contain errors infringing the assumptions DWYU is based on.
-For example, including header files which do not exist at the expected path.
+DWYU assumes the code under inspection compiles with the Bazel configuration used to execute DWYU (e.g. setting `--config=foo`).
+There is no guarantee DWYU will do something meaningful for non compilable code.
 
 ##### Include paths have to be unambiguous
 
@@ -198,7 +205,7 @@ Most projects use conditional include statements based on macros set by Bazel to
 
 If your project is impacted by this edge case, you can try some mitigation strategies:
 
-- You can use the `experimental_no_preprocessor` DWYU aspect option to disable preprocessing.
+- You can use the `no_preprocessor` DWYU aspect option to disable preprocessing.
   As long as you don't use select statements to dynamically switch between different dependencies for your targets this still allows a proper DWYU analysis.
 - You can use `--cxxopt=-DSomeMacro=42` to manually set the missing macro via Bazel to make it known to Bazel.
   This works best if you define a Bazel config for execution the DWYU aspect and make the cxxopt part of the config.
@@ -214,6 +221,7 @@ Include paths specified by those attributes are respected by DWYU.
 ## Framework includes
 
 DWYU considers [framework includes](https://bazel.build/rules/lib/builtins/CompilationContext.html#framework_includes) like system headers or CC toolchain headers and thus does not process them.
+Meaning, DWYU assumes those are globally available without the need for explicit dependencies.
 
 # Supported Platforms
 

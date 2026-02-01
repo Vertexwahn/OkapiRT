@@ -44,7 +44,7 @@ repos:
         args: [--diff_command='diff']
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.7
+    rev: v0.14.10
     hooks:
       - id: ruff-format
       - id: ruff-check
@@ -55,14 +55,20 @@ repos:
     hooks:
       - id: ty
         name: ty
-        entry: uvx --python=3.12 ty==0.0.4 check
+        entry: uvx --python=3.12 ty==0.0.8 check
         types: [python]
         language: system
         # To prevent API changes in one file breaking type annotations in another we run on the full repository
         pass_filenames: false
 
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v21.1.6
+    rev: v21.1.8
     hooks:
     -   id: clang-format
         types_or: [c++, c]
+
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 42.71.0
+    hooks:
+      - id: renovate-config-validator
+        args: [--strict]

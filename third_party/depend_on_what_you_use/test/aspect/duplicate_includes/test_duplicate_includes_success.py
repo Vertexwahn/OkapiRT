@@ -6,7 +6,7 @@ from test.support.result import Result
 
 class TestCase(TestCaseBase):
     def execute_test_logic(self) -> Result:
-        expected = ExpectedResult(success=False, unused_public_deps=["//rule_using_aspect:c"])
-        actual = self._run_bazel_build(target=self.choose_target("//rule_using_aspect:dwyu_recursive_with_impl_deps"))
+        expected = ExpectedResult(success=True)
+        actual = self._run_dwyu(target="//duplicate_includes:use_foo", aspect=self.default_aspect)
 
         return self._check_result(actual=actual, expected=expected)

@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 def generate_cpp_from_blob_cc_library(name, **kwargs):
     src = "@oidn-weights//:" + name
     cpp_out = "weights/" + name[0:-4] + ".cpp"
@@ -19,7 +21,7 @@ def generate_cpp_from_blob_cc_library(name, **kwargs):
         ),
         tools = ["//:blob_to_cpp"],
     )
-    native.cc_library(
+    cc_library(
         name = name,
         srcs = [cpp_out],
         hdrs = [header_out],

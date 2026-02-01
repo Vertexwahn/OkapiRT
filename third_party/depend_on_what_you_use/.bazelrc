@@ -10,6 +10,9 @@ test --test_output=errors
 build --features=external_include_paths
 build --host_features=external_include_paths
 
+# protoc is a dependency of the docs generation. We use the precompiled version to save build time
+common --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
+
 # https://clang.llvm.org/docs/DiagnosticsReference.html
 # Most common warnings
 build --cxxopt=-Wall
@@ -34,10 +37,8 @@ build --cxxopt=-Werror
 # Ignore compiler warnings in external code outside our control
 build --per_file_copt=boost.wave/src/.*@-w
 build --per_file_copt=googletest/src/.*@-w
-build --per_file_copt=src/google/protobuf/.*@-w
 build --host_per_file_copt=boost.wave/src/.*@-w
 build --host_per_file_copt=googletest/src/.*@-w
-build --host_per_file_copt=src/google/protobuf/.*@-w
 
 build:clang_tidy --aspects=//tools/clang_tidy:aspect.bzl%clang_tidy
 build:clang_tidy --output_groups=clang_tidy
@@ -62,6 +63,7 @@ test:sanitize --cxxopt=-g
 test:sanitize --cxxopt=-fno-omit-frame-pointer
 test:sanitize --cxxopt=-fno-sanitize-merge
 test:sanitize --linkopt=-fsanitize=address,leak,undefined
+test:sanitize --linkopt=-lubsan
 test:sanitize --linkopt=-fsanitize-link-c++-runtime
 test:sanitize --action_env="print_stacktrace=1"
 # Also use the debug mode offered by the C++ standard lib itself
@@ -70,6 +72,12 @@ test:sanitize --action_env="print_stacktrace=1"
 test:sanitize --cxxopt=-D_GLIBCXX_DEBUG=1
 test:sanitize --cxxopt=-D_GLIBCXX_DEBU_PEDANTIC=1
 test:sanitize --cxxopt=-D_LIBCPP_DEBUG=1
+
+# Use 'instrument_test_targets' to see the executed tests in the coverage data
+coverage --combined_report=lcov
+coverage --instrumentation_filter="^//dwyu/"
+coverage --experimental_generate_llvm_lcov
+coverage --action_env=BAZEL_USE_LLVM_NATIVE_COVERAGE=1
 
 # Allow users to provide their own workspace settings
 try-import %workspace%/user.bazelrc

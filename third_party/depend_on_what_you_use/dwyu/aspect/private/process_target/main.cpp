@@ -22,10 +22,11 @@ struct ProgramOptions {
     std::vector<std::string> external_includes{};
     std::vector<std::string> system_includes{};
     std::vector<std::string> defines{};
+    bool is_target_under_inspection{false};
     bool verbose{false};
 };
 
-ProgramOptions parseProgramOptions(int argc, ProgramOptionsParser::ConstCharArray argv) {
+ProgramOptions parseProgramOptions(const int argc, ProgramOptionsParser::ConstCharArray argv) {
     ProgramOptions options{};
 
     ProgramOptionsParser parser{};
@@ -45,6 +46,8 @@ ProgramOptions parseProgramOptions(int argc, ProgramOptionsParser::ConstCharArra
     parser.addOptionList("--system_includes", options.system_includes);
     // Defines for this target
     parser.addOptionList("--defines", options.defines);
+    // Processing the target under inspection itself, not one of its dependencies
+    parser.addOptionFlag("--is_target_under_inspection", options.is_target_under_inspection);
     // Print debugging information
     parser.addOptionFlag("--verbose", options.verbose);
     parser.parseOptions(argc, argv);
@@ -53,19 +56,26 @@ ProgramOptions parseProgramOptions(int argc, ProgramOptionsParser::ConstCharArra
 }
 
 void printOptions(const ProgramOptions& options) {
-    std::cout << "\nAnalyzing dependency " << options.target << "\n";
-    std::cout << "Output               " << options.output << "\n";
-    std::cout << "Header files         " << listToStr(options.header_files) << "\n";
-    std::cout << "Includes             " << listToStr(options.includes) << "\n";
-    std::cout << "Quote includes       " << listToStr(options.quote_includes) << "\n";
-    std::cout << "External includes    " << listToStr(options.external_includes) << "\n";
-    std::cout << "System includes      " << listToStr(options.system_includes) << "\n";
-    std::cout << "Defines              " << listToStr(options.defines) << "\n";
+    std::cout << "\n";
+    if (options.is_target_under_inspection) {
+        std::cout << ">> Processing target " << options.target << "\n";
+    }
+    else {
+        std::cout << ">> Processing dependency " << options.target << "\n";
+    }
+    std::cout << "\n";
+    std::cout << "Output            : " << options.output << "\n";
+    std::cout << "Header files      : " << listToStr(options.header_files) << "\n";
+    std::cout << "Includes          : " << listToStr(options.includes) << "\n";
+    std::cout << "Quote includes    : " << listToStr(options.quote_includes) << "\n";
+    std::cout << "External includes : " << listToStr(options.external_includes) << "\n";
+    std::cout << "System includes   : " << listToStr(options.system_includes) << "\n";
+    std::cout << "Defines           : " << listToStr(options.defines) << "\n";
 }
 
 int main_impl(ProgramOptions options) {
     if (options.verbose) {
-        dwyu::printOptions(options);
+        printOptions(options);
     }
 
     nlohmann::json json{};
@@ -83,7 +93,7 @@ int main_impl(ProgramOptions options) {
         output.close();
     }
     else {
-        dwyu::abortWithError("Unable to open output file '", options.output, "'");
+        abortWithError("Unable to open output file '", options.output, "'");
     }
 
     return 0;
