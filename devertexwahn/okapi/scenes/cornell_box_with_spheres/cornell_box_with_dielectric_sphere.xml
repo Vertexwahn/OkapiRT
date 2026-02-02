@@ -16,7 +16,7 @@
 			<rfilter type="gaussian"/>
 			<integer name="width" value="1024" />
 			<integer name="height" value="1024" />
-			<string name="filename" value="cornel_box.naive_diffuse.spp1.embree.exr" />
+			<string name="filename" value="cornell_box_with_dielectric_sphere.exr" />
 		</film>
 
 		<sampler type="independent">
@@ -92,6 +92,7 @@
 		<bsdf type="dielectric">
 			<string name="int_ior" value="bk7"/>
 			<string name="ext_ior" value="air"/>
+            <rgb name="specular_transmittance" value="1.0, 0.05, 0.05"/>
 		</bsdf>
 	</shape>
 
