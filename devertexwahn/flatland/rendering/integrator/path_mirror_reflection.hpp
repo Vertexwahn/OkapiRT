@@ -8,6 +8,8 @@
 #define De_Vertexwahn_Flatland_Rendering_Intersector_f47251b4_9a7b_4321_a54f_cdf570fa8dd6_h
 
 #include "flatland/rendering/integrator/integrator.hpp"
+#include "flatland/rendering/scene/scene.hpp"
+
 #include "math/refract.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
@@ -48,11 +50,11 @@ public:
             ray.max_t = me.t;
 
             // compute reflection
-            Vector2<ScalarType> wi = -ray.direction;
-            wi.normalize();
+            Vector2<ScalarType> wo = -ray.direction;
+            wo.normalize();
 
             // inside or outside?
-            Vector2<ScalarType> reflected_direction = reflect<ScalarType>(wi, me.geo_frame.n.normalized());
+            Vector2<ScalarType> reflected_direction = reflect<ScalarType>(wo, me.geo_frame.n.normalized());
 
             Ray2f reflectedRay(me.p + reflected_direction * ScalarType{0.01}, reflected_direction, ScalarType{0.0}, ScalarType{20000.0});
 

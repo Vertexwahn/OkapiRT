@@ -118,12 +118,12 @@ jobs:
     - name: Build
       run: |
         cd tests
-        bazel build --config=gcc11 //...
+        bazel build --config=gcc13 //...
 
     - name: Run
       run: |
         cd tests
-        bazel run --config=gcc11 //square:main
+        bazel run --config=gcc13 //square:main
 
   build_and_test_windows_server2022:
     name: Windows Server 2022 build <Visual Studio 2022>

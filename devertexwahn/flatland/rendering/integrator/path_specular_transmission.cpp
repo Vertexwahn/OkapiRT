@@ -1,13 +1,15 @@
 /*
- *  SPDX-FileCopyrightText: Copyright 2022-2023 Julian Amann <dev@vertexwahn.de>
+ *  SPDX-FileCopyrightText: Copyright 2022-2026 Julian Amann <dev@vertexwahn.de>
  *  SPDX-License-Identifier: Apache-2.0
  */
 
 #include "flatland/rendering/integrator/path_specular_transmission.hpp"
+#include "flatland/rendering/scene/scene.hpp"
+
+#include "math/refract.hpp"
 
 #include "core/logging.hpp"
-#include "math/refract.hpp"
-#include "flatland/rendering/scene/scene.hpp"
+#include "core/object_factory.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 
@@ -34,16 +36,16 @@ ColorRGB3f PathSpecularTransmission::trace(
 
         // compute refraction
         Vector2f refracted_direction;
-        Vector2f wi = -ray.direction;
-        wi.normalize();
+        Vector2f wo = -ray.direction;
+        wo.normalize();
 
         bool valid = false;
 
         // inside or outside?
-        if (me.geo_frame.n.normalized().dot(wi) < 0) {
-            valid = refract(wi, -me.geo_frame.n.normalized(), 1.6f / 1.f, refracted_direction);
+        if (me.geo_frame.n.normalized().dot(wo) < 0) {
+            valid = refract(wo, -me.geo_frame.n.normalized(), 1.6f / 1.f, refracted_direction);
         } else {
-            valid = refract(wi, me.geo_frame.n.normalized(), 1.f / 1.6f, refracted_direction);
+            valid = refract(wo, me.geo_frame.n.normalized(), 1.f / 1.6f, refracted_direction);
         }
 
         std::cout << "Valid refraction: " << valid << std::endl;
@@ -53,9 +55,9 @@ ColorRGB3f PathSpecularTransmission::trace(
 
         refracted_direction.normalize();
 
-        Ray2f refractedRay(me.p + refracted_direction * 0.01f, refracted_direction, 0.f, 20000.f);
+        Ray2f refracted_ray(me.p + refracted_direction * 0.01f, refracted_direction, 0.f, 20000.f);
 
-        trace(scene, sampler, refractedRay, depth + 1);
+        trace(scene, sampler, refracted_ray, depth + 1);
     } else {
         ray.max_t = 100.f;
     }
@@ -63,6 +65,10 @@ ColorRGB3f PathSpecularTransmission::trace(
     canvas_->add(ray);
 
     return ColorRGB3f{0.f, 0.f, 0.f};
+}
+
+void register_PathSpecularTransmission() {
+    ObjectFactory<PropertySet>::instance().register_class<PathSpecularTransmission>("path_specular_transmission");
 }
 
 DE_VERTEXWAHN_END_NAMESPACE

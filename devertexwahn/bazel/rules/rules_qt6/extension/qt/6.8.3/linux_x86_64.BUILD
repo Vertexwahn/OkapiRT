@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load(":qt_libraries.bzl", "QT_LIBRARIES")
 
 [
@@ -52,6 +53,12 @@ filegroup(
 filegroup(
     name = "plugin_files",
     srcs = glob(["plugins/**/*"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "lib_files",
+    srcs = glob(["lib/**/*.so*", "lib/**/libicu*"]),
     visibility = ["//visibility:public"],
 )
 
