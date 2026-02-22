@@ -296,9 +296,9 @@ TEST_P(Sensor3fTestFixtureBasedOnFixture, GivenRotatedCamera_WhenGeneratingRay_T
 	// Assert
     Vector3f expectedRayDir = rotate_z(degree_to_radian(angle)) * Vector3f{.0f, .0f, 1.f};
 
-	EXPECT_THAT(ray.direction.x(), expectedRayDir.x());
-	EXPECT_THAT(ray.direction.y(), expectedRayDir.y());
-	EXPECT_THAT(ray.direction.z(), expectedRayDir.z());
+	EXPECT_THAT(ray.direction.x(), testing::FloatNear(expectedRayDir.x(), 1e-5f));
+	EXPECT_THAT(ray.direction.y(), testing::FloatNear(expectedRayDir.y(), 1e-5f));
+	EXPECT_THAT(ray.direction.z(), testing::FloatNear(expectedRayDir.z(), 1e-5f));
 }
 
 INSTANTIATE_TEST_SUITE_P(

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "okapi/rendering/shape/triangle_mesh.h"
+#include "okapi/rendering/shape/triangle_mesh.hpp"
 
 #include "math/transform.hpp"
 

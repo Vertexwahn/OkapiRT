@@ -53,14 +53,14 @@
 	<shape type="obj">
 		<string name="filename" value="ajax.obj"/>
 
-		<!-- <bsdf type="diffuse" /> -->
+		<bsdf type="diffuse" />
 	</shape>
 
 	<!-- Ground plane -->
 	<shape type="obj">
 		<string name="filename" value="plane.obj" />
 
-		<!-- <bsdf type="diffuse" /> -->
+		<bsdf type="diffuse" />
 
 		<transform name="to_world">
 			<scale x="100" y="1" z="100" />

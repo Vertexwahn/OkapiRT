@@ -1,12 +1,25 @@
 import mitsuba as mi
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 mi.set_variant('scalar_rgb')
-#mi.set_variant('llvm_ad_rgb')
 
-scene = mi.load_file("cornell_box_with_spheres.next.mitsuba_v4.xml")
+# Derive workspace root from this file location: <workspace>/okapi/scenes/ajax/mitsuba_reference.py
+workspace_root = Path(__file__).resolve().parents[3]
 
-ssp = 1024
+scene_path = workspace_root / "okapi/scenes/cornell_box_with_spheres/cornell_box_with_spheres.next.mitsuba_v4.xml"
+scene = mi.load_file(str(scene_path))
 
-img = mi.render(scene, spp=ssp)
+ssp = 100
 
-mi.Bitmap(img).write("cornell_box_with_spheres.path.integrator.spp" + str(ssp) + ".mitsuba.exr")
+image = mi.render(scene, spp=ssp)
+
+plt.axis("off")
+plt.imshow(image ** (1.0 / 2.2)); # approximate sRGB tonemapping
+plt.show()
+
+params = mi.traverse(scene)
+print(params)
+
+out_path = workspace_root / ("okapi/scenes/cornell_box_with_spheres/cornell_box_with_spheres.path.integrator.spp" + str(ssp) + ".mitsuba.exr")
+mi.Bitmap(image).write(str(out_path))

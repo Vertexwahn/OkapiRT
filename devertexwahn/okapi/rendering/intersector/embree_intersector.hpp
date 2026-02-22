@@ -7,7 +7,7 @@
 #ifndef Okapi_Embree_591acdef_5111_4707_9a72_853fa2a8808a_h
 #define Okapi_Embree_591acdef_5111_4707_9a72_853fa2a8808a_h
 
-#include "okapi/rendering/shape/triangle_mesh.h"
+#include "okapi/rendering/shape/triangle_mesh.hpp"
 
 #include "flatland/rendering/intersector/intersector.hpp"
 #include "flatland/rendering/shape/shape.hpp"

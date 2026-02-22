@@ -8,9 +8,11 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 cc_library(
     name = "embree_intersector",
+    srcs = ["embree_intersector.cpp"],
     hdrs = ["embree_intersector.hpp"],
     visibility = ["//visibility:public"],
     deps = [
+        "//core:object_factory",
         "//flatland/rendering/intersector",
         "//flatland/rendering/scene",
         "//okapi/rendering/shape:triangle_mesh",

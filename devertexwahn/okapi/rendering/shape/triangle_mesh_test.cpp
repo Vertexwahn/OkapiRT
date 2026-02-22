@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "okapi/rendering/shape/triangle_mesh.h"
+#include "okapi/rendering/shape/triangle_mesh.hpp"
 
 #include "math/transform.hpp"
 
@@ -303,4 +303,20 @@ TEST(TriangleMesh3, CheckIfValidTextureCoordinates) {
     EXPECT_THAT(mesh.uvs()[2].y(), 1.f);
     EXPECT_THAT(mesh.uvs()[3].x(), 10.f);
     EXPECT_THAT(mesh.uvs()[3].y(), 1.f);
+}
+
+TEST(TriangleMesh3, ply) {
+     // Arrange
+    auto transform = translate(0.f, 0.f, 0.f);
+
+    PropertySet ps;
+    ps.add_property("parent_path", std::string("okapi/scenes/bunny"));
+    ps.add_property("transform", transform);
+    ps.add_property("filename", std::string("bun_zipper.ply"));
+
+    // Act
+    TriangleMesh3f mesh{ps};
+
+    EXPECT_THAT(mesh.position_count(), 35947);
+    EXPECT_THAT(mesh.position_index_count(), 208353);
 }

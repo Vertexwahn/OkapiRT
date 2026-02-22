@@ -34,9 +34,15 @@ cc_library(
 
 cc_library(
     name = "sphere",
+    srcs = ["sphere.cpp"],
     hdrs = ["sphere.h"],
     visibility = ["//visibility:public"],
-    deps = ["//flatland/rendering/shape"],
+    deps = [
+        "//core:object_factory",
+        "//flatland/rendering/shape",
+        "//math:geometry",
+        "//math:intersection",
+    ],
 )
 
 
@@ -44,15 +50,19 @@ cc_library(
     name = "triangle_mesh",
     srcs = [
         "tiny_obj_loader_impl.cpp",
+        "triangle_mesh.cpp",
     ],
-    hdrs = ["triangle_mesh.h"],
+    hdrs = ["triangle_mesh.hpp"],
     visibility = ["//visibility:public"],
     deps = [
         ":moeller_trumbore",
         "//core:logging",
+        "//core:object_factory",
         "//flatland/rendering/shape",
         "//math:geometry",
         "//math:intersection",
+        "@miniply",
+        "@rply",
         "@tinyobjloader",
     ],
 )

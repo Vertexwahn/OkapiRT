@@ -92,7 +92,8 @@
 		<bsdf type="dielectric">
 			<string name="int_ior" value="bk7"/>
 			<string name="ext_ior" value="air"/>
-            <rgb name="specular_transmittance" value="1.0, 0.05, 0.05"/>
+            <!-- <rgb name="specular_transmittance" value="1.0, 0.05, 0.05"/> -->
+            <rgb name="specular_transmittance" value="1.0, 1.0, 1.0"/>
 		</bsdf>
 	</shape>
 

@@ -4,7 +4,7 @@
  */
 
 #include "okapi/rendering/intersector/embree_intersector.hpp"
-#include "okapi/rendering/shape/triangle_mesh.h"
+#include "okapi/rendering/shape/triangle_mesh.hpp"
 
 #include "gmock/gmock.h"
 

@@ -40,10 +40,11 @@ int main(int argc, char ** argv) {
 
     LOG_INFO_WITH_LOCATION("Running on {} CPU", cpuinfo_get_package(0)->name);
 
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication application(argc, argv);
     QApplication::setWindowIcon(QIcon(":/okapi.ui.ico"));
     QApplication::setOrganizationDomain("vertexwahn.de");
-    application.setApplicationName("Okapi Renderer Alpha 1.0.9");
+    application.setApplicationName("Okapi Renderer Alpha 1.0.10");
     application.setOrganizationName("vertexwahn.de");
 
     QFile style_sheet(":/okapi.ui.qss");

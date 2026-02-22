@@ -10,6 +10,7 @@
 #include "core/object_factory.hpp"
 
 #include "core/exception.hpp"
+#include "core/logging.hpp"
 #include "core/namespace.hpp"
 #include "core/reference_counted.hpp"
 #include "flatland/rendering/scene/load_scene.hpp"
@@ -80,9 +81,37 @@ ReferenceCounted<SceneType<ScalarType, Dimension>> load_scene(
     std::filesystem::path p(filename);
     bool integrator_tag_found = false;
 
+    std::map<std::string, ReferenceCounted<Object>> top_level_bsdf_with_ids_;
+
     for (pugi::xml_node scene_node : doc.root()) {
         if (std::string(scene_node.name()) == "scene") {
             for (pugi::xml_node scene_elements : scene_node) {
+                //LOG_INFO("Loading scene {}", scene_elements.name());
+
+                // read top level bsdf with material ID
+                if (std::string(scene_elements.name()) == "bsdf") {
+                    std::string id = scene_elements.attribute("id").as_string();
+                    LOG_INFO("Id {}", id);
+
+                    std::string str_bsdf_type = scene_elements.attribute("type").as_string();
+                    if(str_bsdf_type == "") {
+                        throw Exception("No empty BSDF type allowed.");
+                    }
+                    if (scene_elements) {
+                        auto bsdf_ps = read_all_properties(scene_elements);
+                        // maybe some BSDFs want to read the filesystem - therefore we provide a parent path
+                        std::string parent_path = p.parent_path().string();
+
+                        create_child_objects(parent_path, scene_elements, object_factory, bsdf_ps);
+
+                        auto bsdf = std::dynamic_pointer_cast<BSDFType<ScalarType, Dimension>>(
+                                object_factory.create_instance(str_bsdf_type, bsdf_ps));
+
+                        //shape->set_bsdf(bsdf);
+                        top_level_bsdf_with_ids_[id] = bsdf;
+                    }
+                }
+
                 if (std::string(scene_elements.name()) == "sensor") {
                     // construct film
                     auto xml_film = scene_elements.child("film");
@@ -159,7 +188,7 @@ ReferenceCounted<SceneType<ScalarType, Dimension>> load_scene(
 
                     auto ps = read_all_properties(scene_elements);
 
-                    if (type == "polygon" || type == "obj" || type == "triangle_mesh" || type == "serialized" ) {
+                    if (type == "polygon" || type == "obj" || type == "ply" || type == "triangle_mesh" || type == "serialized" ) {
                         ps.add_property("parent_path", p.parent_path().string());
                     }
 
@@ -174,6 +203,14 @@ ReferenceCounted<SceneType<ScalarType, Dimension>> load_scene(
 
                     auto shape = std::dynamic_pointer_cast<ShapeType<ScalarType, Dimension>>(
                             object_factory.create_instance(type, ps));
+
+                    auto xml_ref = scene_elements.child("ref");
+                    if (xml_ref) {
+                        std::string id = xml_ref.attribute("id").as_string();
+
+                        auto bsdf = std::dynamic_pointer_cast<BSDFType<ScalarType, Dimension>>(top_level_bsdf_with_ids_[id]);
+                        shape->set_bsdf(bsdf);
+                    }
 
                     auto xml_bsdf = scene_elements.child("bsdf");
                     if(xml_bsdf) {
@@ -205,6 +242,17 @@ ReferenceCounted<SceneType<ScalarType, Dimension>> load_scene(
                     }
 
                     scene->add_shape(shape);
+                }
+
+                if (std::string(scene_elements.name()) == "emitter") {
+                    std::string str_emitter_type = scene_elements.attribute("type").as_string();
+                    auto emitter_ps = read_all_properties(scene_elements);
+
+                    auto emitter = std::dynamic_pointer_cast<EmitterType<ScalarType, Dimension>>(
+                           object_factory.create_instance(str_emitter_type, emitter_ps)
+                    );
+
+                    scene->set_environment(emitter);
                 }
 
                 if (std::string(scene_elements.name()) == "intersector") {

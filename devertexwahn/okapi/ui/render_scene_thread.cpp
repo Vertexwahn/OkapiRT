@@ -112,5 +112,5 @@ void RenderSceneThread::run() {
     LOG_INFO_WITH_LOCATION("Shutting down now.");
     LOG_INFO_WITH_LOCATION("Render time: {} seconds", timer.elapsed_seconds());
 
-    emit update(QString("RenderTime was: %1 seconds").arg(timer.elapsed_seconds()));
+    emit update(QString("Total render time: %1 seconds").arg(timer.elapsed_seconds()));
 }

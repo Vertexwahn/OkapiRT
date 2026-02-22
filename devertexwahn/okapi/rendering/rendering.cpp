@@ -156,15 +156,23 @@ void render_parallel_progressive(
     const size_t max_parallelism = tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism);
     tbb::global_control c(tbb::global_control::max_allowed_parallelism, render_description.thread_count > 0 ? render_description.thread_count : max_parallelism);
 
+    Timer timer;
     for(int sample_index = 0; sample_index < spp; ++sample_index) {
         if(render_description.abort) {
             return;
         }
 
-        LOG_INFO("Progressive rendering: {}/{} SPP", sample_index, spp);
+        float progress = static_cast<float>(sample_index) / spp * 100.f;
+        float estimated_time_in_seconds = static_cast<float>(spp) / sample_index * timer.elapsed_seconds();
+
+        LOG_INFO("Progressive rendering: {0}/{1} SPP ({2:.2f}%) [spent time {3:.2f} seconds, estimated time {4:.2f} seconds]",
+                sample_index,
+                spp,
+                progress, timer.elapsed_seconds(),
+                estimated_time_in_seconds);
 
         if (progress_reporter) {
-            float progress = static_cast<float>(sample_index) / spp;
+            float progress = static_cast<float>(sample_index) / spp * 100.f;
             progress_reporter->update(fmt::format("Progressive rendering: {0}/{1} SPP ({2:.2f} %), Camera pos: ", sample_index, spp, progress));
         }
 
@@ -245,6 +253,7 @@ void render_interactive_parallel_progressive(
     const size_t max_parallelism = tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism);
     tbb::global_control c(tbb::global_control::max_allowed_parallelism, render_description.thread_count > 0 ? render_description.thread_count : max_parallelism);
 
+    Timer timer;
     for(int sample_index = 0; sample_index < spp; ++sample_index) {
         if(render_description.abort) {
             return;
@@ -254,13 +263,21 @@ void render_interactive_parallel_progressive(
             film->clear();
             sample_index = 0;
             render_description.clear_accumulation_buffer = false;
+            timer.reset();
         }
 
         //LOG_INFO("Progressive rendering: {}/{} SPP", sample_index, spp);
 
         if (progress_reporter) {
-            float progress = static_cast<float>(sample_index) / spp;
-            progress_reporter->update(fmt::format("Progressive rendering: {0}/{1} SPP ({2:.2f} %)", sample_index, spp, progress));
+            float progress = static_cast<float>(sample_index) / spp * 100.f;
+            float estimated_time_in_seconds = static_cast<float>(spp) / sample_index * timer.elapsed_seconds();
+            progress_reporter->update(
+                fmt::format("Progressive rendering: {0}/{1} SPP ({2:.2f}%) [spent time {3:.2f} seconds, estimated time {4:.2f} seconds]",
+                    sample_index,
+                    spp,
+                    progress, timer.elapsed_seconds(),
+                    estimated_time_in_seconds)
+            );
         }
 
         tbb::parallel_for(0, tg.tile_count(), [&](int index) {

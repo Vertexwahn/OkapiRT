@@ -54,7 +54,7 @@
 #ifndef De_Vertexwahn_Core_SerializedMesh_9e6c8d39_75a1_4bb1_9b16_8602afb5a378_h
 #define De_Vertexwahn_Core_SerializedMesh_9e6c8d39_75a1_4bb1_9b16_8602afb5a378_h
 
-#include "okapi/rendering/shape/triangle_mesh.h"
+#include "okapi/rendering/shape/triangle_mesh.hpp"
 
 #include "core/logging.hpp"
 #include "core/namespace.hpp"

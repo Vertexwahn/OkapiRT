@@ -63,10 +63,12 @@ cc_test(
 
 cc_library(
     name = "reconstruction_filter",
+    srcs = ["reconstruction_filter.cpp"],
     hdrs = ["reconstruction_filter.hpp"],
     visibility = ["//visibility:public"],
     deps = [
         "//core:object",
+        "//core:object_factory",
         "//flatland/rendering:property_set",
         "//math:constants",
         "//math:util",

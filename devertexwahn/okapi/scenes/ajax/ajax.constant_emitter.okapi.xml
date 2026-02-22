@@ -37,7 +37,7 @@
 			<rfilter type="gaussian"/>
 			<integer name="width" value="768" />
 			<integer name="height" value="768" />
-            <string name="filename" value="ajax.constant_emitter.spp512.exr" />
+            <string name="filename" value="ajax.constant_emitter.okapi.spp512.exr" />
 		</film>
 
 		<sampler type="independent">

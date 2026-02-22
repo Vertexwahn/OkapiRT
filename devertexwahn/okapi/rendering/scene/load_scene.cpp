@@ -1,26 +1,14 @@
 /*
- *  SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
+ *  SPDX-FileCopyrightText: Copyright 2022-2026 Julian Amann <dev@vertexwahn.de>
  *  SPDX-License-Identifier: Apache-2.0
  */
 
 #include "okapi/rendering/scene/load_scene.hpp"
 
-#include "okapi/rendering/integrator/rtiow_integrator.hpp"
-#include "okapi/rendering/integrator/normal_integrator.hpp"
-
-#include "okapi/rendering/intersector/embree_intersector.hpp"
-
-#include "okapi/rendering/shape/sphere.h"
-#include "okapi/rendering/shape/triangle_mesh.h"
 #include "okapi/rendering/sensor/sensor.hpp"
-//#include "okapi/rendering/texture/alpha_blended_texture.hpp"
-//#include "okapi/rendering/texture/bitmap.hpp"
-//#include "okapi/rendering/texture/checkerboard.hpp"
-//#include "okapi/rendering/texture/texture.hpp"
+#include "okapi/rendering/scene/registry.hpp"
 
-//#include "flatland/rendering/intersector/brute_force_intersector.hpp"
 #include "flatland/rendering/property_set.h"
-#include "flatland/rendering/sampler.hpp"
 
 #include "core/logging.hpp"
 #include "core/object_factory.hpp"
@@ -66,48 +54,10 @@ void create_child_objects(
 }
 
 ReferenceCounted<Scene3f> load_scene3f(std::string_view filename, const PropertySet& override_scene_properties) {
-    ObjectFactory<PropertySet> sf;
+    ObjectFactory<PropertySet>::set_registration_callback(register_okapi_plugins);
+    ObjectFactory<PropertySet>& object_factory = ObjectFactory<PropertySet>::instance();
 
-    // intersector/accelerator
-    //sf.register_class<BruteForceIntersector3f>("brute_force");
-    sf.register_class<EmbreeIntersector>("embree");
-    //sf.register_class<OctreeIntersector>("octree");
-
-    // sampler
-    sf.register_class<IndependentSampler>("independent");
-    sf.register_class<ConstantSampler>("static");
-
-    // integrator
-    sf.register_class<RtiowIntegrator3f>("rtiow");
-    sf.register_class<NormalIntegrator3f>("normal");
-
-    // shapes
-    sf.register_class<Sphere3f>("sphere");
-    sf.register_class<TriangleMesh3f>("obj");
-    //sf.register_class<SerializedMesh3f>("serialized");
-
-    // BSDFs
-    /*
-    sf.register_class<Dielectric>("dielectric");
-    sf.register_class<Diffuse>("diffuse");
-    sf.register_class<Mirror>("mirror");
-    sf.register_class<Phong>("phong");
-    */
-
-    // emitters
-    //sf.register_class<AreaLight3f>("area");
-
-    // textures
-    //sf.register_class<AlphaBlendedTexture>("mix_texture");
-    //sf.register_class<BitmapTexture>("bitmap");
-    //sf.register_class<Checkerboard>("checkerboard");
-
-    // filter
-    sf.register_class<BoxFilter>("box");
-    sf.register_class<GaussianFilter>("gaussian");
-    sf.register_class<TentFilter>("tent");
-
-    return load_scene<float, 3>(filename, sf, override_scene_properties);
+    return load_scene<float, 3>(filename, object_factory, override_scene_properties);
 }
 
 DE_VERTEXWAHN_END_NAMESPACE
