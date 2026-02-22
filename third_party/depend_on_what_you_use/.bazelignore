@@ -7,10 +7,7 @@ examples/skipping_targets
 examples/support
 examples/target_mapping
 
-test/apply_fixes/missing_dependency
-test/apply_fixes/needlessly_public_dependency
-test/apply_fixes/tool_cli
-test/apply_fixes/unused_dependency
+test/apply_fixes
 
 test/aspect
 test/aspect/alias
@@ -37,7 +34,5 @@ test/aspect/valid
 test/aspect/virtual_includes
 
 test/benchmark
-
-test/cc_toolchains/mocked
 
 test/workspace_integration

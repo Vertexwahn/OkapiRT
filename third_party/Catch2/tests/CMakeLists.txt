@@ -169,7 +169,7 @@ if(CATCH_ENABLE_COVERAGE)
 endif()
 
 # configure unit tests via CTest
-add_test(NAME RunTests COMMAND $<TARGET_FILE:SelfTest> --order rand --rng-seed time)
+add_test(NAME RunTests COMMAND $<TARGET_FILE:SelfTest> --order rand --rng-seed time --warn InfiniteGenerators)
 set_tests_properties(RunTests PROPERTIES
   FAIL_REGULAR_EXPRESSION "Filters:"
   COST 15
@@ -325,6 +325,24 @@ set_tests_properties(FilteredSections::GeneratorsDontCauseInfiniteLoop
   PROPERTIES
     PASS_REGULAR_EXPRESSION "inside with fov: 0" # This should happen
     FAIL_REGULAR_EXPRESSION "inside with fov: 1" # This would mean there was no filtering
+)
+
+add_test(NAME "FilteredSections::DifferentSimpleFilters"
+  COMMAND
+      Python3::Interpreter "${CMAKE_CURRENT_LIST_DIR}/TestScripts/testSectionFiltering.py" $<TARGET_FILE:SelfTest>
+)
+set_tests_properties("FilteredSections::DifferentSimpleFilters"
+  PROPERTIES
+    LABELS "uses-python"
+)
+
+add_test(NAME "FilteredSections::HittingGeneratorsWithSectionFilterCausesSkip"
+  COMMAND
+    $<TARGET_FILE:SelfTest> "baz" -p "c:A" -r "compact"
+)
+set_tests_properties("FilteredSections::HittingGeneratorsWithSectionFilterCausesSkip"
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "test cases: 1 \\| 1 skipped[\r\n\t ]*assertions: 1 \\| 1 passed"
 )
 
 add_test(NAME ApprovalTests
@@ -677,15 +695,6 @@ set_tests_properties("Bazel::RngSeedEnvVar::MalformedValueIsIgnored"
   PROPERTIES
     ENVIRONMENT "BAZEL_TEST=1;TEST_RANDOM_SEED=XOXOXOXO"
     PASS_REGULAR_EXPRESSION "Randomness seeded to: 17171717"
-)
-
-add_test(NAME "FilteredSections::DifferentSimpleFilters"
-  COMMAND
-      Python3::Interpreter "${CMAKE_CURRENT_LIST_DIR}/TestScripts/testSectionFiltering.py" $<TARGET_FILE:SelfTest>
-)
-set_tests_properties("FilteredSections::DifferentSimpleFilters"
-  PROPERTIES
-    LABELS "uses-python"
 )
 
 list(APPEND CATCH_TEST_TARGETS SelfTest)

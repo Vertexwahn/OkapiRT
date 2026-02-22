@@ -3,7 +3,6 @@ load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//dwyu/cc_info_mapping:providers.bzl", "DwyuCcInfoMappingInfo")
-load("//dwyu/cc_toolchain_headers:providers.bzl", "DwyuCcToolchainHeadersInfo")
 load("//dwyu/private:utils.bzl", "make_param_file_args")
 
 # Map of '-std=c++XX' to the corresponding standard version
@@ -313,6 +312,17 @@ def _gather_transitive_reports(ctx):
             reports.extend(_dywu_results_from_deps(ctx.rule.attr.implementation_deps))
     return reports
 
+def _get_pkg_relative_file_path(file):
+    """
+    Return the path of a file relative to the package using it
+    """
+
+    file_label = str(file.owner)
+    pkg_relative_path = file_label.split(":", 1)[1]
+    normalized_path = pkg_relative_path.replace("/", "_").replace(".", "_")
+
+    return normalized_path
+
 def _extract_includes_from_files(ctx, target, files, defines, cc_toolchain):
     """
     For each given file perform a preprocessing step to find all relevant include statements
@@ -341,7 +351,7 @@ def _extract_includes_from_files(ctx, target, files, defines, cc_toolchain):
 
     preprocessor_results = []
     for file in files:
-        pp_output = ctx.actions.declare_file("{}_{}.dwyu_ppr.json".format(target.label.name, file.basename))
+        pp_output = ctx.actions.declare_file("{}.dwyu_psf_{}.json".format(target.label.name, _get_pkg_relative_file_path(file)))
 
         # The source files could be a TreeArtifact! Thus, process each file as list, although we want to process the individual source files in parallel by default.
         args = make_param_file_args(ctx)
@@ -435,6 +445,10 @@ def dwyu_aspect_impl(target, ctx):
             args.add("--ignored_includes_config", ctx.files._ignored_includes[0])
         if _do_ensure_private_deps(ctx):
             args.add("--optimize_implementation_deps")
+        if ctx.attr.dwyu_analysis_reports_missing_direct_deps:
+            args.add("--report_missing_direct_deps")
+        if ctx.attr.dwyu_analysis_reports_unused_deps:
+            args.add("--report_unused_deps")
         if _is_verbose(ctx):
             args.add("--verbose")
 
@@ -465,12 +479,10 @@ def dwyu_aspect_impl(target, ctx):
             args.add("--implementation_deps_available")
         if ctx.attr._no_preprocessor:
             args.add("--no_preprocessor")
-        if ctx.attr._ignore_cc_toolchain_headers:
-            args.add("--toolchain_headers_info", ctx.attr._cc_toolchain_headers[DwyuCcToolchainHeadersInfo].headers_info)
 
         # Skip 'public_files' as those are included in the targets CcInfo.compilation_context.headers
         analysis_inputs = depset(
-            direct = [processed_target, ctx.attr._cc_toolchain_headers[DwyuCcToolchainHeadersInfo].headers_info] + private_files + processed_deps + processed_impl_deps + ctx.files._ignored_includes,
+            direct = [processed_target] + private_files + processed_deps + processed_impl_deps + ctx.files._ignored_includes,
             transitive = [target[CcInfo].compilation_context.headers],
         )
         ctx.actions.run(

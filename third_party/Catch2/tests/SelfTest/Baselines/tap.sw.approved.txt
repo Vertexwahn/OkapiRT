@@ -1358,6 +1358,26 @@ ok {test-number} - i % 2 == 0 for: 0 == 0
 ok {test-number} - i % 2 == 0 for: 0 == 0
 # GENERATE can combine literals and generators
 ok {test-number} - i % 2 == 0 for: 0 == 0
+# Generator adapters properly handle isFinite
+ok {test-number} - finite_cat.isFinite() for: true
+# Generator adapters properly handle isFinite
+ok {test-number} - !(infinite_cat.isFinite()) for: !false
+# Generator adapters properly handle isFinite
+ok {test-number} - take_1.isFinite() for: true
+# Generator adapters properly handle isFinite
+ok {test-number} - take_2.isFinite() for: true
+# Generator adapters properly handle isFinite
+ok {test-number} - finite_chunk.isFinite() for: true
+# Generator adapters properly handle isFinite
+ok {test-number} - !(infinite_chunk.isFinite()) for: !false
+# Generator adapters properly handle isFinite
+ok {test-number} - finite_map.isFinite() for: true
+# Generator adapters properly handle isFinite
+ok {test-number} - !(infinite_map.isFinite()) for: !false
+# Generator adapters properly handle isFinite
+ok {test-number} - finite_filter.isFinite() for: true
+# Generator adapters properly handle isFinite
+ok {test-number} - !(infinite_filter.isFinite()) for: !false
 # Generators -- adapters
 ok {test-number} - i % 2 == 0 for: 0 == 0
 # Generators -- adapters
@@ -2041,21 +2061,49 @@ ok {test-number} - d <= Approx( 1.22 ).epsilon(0.1) for: 1.22999999999999998 <= 
 # ManuallyRegistered
 ok {test-number} - with 1 message: 'was called'
 # MapGenerator can be skipped forward efficiently
+ok {test-number} - map_calls == 0 for: 0 == 0
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_calls == 0 for: 0 == 0
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_generator.get() == 3 for: 3 == 3
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_calls == 1 for: 1 == 1
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_generator.get() == 3 for: 3 == 3
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_calls == 1 for: 1 == 1
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_calls == 1 for: 1 == 1
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_calls == 0 for: 0 == 0
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_calls == 0 for: 0 == 0
+# MapGenerator can be skipped forward efficiently
 ok {test-number} - map_generator.get() == 4 for: 4 == 4
 # MapGenerator can be skipped forward efficiently
-ok {test-number} - map_calls == map_calls_1 + 1 for: 2 == 2
+ok {test-number} - map_calls == 1 for: 1 == 1
 # MapGenerator can be skipped forward efficiently
 ok {test-number} - map_generator.get() == 4 for: 4 == 4
 # MapGenerator can be skipped forward efficiently
-ok {test-number} - map_calls == map_calls_1 + 1 for: 2 == 2
+ok {test-number} - map_calls == 1 for: 1 == 1
+# MapGenerator can be skipped forward efficiently
+ok {test-number} - map_calls == 1 for: 1 == 1
 # MapGenerator can be skipped forward efficiently
 ok {test-number} - map_generator.get() == 6 for: 6 == 6
 # MapGenerator can be skipped forward efficiently
-ok {test-number} - map_calls == map_calls_2 + 1 for: 3 == 3
+ok {test-number} - map_calls == 2 for: 2 == 2
 # MapGenerator can be skipped forward efficiently
 ok {test-number} - map_generator.skipToNthElement( 7 )
 # MapGenerator can be skipped forward efficiently
-ok {test-number} - map_calls == map_calls_2 + 1 for: 3 == 3
+ok {test-number} - map_calls == 2 for: 2 == 2
+# MapGenerator can handle not default constructible types
+ok {test-number} - map_generator.get().m_i == 1 for: 1 == 1
+# MapGenerator can handle not default constructible types
+ok {test-number} - map_generator.next() for: true
+# MapGenerator can handle not default constructible types
+ok {test-number} - map_generator.next() for: true
+# MapGenerator can handle not default constructible types
+ok {test-number} - map_generator.get().m_i == 3 for: 3 == 3
 # Matchers can be (AllOf) composed with the && operator
 ok {test-number} - testStringForMatching(), ContainsSubstring( "string" ) && ContainsSubstring( "abc" ) && ContainsSubstring( "substring" ) && ContainsSubstring( "contains" ) for: "this string contains 'abc' as a substring" ( contains: "string" and contains: "abc" and contains: "substring" and contains: "contains" )
 # Matchers can be (AnyOf) composed with the || operator
@@ -2308,6 +2356,52 @@ ok {test-number} - spec.hasFilters() for: true
 ok {test-number} - spec.getInvalidSpecs().empty() for: true
 # Parsed tags are matched case insensitive
 ok {test-number} - spec.matches( testCase ) for: true
+# Parsing path filter specs
+ok {test-number} - result for: {?}
+# Parsing path filter specs
+ok {test-number} - !(config.useNewPathFilteringBehaviour) for: !false
+# Parsing path filter specs
+ok {test-number} - result for: {?}
+# Parsing path filter specs
+ok {test-number} - config.useNewPathFilteringBehaviour for: true
+# Parsing path filter specs
+ok {test-number} - !(result) for: !{?}
+# Parsing path filter specs
+ok {test-number} - result for: {?}
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[0] == PathFilter( PathFilter::For::Generator, "*" ) for: {?} == {?}
+# Parsing path filter specs
+ok {test-number} - !(result) for: !{?}
+# Parsing path filter specs
+ok {test-number} - result for: {?}
+# Parsing path filter specs
+ok {test-number} - config.useNewPathFilteringBehaviour for: true
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[0] == PathFilter( PathFilter::For::Generator, "1" ) for: {?} == {?}
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[1] == PathFilter( PathFilter::For::Section, "foobar" ) for: {?} == {?}
+# Parsing path filter specs
+ok {test-number} - !(result) for: !{?}
+# Parsing path filter specs
+ok {test-number} - !(result1) for: !{?}
+# Parsing path filter specs
+ok {test-number} - !(result2) for: !{?}
+# Parsing path filter specs
+ok {test-number} - result for: {?}
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[0] == PathFilter( PathFilter::For::Section, "foo-bar" ) for: {?} == {?}
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[1] == PathFilter( PathFilter::For::Generator, "3" ) for: {?} == {?}
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[2] == PathFilter( PathFilter::For::Generator, "123" ) for: {?} == {?}
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[3] == PathFilter( PathFilter::For::Section, "baz" ) for: {?} == {?}
+# Parsing path filter specs
+ok {test-number} - result for: {?}
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[0] == PathFilter(PathFilter::For::Section, "untrimmed" ) for: {?} == {?}
+# Parsing path filter specs
+ok {test-number} - config.pathFilters[1] == PathFilter(PathFilter::For::Generator, "42" ) for: {?} == {?}
 # Parsing sharding-related cli flags
 ok {test-number} - cli.parse({ "test", "--shard-count=8" }) for: {?}
 # Parsing sharding-related cli flags
@@ -2351,9 +2445,9 @@ ok {test-number} - config.warnings == WarnAbout::NoAssertions for: 1 == 1
 # Parsing warnings
 ok {test-number} - !(cli.parse( { "test", "-w", "NoTests" } )) for: !{?}
 # Parsing warnings
-ok {test-number} - cli.parse( { "test", "--warn", "NoAssertions", "--warn", "UnmatchedTestSpec" } ) for: {?}
+ok {test-number} - cli.parse( { "test", "--warn", "NoAssertions", "--warn", "UnmatchedTestSpec", "--warn", "InfiniteGenerators" } ) for: {?}
 # Parsing warnings
-ok {test-number} - config.warnings == ( WarnAbout::NoAssertions | WarnAbout::UnmatchedTestSpec ) for: 3 == 3
+ok {test-number} - config.warnings == ( WarnAbout::NoAssertions | WarnAbout::UnmatchedTestSpec | WarnAbout::InfiniteGenerator ) for: 7 == 7
 # Pointers can be compared to null
 ok {test-number} - p == 0 for: 0 == 0
 # Pointers can be compared to null
@@ -2592,6 +2686,12 @@ ok {test-number} - Catch::generateRandomSeed(method)
 ok {test-number} - Catch::generateRandomSeed(method)
 # Random seed generation reports unknown methods
 ok {test-number} - Catch::generateRandomSeed(static_cast<Catch::GenerateFrom>(77))
+# RandomGenerator reports itself as infinite - float
+ok {test-number} - !(Catch::Generators::random( TestType{ 0 }, TestType{ 100 } ).isFinite()) for: !false
+# RandomGenerator reports itself as infinite - int
+ok {test-number} - !(Catch::Generators::random( TestType{ 0 }, TestType{ 100 } ).isFinite()) for: !false
+# RandomGenerator reports itself as infinite - long double
+ok {test-number} - !(Catch::Generators::random( TestType{ 0 }, TestType{ 100 } ).isFinite()) for: !false
 # Range type with sentinel
 ok {test-number} - Catch::Detail::stringify(UsesSentinel{}) == "{  }" for: "{  }" == "{  }"
 # Reconstruction should be based on stringification: #914
@@ -2606,6 +2706,8 @@ not ok {test-number} - testStringForMatching(), Matches( "this string contains '
 ok {test-number} - registry.registerReporter( "with::doublecolons", Catch::Detail::make_unique<TestReporterFactory>() ), "'::' is not allowed in reporter name: 'with::doublecolons'" for: "'::' is not allowed in reporter name: 'with::doublecolons'" equals: "'::' is not allowed in reporter name: 'with::doublecolons'"
 # Regression test #1
 ok {test-number} - actual, !UnorderedEquals( expected ) for: { 'a', 'b' } not UnorderedEquals: { 'c', 'b' }
+# RepeatGenerator refuses infinite generators
+ok {test-number} - RepeatGenerator<int>( 2, random( 1, 100 ) )
 # Reporter's write listings to provided stream
 ok {test-number} - !(factories.empty()) for: !false
 # Reporter's write listings to provided stream
@@ -4743,5 +4845,5 @@ ok {test-number} - q3 == 23. for: 23.0 == 23.0
 ok {test-number} -
 # xmlentitycheck
 ok {test-number} -
-1..2374
+1..2425
 

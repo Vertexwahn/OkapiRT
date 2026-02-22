@@ -152,6 +152,8 @@ bool mouseRightPressed;
 float curr_quat[4];
 float prev_quat[4];
 float eye[3], lookat[3], up[3];
+float g_angleX = 0.0f; // in degree
+float g_angleY = 0.0f; // in degree
 bool g_show_wire = true;
 bool g_cull_face = false;
 
@@ -220,6 +222,68 @@ struct vec3 {
   }
 };
 
+struct mat3 {
+  float m[3][3];
+  mat3() {
+    m[0][0] = 1.0f;
+    m[0][1] = 0.0f;
+    m[0][2] = 0.0f;
+    m[1][0] = 0.0f;
+    m[1][1] = 1.0f;
+    m[1][2] = 0.0f;
+    m[2][0] = 0.0f;
+    m[2][1] = 0.0f;
+    m[2][2] = 1.0f;
+  }
+};
+
+struct mat4 {
+  float m[4][4];
+  mat4() {
+    m[0][0] = 1.0f;
+    m[0][1] = 0.0f;
+    m[0][2] = 0.0f;
+    m[0][3] = 0.0f;
+    m[1][0] = 0.0f;
+    m[1][1] = 1.0f;
+    m[1][2] = 0.0f;
+    m[1][3] = 0.0f;
+    m[2][0] = 0.0f;
+    m[2][1] = 0.0f;
+    m[2][2] = 1.0f;
+    m[2][3] = 0.0f;
+    m[3][0] = 0.0f;
+    m[3][1] = 0.0f;
+    m[3][2] = 0.0f;
+    m[3][3] = 1.0f;
+  }
+};
+
+
+void matmul3x3(const mat3 &a, const mat3 &b, mat3 &dst) {
+  for (size_t i = 0; i < 3; i++) {
+    for (size_t j = 0; j < 3; j++) {
+      float v = 0.0f;
+      for (size_t k = 0; k < 3; k++) {
+        v += a.m[i][k] * b.m[k][j];
+      }
+      dst.m[i][j] = v;
+    }
+  }
+}
+
+void matmul4x4(const mat4 &a, const mat4 &b, mat4 &dst) {
+  for (size_t i = 0; i < 4; i++) {
+    for (size_t j = 0; j < 4; j++) {
+      float v = 0.0f;
+      for (size_t k = 0; k < 4; k++) {
+        v += a.m[i][k] * b.m[k][j];
+      }
+      dst.m[i][j] = v;
+    }
+  }
+}
+
 void normalizeVector(vec3 &v) {
   float len2 = v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2];
   if (len2 > 0.0f) {
@@ -229,6 +293,52 @@ void normalizeVector(vec3 &v) {
     v.v[1] /= len;
     v.v[2] /= len;
   }
+}
+
+// Maya-like turntable
+// Reference:
+// https://gamedev.stackexchange.com/questions/204367/implementing-a-maya-like-orbit-camera-in-vulkan-opengl
+//
+// angleX, angleY = angle in degree.
+// TODO: scale
+static void turntable(float angleX, float angleY, float center[3], float dst[4][4]) {
+  float pivot[3];
+  pivot[0] = center[0];
+  pivot[1] = center[1];
+  pivot[2] = center[2];
+
+  // rotate Y
+  const float kPI = 3.141592f;
+  float cosY = std::cos(kPI * angleY / 180.0f);
+  float sinY = std::sin(kPI * angleY / 180.0f);
+
+  mat3 rotY;
+  rotY.m[0][0] = cosY;
+  rotY.m[0][1] = 0.0f;
+  rotY.m[0][2] = -sinY;
+  rotY.m[1][0] = 0.0f;
+  rotY.m[1][1] = 1.0f;
+  rotY.m[1][2] = 0.0f;
+  rotY.m[2][0] = sinY;
+  rotY.m[2][1] = 0.0f;
+  rotY.m[2][2] = cosY;
+
+  float cosX = std::cos(kPI * angleX / 180.0f);
+  float sinX = std::sin(kPI * angleX / 180.0f);
+
+  mat3 rotX;
+  rotX.m[0][0] = 1.0f;
+  rotX.m[0][1] = 0.0f;
+  rotX.m[0][2] = 0.0f;
+  rotX.m[1][0] = 0.0f;
+  rotX.m[1][1] = cosX;
+  rotX.m[1][2] = sinX;
+  rotX.m[2][0] = 0.0f;
+  rotX.m[2][1] = -sinX;
+  rotX.m[2][2] = cosX;
+
+
+
 }
 
 /*
@@ -1066,15 +1176,25 @@ int main(int argc, char** argv) {
     GLfloat mat[4][4];
     gluLookAt(eye[0], eye[1], eye[2], lookat[0], lookat[1], lookat[2], up[0],
               up[1], up[2]);
+
+    float center[3];
+    center[0] = 0.5 * (bmax[0] + bmin[0]);
+    center[1] = 0.5 * (bmax[1] + bmin[1]);
+    center[2] = 0.5 * (bmax[2] + bmin[2]);
+    float rotm[4][4];
+    turntable(g_angleX, g_angleY, center, rotm);
+
     build_rotmatrix(mat, curr_quat);
     glMultMatrixf(&mat[0][0]);
 
     // Fit to -1, 1
     glScalef(1.0f / maxExtent, 1.0f / maxExtent, 1.0f / maxExtent);
 
+#if 0
     // Centerize object.
     glTranslatef(-0.5 * (bmax[0] + bmin[0]), -0.5 * (bmax[1] + bmin[1]),
                  -0.5 * (bmax[2] + bmin[2]));
+#endif
 
     Draw(gDrawObjects, materials, textures);
 

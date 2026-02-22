@@ -88,6 +88,15 @@ namespace Catch {
              * comes first.
              */
             StringRef currentElementAsString() const;
+
+            /**
+             * Returns true if calls to `next` will eventually return false
+             *
+             * Note that for backwards compatibility this is currently defaulted
+             * to return `true`, but in the future all generators will have to
+             * provide their own implementation.
+             */
+            virtual bool isFinite() const;
         };
         using GeneratorBasePtr = Catch::Detail::unique_ptr<GeneratorUntypedBase>;
 
@@ -96,9 +105,7 @@ namespace Catch {
     class IGeneratorTracker {
     public:
         virtual ~IGeneratorTracker(); // = default;
-        virtual auto hasGenerator() const -> bool = 0;
         virtual auto getGenerator() const -> Generators::GeneratorBasePtr const& = 0;
-        virtual void setGenerator( Generators::GeneratorBasePtr&& generator ) = 0;
     };
 
 } // namespace Catch
