@@ -47,7 +47,7 @@ bool CommandLineArguments::handle_help() const {
 
 bool CommandLineArguments::handle_version() const {
     if(vm.count("version")) {
-        std::cout << "Okapi Renderer Alpha 1.0.10" << std::endl;
+        std::cout << "Okapi Renderer Alpha 1.0.11" << std::endl;
         return true;
     }
 

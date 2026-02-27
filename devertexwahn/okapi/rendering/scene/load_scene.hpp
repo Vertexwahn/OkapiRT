@@ -16,7 +16,7 @@
 #include "flatland/rendering/scene/load_scene.hpp"
 #include "flatland/rendering/scene/scene.hpp"
 #include "okapi/rendering/sensor/film.hpp"
-#include "okapi/rendering/sensor/reconstruction_filter.hpp"
+#include "okapi/rendering/reconstruction_filter/reconstruction_filter.hpp"
 
 #include "pugixml.hpp"
 
