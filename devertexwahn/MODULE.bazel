@@ -223,10 +223,10 @@ local_path_override(
     path = "../third_party/libwebp-1.6.0",
 )
 
-local_path_override(
-    module_name = "nasm",
-    path = "../third_party/nasm-2.14.02",
-)
+#local_path_override(
+#    module_name = "nasm",
+#    path = "../third_party/nasm-2.14.02",
+#)
 
 local_path_override(
     module_name = "onetbb",
