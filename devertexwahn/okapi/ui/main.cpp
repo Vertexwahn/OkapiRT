@@ -44,7 +44,7 @@ int main(int argc, char ** argv) {
     QApplication application(argc, argv);
     QApplication::setWindowIcon(QIcon(":/okapi.ui.ico"));
     QApplication::setOrganizationDomain("vertexwahn.de");
-    application.setApplicationName("Okapi Renderer Alpha 1.0.10");
+    application.setApplicationName("Okapi Renderer Alpha 1.0.11");
     application.setOrganizationName("vertexwahn.de");
 
     QFile style_sheet(":/okapi.ui.qss");

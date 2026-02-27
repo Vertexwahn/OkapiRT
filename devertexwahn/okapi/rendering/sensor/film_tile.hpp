@@ -13,7 +13,7 @@
 #include "math/point.hpp"
 #include "math/tensor.hpp"
 #include "math/vector.hpp"
-#include "okapi/rendering/sensor/reconstruction_filter.hpp"
+#include "okapi/rendering/reconstruction_filter/reconstruction_filter.hpp"
 
 DE_VERTEXWAHN_BEGIN_NAMESPACE
 
