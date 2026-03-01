@@ -5,14 +5,19 @@
 
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
+
 cc_library(
     name = "normal_integrator",
-    srcs = ["normal_integrator.hpp"],
+    srcs = ["normal_integrator.cpp"],
+    hdrs = ["normal_integrator.hpp"],
     visibility = ["//visibility:public"],
-    deps = ["//flatland/rendering/integrator"],
+    deps = [
+        "//core:object_factory",
+        "//flatland/rendering/integrator",
+        "//flatland/rendering/scene",
+    ],
 )
 
-'''
 cc_test(
     name = "normal_integrator_test",
     size = "small",
@@ -21,37 +26,9 @@ cc_test(
     ],
     data = ["//okapi/scenes"],
     deps = [
-        ":normal_integrator",
         "//flatland/rendering/integrator",
         "//okapi/rendering/scene:load_scene",
         "//okapi/rendering/sensor",
-        "@googletest//:gtest_main",
-    ],
-)
-'''
-
-cc_library(
-    name = "rtiow_integrator",
-    srcs = ["rtiow_integrator.hpp"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//core:namespace",
-        "//flatland/rendering/integrator",
-        "//math:constants",
-    ],
-)
-
-cc_test(
-    name = "rtiow_integrator_test",
-    size = "small",
-    srcs = [
-        "rtiow_integrator_test.cpp",
-    ],
-    data = ["//okapi/scenes"],
-    deps = [
-        ":rtiow_integrator",
-        "//flatland/rendering/intersector",
-        "//flatland/rendering/scene",
         "@googletest//:gtest_main",
     ],
 )
