@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-#include "okapi/rendering/sensor/reconstruction_filter.hpp"
+#include "okapi/rendering/reconstruction_filter/reconstruction_filter.hpp"
 
 #include "core/object_factory.hpp"
 

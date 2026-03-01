@@ -4,7 +4,7 @@
  */
 
 #include "core/reference_counted.hpp"
-#include "okapi/rendering/sensor/reconstruction_filter.hpp"
+#include "okapi/rendering/reconstruction_filter/reconstruction_filter.hpp"
 #include "imaging/io/io.hpp"
 
 #include "gmock/gmock.h"
