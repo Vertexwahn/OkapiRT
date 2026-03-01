@@ -32,7 +32,9 @@ public:
 
     void save_as_ppm(const QString& filename);
     void save_as_png(const QString& filename);
+    void save_as_tiff(const QString& filename);
     void save_as_webp(const QString& filename);
+    void save_as_gif(const QString& filename);
     void save_as_pfm(const QString& filename);
     void save_as_open_exr(const QString& filename);
     void save_as_jpeg(const QString& filename);

@@ -6,6 +6,7 @@
 #include "okapi/ui/viewport.hpp"
 
 #include "imaging/io/io.hpp"
+#include "imaging/io/io_gif.hpp"
 #include "imaging/io/io_openexr.hpp"
 #include "imaging/io/io_pfm.hpp"
 #include "okapi/rendering/sensor/sensor.hpp"
@@ -78,7 +79,7 @@ void Viewport::wheelEvent(QWheelEvent* event) {
     //repositionCamera();
 
     float delta = event->angleDelta().y();
-    std::cout << delta << std::endl;
+    //std::cout << delta << std::endl;
 
     float factor = pow(1.1, delta / -120.f);
     camera_controller_->handle_wheel(factor);
@@ -126,9 +127,31 @@ void Viewport::save_as_png(const QString& filename) {
     }
 }
 
+void Viewport::save_as_tiff(const QString& filename) {
+    try {
+        store_image(filename.toStdString().data(), render_preview_thread_.image_);
+    }
+    catch (std::exception &ex) {
+        QMessageBox msgBox;
+        msgBox.setText(ex.what());
+        msgBox.exec();
+    }
+}
+
 void Viewport::save_as_webp(const QString& filename) {
     try {
         store_image(filename.toStdString().data(), render_preview_thread_.image_);
+    }
+    catch (std::exception &ex) {
+        QMessageBox msgBox;
+        msgBox.setText(ex.what());
+        msgBox.exec();
+    }
+}
+
+void Viewport::save_as_gif(const QString& filename) {
+    try {
+        store_gif(filename.toStdString().data(), *render_preview_thread_.image_);
     }
     catch (std::exception &ex) {
         QMessageBox msgBox;
@@ -233,6 +256,21 @@ void Viewport::update_camera() {
         render_scene_thread_.scene->sensor()->set_transform(
             camera_controller_->camera()->transformation().view_matrix()
         );
+
+        // <matrix value="-0.6859206557273865,-0.32401347160339355,-0.6515582203865051,7.358891487121582,0.0,0.8953956365585327,-0.44527140259742737,4.958309173583984,0.7276763319969177,-0.305420845746994,-0.6141703724861145,6.925790786743164,0.0,0.0,0.0,1.0"/>
+        //std::cout << "<matrix value=\"";
+        //for (int i = 0; i < 16; i++) {
+            //std::cout << camera_controller_->camera()->transformation().view_matrix()(i);
+
+            //if (i != 15) {
+                //std::cout << ", ";
+            //}
+        //}
+        //std::cout << "\"/>" << std::endl;
+
+        //std::cout << "Cam pos x: " << camera_controller_->camera()->transformation().x() << std::endl;
+        //std::cout << "Cam pos y: " << camera_controller_->camera()->transformation().y() << std::endl;
+        //std::cout << "Cam pos z: " << camera_controller_->camera()->transformation().z() << std::endl;
     }
 }
 

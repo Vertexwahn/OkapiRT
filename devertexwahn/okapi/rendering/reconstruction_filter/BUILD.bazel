@@ -5,6 +5,7 @@
 
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
+
 cc_library(
     name = "reconstruction_filter",
     srcs = ["reconstruction_filter.cpp"],
