@@ -303,4 +303,19 @@ class YAML_CPP_API BadFile : public Exception {
 };
 }  // namespace YAML
 
+#if defined(_MSC_VER)
+#define YAML_ATTRIBUTE_NO_SANITIZE_ADDRESS __declspec(no_sanitize_address)
+#elif defined(__has_cpp_attribute) && __has_cpp_attribute(gnu::no_sanitize)
+#define YAML_ATTRIBUTE_NO_SANITIZE_ADDRESS [[gnu::no_sanitize("address")]]
+#elif defined(__has_cpp_attribute) && __has_cpp_attribute(clang::no_sanitize)
+#define YAML_ATTRIBUTE_NO_SANITIZE_ADDRESS [[clang::no_sanitize("address")]]
+#elif defined(__has_attribute) && __has_attribute(no_sanitize)
+#define YAML_ATTRIBUTE_NO_SANITIZE_ADDRESS \
+  __attribute__((no_sanitize("address")))
+#elif defined(__has_attribute) && __has_attribute(no_sanitize_address)
+#define YAML_ATTRIBUTE_NO_SANITIZE_ADDRESS __attribute__((no_sanitize_address))
+#else
+#define YAML_ATTRIBUTE_NO_SANITIZE_ADDRESS
+#endif
+
 #endif  // EXCEPTIONS_H_62B23520_7C8E_11DE_8A39_0800200C9A66
