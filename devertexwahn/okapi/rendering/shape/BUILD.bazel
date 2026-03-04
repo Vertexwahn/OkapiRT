@@ -31,6 +31,32 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "serialzied_mesh",
+    srcs = ["serialized_mesh.cpp"],
+    hdrs = ["serialized_mesh.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":triangle_mesh",
+        "//core:object_factory",
+        "@zlib",
+    ],
+)
+
+cc_test(
+    name = "serialzied_mesh_test",
+    size = "small",
+    srcs = [
+        "serialized_mesh_test.cpp",
+    ],
+    data = ["//okapi/scenes"],
+    deps = [
+        ":serialzied_mesh",
+        "//okapi/rendering/scene:load_scene",
+        "@googletest//:gtest_main",
+    ],
+)
+
 
 cc_library(
     name = "sphere",
