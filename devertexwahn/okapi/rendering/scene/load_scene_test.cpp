@@ -293,3 +293,11 @@ TEST(load_scene3f, GivenFileWithSimpleIntegraterWithMissingAttribute_WhenLoading
                 )
     );
 }
+
+/*
+// Requires lucy.ply which is over 500 MB and not checked in
+TEST(load_scene3f, test) {
+    auto scene = load_scene3f("okapi/scenes/lucy/lucy.constant_emitter.okapi3.xml");
+    ASSERT_TRUE(scene);
+}
+*/
