@@ -4,23 +4,26 @@
 """
 
 load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar")
-#load("@rules_license//rules:compliance.bzl", "licenses_used")
-#load("@rules_license//rules:license.bzl", "license")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("@rules_license//rules:license.bzl", "license")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library", "qt_resource", "qt_resource_via_qrc", "qt_ui_library")
 load("//okapi/res:win_res.bzl", "windows_resources")
 
 package(
-    #default_applicable_licenses = [":license"],
+    default_applicable_licenses = [":license"],
     default_visibility = ["//visibility:public"],
 )
 
-#license(
-#    name = "license",
-#    copyright_notice = "Copyright 2025 Julian Amann",
-#    license_kinds = ["@rules_license//licenses/spdx:Apache-2.0"],
-#    license_text = "//:LICENSE",
-#)
+license(
+    name = "license",
+    copyright_notice = "Copyright 2025-2026 Julian Amann",
+    license_kinds = ["@rules_license//licenses/spdx:Apache-2.0"],
+    license_text = "//:LICENSE",
+)
 
 cc_library(
     name = "camera",
@@ -173,8 +176,10 @@ qt_cc_library(
 
 config_setting(
     name = "windows_x86_64",
-    values = {"cpu": "x64_windows"},
-    visibility = ["//visibility:public"],
+    constraint_values = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
 )
 
 qt_cc_binary(
@@ -314,6 +319,7 @@ qt_cc_library(
         "//core:logging",
         "//core:timer",
         "//imaging/io",
+        "//imaging/io:io_gif",
         "//imaging/io:io_openexr",
         "//imaging/io:io_pfm",
         "//okapi:command_line_arguments",
@@ -378,12 +384,323 @@ cc_test(
 )
 
 #-----------------------------------------------------------
-# Deployment
+# Deployment - Portable Windows Package
 #-----------------------------------------------------------
 
-# Currently not satisfied with the deployment
-# Nevertheless, this is a start point
+# Create a portable ZIP archive with all runtime dependencies
+# This target packages okapi.ui.exe with all Qt DLLs, plugins, and QML modules
+# for deployment to Windows systems without Qt installed.
+#
+# Usage:
+#   bazel build --config=vs2022 --compilation_mode=opt //okapi/ui:okapi_ui_windows_portable
+#   # Output: bazel-bin/okapi/ui/okapi_ui_windows_portable.zip (~129 MB, 1821 files)
+#
+# Extract manually:
+#   Expand-Archive bazel-bin/okapi/ui/okapi_ui_windows_portable.zip -DestinationPath C:/deploy
+#
+# Package Contents:
+#   (root)/
+#     ├── okapi.ui.exe           (main application, 76 MB)
+#     ├── Qt6*.dll               (Qt runtime libraries - automatically detected by windeployqt)
+#     ├── okapi.ui.ico           (application icon)
+#     ├── platforms/             (Qt platform plugins - automatically detected)
+#     ├── styles/                (Qt style plugins - automatically detected)
+#     ├── imageformats/          (Qt image format plugins - automatically detected)
+#     └── okapi/ui/
+#         ├── okapi.ui.qss       (application stylesheet)
+#         ├── license_notes.txt  (license information)
+#         └── scenes/            (Demo scenes with meshes and textures)
+#
+# Note: windeployqt automatically determines and deploys only the necessary Qt dependencies
+#
+# Running the deployed application:
+#   & 'C:/deploy/okapi.ui.exe'
+genrule(
+    name = "okapi_ui_windows_portable",
+    srcs = [
+        ":okapi.ui",
+        "//okapi/cli:okapi.cli",
+        "//okapi/hub",
+        "//okapi/hub/oh",
+        "//okapi/hub/render_node",
+        "okapi.ui.qss",
+        "okapi.ui.ico",
+        "license_notes.txt",
+    ] + glob(["scenes/**/*"]),
+    outs = ["okapi_ui_windows_portable.zip"],
+    cmd = select({
+        "@platforms//os:windows": """
+            # Create temp directory for packaging
+            TEMP_DIR=$$(mktemp -d)
+            PACKAGE_DIR="$$TEMP_DIR"
+            mkdir -p "$$PACKAGE_DIR"
 
+            # Copy the executable to root
+            EXE_PATH="$$(realpath "$(execpath :okapi.ui)")"
+            EXE_NAME="$$(basename "$$EXE_PATH")"
+            cp "$$EXE_PATH" "$$PACKAGE_DIR/$$EXE_NAME"
+
+            # Copy CLI executable to root
+            CLI_PATH="$$(realpath "$(execpath //okapi/cli:okapi.cli)")"
+            CLI_NAME="$$(basename "$$CLI_PATH")"
+            cp "$$CLI_PATH" "$$PACKAGE_DIR/$$CLI_NAME"
+
+            # Copy hub executable to root
+            HUB_PATH="$$(realpath "$(execpath //okapi/hub:hub)")"
+            HUB_NAME="$$(basename "$$HUB_PATH")"
+            cp "$$HUB_PATH" "$$PACKAGE_DIR/$$HUB_NAME"
+
+            # Copy oh executable to root
+            OH_PATH="$$(realpath "$(execpath //okapi/hub/oh:oh)")"
+            OH_NAME="$$(basename "$$OH_PATH")"
+            cp "$$OH_PATH" "$$PACKAGE_DIR/$$OH_NAME"
+
+            # Copy render_node executable to root
+            RN_PATH="$$(realpath "$(execpath //okapi/hub/render_node:render_node)")"
+            RN_NAME="$$(basename "$$RN_PATH")"
+            cp "$$RN_PATH" "$$PACKAGE_DIR/$$RN_NAME"
+
+            # Copy icon to root
+            cp "$(execpath okapi.ui.ico)" "$$PACKAGE_DIR/"
+
+            # Copy qss and license_notes.txt to okapi/ui/
+            mkdir -p "$$PACKAGE_DIR/okapi/ui"
+            cp "$(execpath okapi.ui.qss)" "$$PACKAGE_DIR/okapi/ui/"
+            cp "$(execpath license_notes.txt)" "$$PACKAGE_DIR/okapi/ui/"
+
+            # Use windeployqt to deploy Qt dependencies
+            # Find windeployqt.exe in the Qt Bazel external repository
+            # The path needs to be resolved relative to the execution root
+            WINDEPLOYQT=""
+
+            # Check common Bazel external repository locations
+            for base_dir in "external" ".."; do
+                for repo_name in "rules_qt++fetch+qt_windows_x86_64" "qt_windows_x86_64"; do
+                    windeployqt_path="$$base_dir/$$repo_name/bin/windeployqt.exe"
+                    if [ -f "$$windeployqt_path" ]; then
+                        # Convert to Windows path format
+                        WINDEPLOYQT="$$(realpath -m "$$windeployqt_path" 2>/dev/null || echo "$$windeployqt_path")"
+                        echo "Found windeployqt at: $$WINDEPLOYQT"
+                        break 2
+                    fi
+                done
+            done
+
+            if [ -n "$$WINDEPLOYQT" ]; then
+                cd "$$PACKAGE_DIR"
+                echo "Running windeployqt on $$EXE_NAME..."
+                "$$WINDEPLOYQT" --release --no-translations --no-system-d3d-compiler \
+                    --no-compiler-runtime --no-opengl-sw "$$EXE_NAME" || {
+                    echo "Warning: windeployqt failed with exit code $$?, continuing anyway..."
+                }
+                cd - > /dev/null
+            else
+                echo "ERROR: windeployqt.exe not found in Qt external repository"
+                echo "Deployment will be incomplete - Qt DLLs/plugins not included"
+            fi
+
+            # Copy scenes folder to okapi/ui/scenes
+            mkdir -p "$$PACKAGE_DIR/okapi/ui/scenes"
+            for scene_file in $(SRCS); do
+                if [[ "$$scene_file" == */scenes/* ]]; then
+                    REL_PATH=$${scene_file#*scenes/}
+                    TARGET_DIR="$$PACKAGE_DIR/okapi/ui/scenes/$$(dirname "$$REL_PATH")"
+                    mkdir -p "$$TARGET_DIR"
+                    cp "$$scene_file" "$$TARGET_DIR/"
+                fi
+            done
+
+            # Create the ZIP archive
+            OUTPUT_FILE="$$(realpath -m "$@" 2>/dev/null || echo "$@")"
+            cd "$$TEMP_DIR"
+            zip -r "$$OUTPUT_FILE" .
+
+            # Cleanup
+            cd -
+            rm -rf "$$TEMP_DIR"
+        """,
+        "//conditions:default": "echo 'Windows only' > $@ && touch $@",
+    }),
+    tags = ["manual"],
+    target_compatible_with = ["@platforms//os:windows"],
+)
+
+#-----------------------------------------------------------
+# Deployment - Portable Linux Package
+#-----------------------------------------------------------
+
+# Create a portable tar.gz archive with all runtime dependencies
+# This target packages okapi.ui with all Qt shared libraries, plugins,
+# and a launcher script for deployment to Linux systems without Qt installed.
+#
+# Usage:
+#   bazel build --config=gcc13 --compilation_mode=opt //okapi/ui:okapi_ui_linux_portable
+#   # Output: bazel-bin/okapi/ui/okapi_ui_linux_portable.tar.gz
+#
+# Extract:
+#   mkdir -p ~/deploy && tar xzf bazel-bin/okapi/ui/okapi_ui_linux_portable.tar.gz -C ~/deploy
+#
+# Package Contents:
+#   okapi-renderer-alpha-1.0.11-linux/
+#     ├── okapi.ui              (main GUI application binary)
+#     ├── okapi.cli             (command-line renderer)
+#     ├── hub                   (hub executable)
+#     ├── oh                    (oh executable)
+#     ├── render_node           (render node executable)
+#     ├── okapi.ui.sh           (launcher script for GUI)
+#     ├── okapi.ui.ico          (application icon)
+#     ├── lib/                  (Qt libraries)
+#     │   ├── libQt6*.so*
+#     │   └── libicu*.so*
+#     ├── plugins/              (Qt plugins)
+#     │   ├── platforms/
+#     │   ├── styles/
+#     │   ├── imageformats/
+#     │   └── ...
+#     └── okapi/ui/
+#         ├── okapi.ui.qss      (stylesheet)
+#         ├── license_notes.txt (license information)
+#         └── scenes/           (demo scenes)
+#
+# Running the deployed application:
+#   cd ~/deploy/okapi-renderer-alpha-1.0.11-linux
+#   ./okapi.ui.sh
+genrule(
+    name = "okapi_ui_linux_portable",
+    srcs = [
+        ":okapi.ui",
+        "//okapi/cli:okapi.cli",
+        "//okapi/hub",
+        "//okapi/hub/oh",
+        "//okapi/hub/render_node",
+        "okapi.ui.qss",
+        "okapi.ui.ico",
+        "license_notes.txt",
+        "@qt_linux_x86_64//:plugin_files",
+        "@qt_linux_x86_64//:lib_files",
+    ] + glob(["scenes/**/*"]),
+    outs = ["okapi_ui_linux_portable.tar.gz"],
+    cmd = select({
+        "@platforms//os:linux": """
+            # Create temp directory for packaging
+            TEMP_DIR=$$(mktemp -d)
+            PACKAGE_DIR="$$TEMP_DIR/okapi-renderer-alpha-1.0.11-linux"
+            mkdir -p "$$PACKAGE_DIR"
+
+            # Copy the main GUI binary
+            cp "$$(realpath "$(execpath :okapi.ui)")" "$$PACKAGE_DIR/okapi.ui"
+            chmod +x "$$PACKAGE_DIR/okapi.ui"
+
+            # Copy CLI executable
+            cp "$$(realpath "$(execpath //okapi/cli:okapi.cli)")" "$$PACKAGE_DIR/okapi.cli"
+            chmod +x "$$PACKAGE_DIR/okapi.cli"
+
+            # Copy hub executable
+            cp "$$(realpath "$(execpath //okapi/hub:hub)")" "$$PACKAGE_DIR/hub"
+            chmod +x "$$PACKAGE_DIR/hub"
+
+            # Copy oh executable
+            cp "$$(realpath "$(execpath //okapi/hub/oh:oh)")" "$$PACKAGE_DIR/oh"
+            chmod +x "$$PACKAGE_DIR/oh"
+
+            # Copy render_node executable
+            cp "$$(realpath "$(execpath //okapi/hub/render_node:render_node)")" "$$PACKAGE_DIR/render_node"
+            chmod +x "$$PACKAGE_DIR/render_node"
+
+            # Copy icon to root
+            cp "$(execpath okapi.ui.ico)" "$$PACKAGE_DIR/"
+
+            # Copy qss and license_notes.txt to okapi/ui/
+            mkdir -p "$$PACKAGE_DIR/okapi/ui"
+            cp "$(execpath okapi.ui.qss)" "$$PACKAGE_DIR/okapi/ui/"
+            cp "$(execpath license_notes.txt)" "$$PACKAGE_DIR/okapi/ui/"
+
+            # Find Qt external repository directory
+            # Locate it via the plugin files that are already in srcs
+            QT_DIR=""
+            for plugin_file in $(locations @qt_linux_x86_64//:plugin_files); do
+                if [[ "$$plugin_file" == */plugins/* ]]; then
+                    # Navigate up from plugins/subdir/file.so to the Qt root
+                    QT_DIR="$$(cd "$$(dirname "$$plugin_file")/../.." && pwd)"
+                    echo "Found Qt at: $$QT_DIR"
+                    break
+                fi
+            done
+
+            if [ -n "$$QT_DIR" ]; then
+                # Copy Qt shared libraries from lib_files filegroup
+                mkdir -p "$$PACKAGE_DIR/lib"
+                for lib_file in $(locations @qt_linux_x86_64//:lib_files); do
+                    BASENAME="$$(basename "$$lib_file")"
+                    # Skip .prl files and cmake directories
+                    if [[ "$$BASENAME" == *.prl ]] || [[ "$$lib_file" == */cmake/* ]]; then
+                        continue
+                    fi
+                    cp -L "$$lib_file" "$$PACKAGE_DIR/lib/" 2>/dev/null || true
+                done
+
+                # Copy Qt plugins
+                mkdir -p "$$PACKAGE_DIR/plugins"
+                for plugin_dir in platforms styles imageformats platformthemes xcbglintegrations platforminputcontexts; do
+                    if [ -d "$$QT_DIR/plugins/$$plugin_dir" ]; then
+                        cp -rL "$$QT_DIR/plugins/$$plugin_dir" "$$PACKAGE_DIR/plugins/"
+                    fi
+                done
+            else
+                echo "ERROR: Qt Linux directory not found in external repository"
+                echo "Deployment will be incomplete - Qt libraries/plugins not included"
+            fi
+
+            # Copy scenes folder to okapi/ui/scenes
+            mkdir -p "$$PACKAGE_DIR/okapi/ui/scenes"
+            for scene_file in $(SRCS); do
+                if [[ "$$scene_file" == */scenes/* ]]; then
+                    REL_PATH=$${scene_file#*scenes/}
+                    TARGET_DIR="$$PACKAGE_DIR/okapi/ui/scenes/$$(dirname "$$REL_PATH")"
+                    mkdir -p "$$TARGET_DIR"
+                    cp "$$scene_file" "$$TARGET_DIR/"
+                fi
+            done
+
+            # Create launcher script
+            cat > "$$PACKAGE_DIR/okapi.ui.sh" << 'LAUNCHER_EOF'
+#!/bin/bash
+# Launcher script for Okapi Renderer
+SCRIPT_DIR="$$(cd "$$(dirname "$$0")" && pwd)"
+
+# Set library path
+export LD_LIBRARY_PATH="$$SCRIPT_DIR/lib:$$LD_LIBRARY_PATH"
+
+# Set Qt plugin path
+export QT_PLUGIN_PATH="$$SCRIPT_DIR/plugins"
+export QT_QPA_PLATFORM_PLUGIN_PATH="$$SCRIPT_DIR/plugins/platforms"
+
+# Run the application
+cd "$$SCRIPT_DIR"
+exec ./okapi.ui "$$@"
+LAUNCHER_EOF
+            chmod +x "$$PACKAGE_DIR/okapi.ui.sh"
+
+            # Create the tar.gz archive
+            OUTPUT_FILE="$$(realpath -m "$@" 2>/dev/null || echo "$@")"
+            cd "$$TEMP_DIR"
+            tar czf "$$OUTPUT_FILE" "okapi-renderer-alpha-1.0.11-linux"
+
+            # Cleanup
+            cd -
+            rm -rf "$$TEMP_DIR"
+        """,
+        "//conditions:default": "echo 'Linux only' && exit 1",
+    }),
+    tags = ["manual"],
+    target_compatible_with = ["@platforms//os:linux"],
+)
+
+#-----------------------------------------------------------
+# Legacy Deployment
+#-----------------------------------------------------------
+
+# Legacy tar.gz deployment (kept for compatibility)
 pkg_tar(
     name = "app_runfiles",
     srcs = [
