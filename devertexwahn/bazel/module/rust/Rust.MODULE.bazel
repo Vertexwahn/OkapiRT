@@ -3,7 +3,7 @@
     SPDX-License-Identifier: Apache-2.0
 """
 
-bazel_dep(name = "rules_rust", version = "0.68.1")
+bazel_dep(name = "rules_rust", version = "0.69.0")
 
 # Rust toolchain
 RUST_EDITION = "2024"
