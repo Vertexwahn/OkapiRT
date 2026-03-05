@@ -53,7 +53,8 @@ void register_okapi_plugins() {
     register_TriangleMesh3f();
 
     // BSDFs
-
+    register_Diffuse();
+    
     // Emitters
 
     // Textures

@@ -6,11 +6,11 @@
 
 exports_files(["LICENSE"])
 
-filegroup(
-    name = "clang_tidy_config2",
-    data = [
-        ".clang-tidy",
-    ],
-    visibility = ["//visibility:public"],
-)
+#filegroup(
+#    name = "clang_tidy_config2",
+#    data = [
+#        ".clang-tidy",
+#    ],
+#    visibility = ["//visibility:public"],
+#)
 

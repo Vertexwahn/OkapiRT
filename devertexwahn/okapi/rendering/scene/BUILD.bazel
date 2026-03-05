@@ -33,7 +33,7 @@ cc_library(
         "//core:namespace",
         "//flatland/rendering:sampler",
         "//flatland/rendering/intersector:brute_force_intersector",
-        #"//okapi/rendering/bsdf:diffuse",
+        "//okapi/rendering/bsdf:diffuse",
         "//okapi/rendering/integrator:normal_integrator",
         "//okapi/rendering/intersector:embree_intersector",
         "//okapi/rendering/reconstruction_filter",

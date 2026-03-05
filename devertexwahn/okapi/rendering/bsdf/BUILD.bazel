@@ -1,0 +1,22 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2022-2026 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "diffuse",
+    srcs = ["diffuse.cpp"],
+    hdrs = ["diffuse.hpp"],
+    deps = [
+        "//core:exception",
+        "//core:object_factory",
+        "//core:property_set",
+        "//flatland/rendering/bsdf",
+        "//math:frame",
+        "//math:sampling",
+    ],
+)
