@@ -1809,6 +1809,7 @@ template <typename T> class buffer {
   /// Appends data to the end of the buffer.
   template <typename U>
   FMT_CONSTEXPR20 void append(const U* begin, const U* end) {
+    static_assert(std::is_same<T, U>() || std::is_same<U, char>(), "");
     while (begin != end) {
       auto size = size_;
       auto free_cap = capacity_ - size;
@@ -1821,7 +1822,7 @@ template <typename T> class buffer {
       }
       // A loop is faster than memcpy on small sizes.
       T* out = ptr_ + size;
-      for (size_t i = 0; i < count; ++i) out[i] = begin[i];
+      for (size_t i = 0; i < count; ++i) out[i] = static_cast<T>(begin[i]);
       size_ += count;
       begin += count;
     }

@@ -1097,8 +1097,8 @@ inline auto digits2_i(size_t value) noexcept -> const char* {
 }
 
 template <typename Char> constexpr auto getsign(sign s) -> Char {
-  return static_cast<char>(((' ' << 24) | ('+' << 16) | ('-' << 8)) >>
-                           (static_cast<int>(s) * 8));
+  return static_cast<Char>(static_cast<char>(
+      ((' ' << 24) | ('+' << 16) | ('-' << 8)) >> (static_cast<int>(s) * 8)));
 }
 
 template <typename T> FMT_CONSTEXPR auto count_digits_fallback(T n) -> int {
@@ -1219,7 +1219,7 @@ FMT_API auto thousands_sep_impl(locale_ref loc) -> thousands_sep_result<Char>;
 template <typename Char>
 inline auto thousands_sep(locale_ref loc) -> thousands_sep_result<Char> {
   auto result = thousands_sep_impl<char>(loc);
-  return {result.grouping, Char(result.thousands_sep)};
+  return {std::move(result.grouping), Char(result.thousands_sep)};
 }
 template <>
 inline auto thousands_sep(locale_ref loc) -> thousands_sep_result<wchar_t> {
@@ -1968,7 +1968,7 @@ template <typename Char> class digit_grouping {
   explicit digit_grouping(locale_ref loc, bool localized = true) {
     if (!localized) return;
     auto sep = thousands_sep<Char>(loc);
-    grouping_ = sep.grouping;
+    grouping_ = std::move(sep.grouping);
     if (sep.thousands_sep) thousands_sep_.assign(1, sep.thousands_sep);
   }
   digit_grouping(std::string grouping, std::basic_string<Char> sep)
@@ -3621,8 +3621,8 @@ FMT_CONSTEXPR20 auto write(OutputIt out, T value) -> OutputIt {
       memcpy(ptr, prefix, 2);
       ptr += 2;
     } else {
-      *ptr++ = prefix[0];
-      *ptr++ = prefix[1];
+      *ptr++ = static_cast<Char>(prefix[0]);
+      *ptr++ = static_cast<Char>(prefix[1]);
     }
     if (abs_exponent >= 100) {
       *ptr++ = static_cast<Char>('0' + abs_exponent / 100);

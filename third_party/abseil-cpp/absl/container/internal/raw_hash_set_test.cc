@@ -2878,8 +2878,9 @@ TYPED_TEST(RawHashSamplerTest, Sample) {
   }
 }
 
-std::vector<const HashtablezInfo*> SampleSooMutation(
-    absl::FunctionRef<void(SooInt32Table&)> mutate_table) {
+template <typename IntTableType>
+std::vector<const HashtablezInfo*> SampleTableMutation(
+    absl::FunctionRef<void(IntTableType&)> mutate_table) {
   // Enable the feature even if the prod default is off.
   SetSamplingRateTo1Percent();
 
@@ -2892,7 +2893,7 @@ std::vector<const HashtablezInfo*> SampleSooMutation(
     ++start_size;
   });
 
-  std::vector<SooInt32Table> tables;
+  std::vector<IntTableType> tables;
   for (int i = 0; i < 1000000; ++i) {
     tables.emplace_back();
     mutate_table(tables.back());
@@ -2909,6 +2910,16 @@ std::vector<const HashtablezInfo*> SampleSooMutation(
   EXPECT_NEAR((end_size - start_size) / static_cast<double>(tables.size()),
               0.01, 0.005);
   return infos;
+}
+
+std::vector<const HashtablezInfo*> SampleSooMutation(
+    absl::FunctionRef<void(SooInt32Table&)> mutate_table) {
+  return SampleTableMutation<SooInt32Table>(mutate_table);
+}
+
+std::vector<const HashtablezInfo*> SampleNonSooMutation(
+    absl::FunctionRef<void(NonSooIntTable&)> mutate_table) {
+  return SampleTableMutation<NonSooIntTable>(mutate_table);
 }
 
 TEST(RawHashSamplerTest, SooTableInsertToEmpty) {
@@ -2930,6 +2941,86 @@ TEST(RawHashSamplerTest, SooTableInsertToEmpty) {
     ASSERT_EQ(info->max_probe_length, 0);
     ASSERT_EQ(info->total_probe_length, 0);
   }
+}
+
+// Verifies that repeated insertions and erasures on an SOO table do not cause
+// the sampling decision to be evaluated multiple times, preventing
+// oversampling.
+TEST(RawHashSamplerTest, SooTableRepeatedInsertEraseDoesNotOversample) {
+  if (SooInt32Table().capacity() != SooCapacity()) {
+    CHECK_LT(sizeof(void*), 8) << "missing SOO coverage";
+    GTEST_SKIP() << "not SOO on this platform";
+  }
+  std::vector<const HashtablezInfo*> infos =
+      SampleSooMutation([](SooInt32Table& t) {
+        for (int i = 0; i < 10; ++i) {
+          t.insert(1);
+          t.erase(1);
+        }
+      });
+
+  // SampleSooMutation checks EXPECT_NEAR(sampled/total, 1%, 0.5%).
+  // If the sampling logic is incorrectly evaluated on every 0->1 element
+  // transition, the chance of being sampled per table approaches 10% (1 -
+  // 0.99^10), which is enough to cause this test to fail. By passing, this test
+  // verifies that the sampling decision is evaluated exactly once per SOO table
+  // instance.
+}
+
+TEST(RawHashSamplerTest, NonSooTableRepeatedInsertEraseCountSizeRight) {
+  ASSERT_EQ(NonSooIntTable().capacity(), 0);
+  std::vector<const HashtablezInfo*> infos =
+      SampleNonSooMutation([](NonSooIntTable& t) {
+        for (int i = 0; i < 10; ++i) {
+          t.insert(1);
+          t.erase(1);
+        }
+      });
+  for (const HashtablezInfo* info : infos) {
+    EXPECT_EQ(info->soo_capacity, 0);
+    ASSERT_EQ(info->capacity, 1);
+    ASSERT_EQ(info->size, 0);
+  }
+}
+
+// Verifies that copy-constructing or copy-assigning an SOO table does not
+// incorrectly trigger new sampling evaluations.
+TEST(RawHashSamplerTest, SooTableCopyDoesNotOversample) {
+  if (SooInt32Table().capacity() != SooCapacity()) {
+    CHECK_LT(sizeof(void*), 8) << "missing SOO coverage";
+    GTEST_SKIP() << "not SOO on this platform";
+  }
+  std::vector<const HashtablezInfo*> infos =
+      SampleSooMutation([](SooInt32Table& t) {
+        t.insert(1);
+        t.erase(1);
+        SooInt32Table t_copy(t);
+        for (int i = 0; i < 10; ++i) {
+          t_copy.insert(1);
+          t_copy.erase(1);
+        }
+        t = std::move(t_copy);
+      });
+}
+
+// Verifies that move-constructing or move-assigning an SOO table correctly
+// transfers the sampling state and does not trigger oversampling.
+TEST(RawHashSamplerTest, SooTableMoveDoesNotOversample) {
+  if (SooInt32Table().capacity() != SooCapacity()) {
+    CHECK_LT(sizeof(void*), 8) << "missing SOO coverage";
+    GTEST_SKIP() << "not SOO on this platform";
+  }
+  std::vector<const HashtablezInfo*> infos =
+      SampleSooMutation([](SooInt32Table& t) {
+        t.insert(1);
+        t.erase(1);
+        SooInt32Table t_moved(std::move(t));
+        for (int i = 0; i < 10; ++i) {
+          t_moved.insert(1);
+          t_moved.erase(1);
+        }
+        t = std::move(t_moved);
+      });
 }
 
 TEST(RawHashSamplerTest, SooTableReserveToEmpty) {
@@ -3029,6 +3120,63 @@ TEST(RawHashSamplerTest, SooTableRehashShrinkWhenSizeFitsInSoo) {
     ASSERT_EQ(info->total_probe_length, 0);
   }
 }
+
+// Verifies that a moved-from table does not retain the sampled state of the
+// original table, allowing it to be used without incorrectly updating global
+// sampling stats.
+TEST(RawHashSamplerTest, MovedFromTableIsNotSampled) {
+  if (SooInt32Table().capacity() != SooCapacity()) {
+    CHECK_LT(sizeof(void*), 8) << "missing SOO coverage";
+    GTEST_SKIP() << "not SOO on this platform";
+  }
+
+  SetSamplingRateTo1Percent();
+  auto& sampler = GlobalHashtablezSampler();
+  size_t start_size = 0;
+  absl::flat_hash_set<const HashtablezInfo*> preexisting_info;
+  sampler.Iterate([&](const HashtablezInfo& info) {
+    preexisting_info.insert(&info);
+    ++start_size;
+  });
+
+  SooInt32Table t1;
+  // Loop until t1 is sampled
+  while (true) {
+    t1 = SooInt32Table();
+    t1.insert(1);
+    size_t new_size = 0;
+    sampler.Iterate([&](const HashtablezInfo&) { ++new_size; });
+    if (new_size > start_size) break;
+  }
+
+  // Move the table
+  SooInt32Table t2 = std::move(t1);
+
+  // Disable sampling to ensure any new sampling is a bug.
+  SetHashtablezEnabled(false);
+
+  // t2 is now the sampled table. t1 is moved-from.
+  // We want to verify that t2 is still sampled, and that t1 isn't sampled
+  // anymore, even if we insert a new entry into it.
+  t1.clear();  // Must clear before using a moved-from table.
+  t1.insert(2);
+  t2.insert(2);
+
+  // Verify no new sample was generated, and t2's sample size is now 2.
+  size_t final_size = 0;
+  const HashtablezInfo* latest_info = nullptr;
+  size_t dropped = sampler.Iterate([&](const HashtablezInfo& info) {
+    ++final_size;
+    if (!preexisting_info.contains(&info)) {
+      latest_info = &info;
+    }
+  });
+  EXPECT_EQ(0, dropped);
+  EXPECT_EQ(final_size, start_size + 1);
+  ASSERT_NE(latest_info, nullptr);
+  EXPECT_EQ(latest_info->size.load(std::memory_order_relaxed), 2);
+}
+
 #endif  // ABSL_INTERNAL_HASHTABLEZ_SAMPLE
 
 TEST(RawHashSamplerTest, DoNotSampleCustomAllocators) {

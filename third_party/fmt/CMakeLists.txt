@@ -50,8 +50,11 @@ endif ()
 
 project(FMT CXX)
 
-# Determine support for the C++ module scanning.
-# Requires C++20, CMake >= 3.28 and (Ninja >= 1.11 OR Visual Studio >= 17.4).
+# Determine support for the C++ module scanning and CXX_MODULE File_Sets
+# Requires C++20, CMake >= 3.28 and
+# Generators(Ninja >= 1.11 OR Visual Studio >= 17.4).
+# Compilers GCC>=14, Clang>=16 or MSVC >= 17.4
+# Source: https://cmake.org/cmake/help/latest/manual/cmake-cxxmodules.7.html
 set(FMT_USE_CMAKE_MODULES FALSE)
 if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.28 AND CMAKE_CXX_STANDARD
                                                  GREATER_EQUAL 20)
@@ -59,7 +62,14 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.28 AND CMAKE_CXX_STANDARD
     execute_process(COMMAND "${CMAKE_MAKE_PROGRAM}" "--version"
                     OUTPUT_VARIABLE NINJA_VERSION)
     if (NINJA_VERSION VERSION_GREATER_EQUAL 1.11)
-      set(FMT_USE_CMAKE_MODULES TRUE)
+      if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION
+                                                    GREATER_EQUAL 14)
+          OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+              AND CMAKE_CXX_COMPILER_VERSION GREATER_EQUAL 16)
+          OR (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND MSVC_VERSION
+                                                        GREATER_EQUAL 1934))
+        set(FMT_USE_CMAKE_MODULES TRUE)
+      endif ()
     endif ()
   elseif (CMAKE_GENERATOR MATCHES "^Visual Studio" AND MSVC_VERSION
                                                        GREATER_EQUAL 1934)
@@ -314,8 +324,6 @@ if (FMT_SAFE_DURATION_CAST)
   target_compile_definitions(fmt PUBLIC FMT_SAFE_DURATION_CAST)
 endif ()
 
-include(CMakeParseArguments)
-
 # Adds a library compiled with C++20 module support.
 #
 # Usage:
@@ -417,8 +425,7 @@ endif ()
 target_link_libraries(fmt-c PUBLIC fmt::fmt)
 add_library(fmt::fmt-c ALIAS fmt-c)
 
-set_target_properties(fmt-c PROPERTIES
-  PUBLIC_HEADER include/fmt/fmt-c.h)
+set_target_properties(fmt-c PROPERTIES PUBLIC_HEADER include/fmt/fmt-c.h)
 
 # Install targets.
 if (FMT_INSTALL)
@@ -537,7 +544,6 @@ function (add_doc_target)
       --site-dir ${CMAKE_CURRENT_BINARY_DIR}/doc-html --no-directory-urls
     SOURCES ${sources})
 
-  include(GNUInstallDirs)
   install(
     DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc-html/
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/fmt
