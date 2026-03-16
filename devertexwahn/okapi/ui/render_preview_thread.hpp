@@ -17,6 +17,7 @@
 
 #include "OpenImageDenoise/oidn.hpp"
 
+// This thread only performs trivial tone mapping and denoising if enabled
 class RenderPreviewThread : public QThread {
     Q_OBJECT
 
