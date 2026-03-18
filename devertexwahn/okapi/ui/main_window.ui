@@ -129,9 +129,9 @@
      <addaction name="actionExportTIFF"/>
      <addaction name="actionExportWebP"/>
      <addaction name="actionExportGIF"/>
-     <addaction name="actionJPEG"/>
+     <addaction name="actionExportJPEG"/>
      <addaction name="actionExportOpenEXR"/>
-     <addaction name="actionPortable_Pixel_Map"/>
+     <addaction name="actionExportPortablePixelMap"/>
     </widget>
     <addaction name="menuExport"/>
     <addaction name="actionSettings"/>
@@ -245,12 +245,12 @@
     <string>OpenEXR (.exr)</string>
    </property>
   </action>
-  <action name="actionPortable_Pixel_Map">
+  <action name="actionExportPortablePixelMap">
    <property name="text">
     <string>Portable Pixel Map (.ppm)</string>
    </property>
   </action>
-  <action name="actionJPEG">
+  <action name="actionExportJPEG">
    <property name="text">
     <string>JPEG (.jpg)</string>
    </property>

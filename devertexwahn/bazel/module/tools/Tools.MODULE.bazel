@@ -7,11 +7,11 @@
 bazel_dep(name = "bazel_clang_tidy", dev_dependency = True)
 bazel_dep(name = "bazel_iwyu", version = "0.0.1", dev_dependency = True)
 bazel_dep(name = "bazel_sonarqube", version = "1.0.5", dev_dependency = True)
-bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.2", dev_dependency = True)
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1", dev_dependency = True)
 bazel_dep(name = "buildozer", version = "8.5.1", dev_dependency = True)
 bazel_dep(name = "cpplint", version = "2.0.2", dev_dependency = True)
 bazel_dep(name = "depend_on_what_you_use", version = "0.13.0", dev_dependency = True)
-bazel_dep(name = "rules_doxygen", version = "2.6.1", dev_dependency = True)
+bazel_dep(name = "rules_doxygen", version = "2.6.2", dev_dependency = True)
 bazel_dep(name = "rules_license", version = "1.0.0", dev_dependency = True)
 
 local_path_override(
@@ -20,9 +20,16 @@ local_path_override(
 )
 
 # In bazel_sonarqube version 1.0.5 the "BUILD.sonar_scanner" uses native java_import/java_binary which are removed in Bazel 9.
-# Those imports are needed to make "bazel cquery" working. 
+# Those imports are needed to make "bazel cquery" working.
 # This override contains a bit new version the contains those changes.
 local_path_override(
     module_name = "bazel_sonarqube",
     path = "../third_party/bazel-sonarqube",
 )
+
+#-------------------------------------------------------------------------------------
+# Doxygen
+#-------------------------------------------------------------------------------------
+
+doxygen_extension = use_extension("@rules_doxygen//:extensions.bzl", "doxygen_extension")
+use_repo(doxygen_extension, "doxygen")

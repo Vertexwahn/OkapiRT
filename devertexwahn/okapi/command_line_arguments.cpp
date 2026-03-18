@@ -20,10 +20,10 @@ CommandLineArguments::CommandLineArguments() {
         ("render_mode", value<std::string>()->default_value("progressive"), "Defines which render mode should be used.")
         ("samples_per_pixel", value<int>()->default_value(0), "Samples per pixel")
         ("scene_filename", value<std::string>()->default_value(""), "Okapi scene filename use as input for rendering")
+        ("show_maximized", value<bool>()->default_value(false), "Specify if render windows should be shown maximaized" )
         ("store_benchmark_json_data", value<bool>()->default_value(false), "Determines if benchmark data such as render time should be uploaded.")
         ("thread_count", value<int>()->default_value(0), "Number of thread that should be used for rendering")
         ("upload_benchmark_data", value<bool>()->default_value(false), "Determines if benchmark data such as render time should be uploaded.")
-        ("show_maximized", value<bool>()->default_value(false), "Specify if render windows should be shown maximaized" )
         ("version,v", "print version string");
 }
 
@@ -136,5 +136,6 @@ RenderMode CommandLineArguments::render_mode() const {
 std::string CommandLineArguments::filename() const {
     return vm["scene_filename"].as<std::string>();
 }
+
 
 DE_VERTEXWAHN_END_NAMESPACE

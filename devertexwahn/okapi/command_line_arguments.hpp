@@ -47,6 +47,7 @@ public:
 
     RenderMode render_mode() const;
 
+
     std::string filename() const;
 
 public:

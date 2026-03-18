@@ -1,5 +1,5 @@
 /*
- *  SPDX-FileCopyrightText: Copyright 2022-2024 Julian Amann <dev@vertexwahn.de>
+ *  SPDX-FileCopyrightText: Copyright 2022-2026 Julian Amann <dev@vertexwahn.de>
  *  SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,8 +11,10 @@
 
 #include "okapi/command_line_arguments.hpp"
 #include "okapi/ui/about_dialog.hpp"
-#include "okapi/ui/viewport.hpp"
+
+
 #include "okapi/ui/settings_dialog.hpp"
+#include "okapi/ui/viewport.hpp"
 
 #include "QtWidgets/QMainWindow"
 
@@ -35,28 +37,37 @@ public:
     void closeEvent( QCloseEvent* ) override;
 
 public Q_SLOTS:
-    void on_actionExit_triggered();
-    void on_actionSettings_triggered();
     void on_actionAbout_triggered();
-    void on_actionFit_render_output_to_window_triggered();
-    void on_actionPortable_Pixel_Map_triggered();
+    void on_actionCopy_triggered();
+    void on_actionExit_triggered();
+    void on_actionExportGIF_triggered();
+    void on_actionExportJPEG_triggered();
+    void on_actionExportOpenEXR_triggered();
     void on_actionExportPFM_triggered();
     void on_actionExportPNG_triggered();
+    void on_actionExportPortablePixelMap_triggered();
+    void on_actionExportTIFF_triggered();
     void on_actionExportWebP_triggered();
-    void on_actionOpenEXR_exr_triggered();
-    void on_actionJPEG_triggered();
-    void on_actionCopy_triggered();
+    void on_actionFit_render_output_to_window_triggered();
+    void on_actionScene_Explorer_triggered();
+    void on_actionSettings_triggered();
     void on_checkBoxDenoise_toggled(bool checked);
     void on_horizontalSliderExposureValue_valueChanged(int position);
 
     void update(const QString& message);
 
 private:
-    Viewport* rw_ = nullptr;
-    AboutDialog* about_dialog_ = nullptr;
-    SettingsDialog* settings_dialog_ = nullptr;
-    Ui::MainWindow* ui_ = nullptr;
+    void update_scene_explorer();
+
+private:
+    AboutDialog*          about_dialog_ = nullptr;
+    SettingsDialog*       settings_dialog_ = nullptr;
+    Ui::MainWindow*       ui_ = nullptr;
+    Viewport*             rw_ = nullptr;
+
+
     CommandLineArguments* cla_ = nullptr;
+    bool                  use_gpu_ = false;
 };
 
 #endif // end define De_Vertexwahn_Okapi_MainWindow_41629fd2_fe98_4bb5_a740_462c8b717333_hpp
