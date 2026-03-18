@@ -164,6 +164,8 @@ qt_cc_library(
         ":render_state",
         ":settings_dialog",
         ":viewport",
+        "//core/stl:filesystem",
+        "//core/stl:string",
         "//imaging/io",
         "//okapi:command_line_arguments",
         "//okapi/rendering",
@@ -181,6 +183,14 @@ config_setting(
         "@platforms//cpu:x86_64",
     ],
 )
+
+config_setting(
+    name = "macos",
+    constraint_values = [
+        "@platforms//os:macos",
+    ],
+)
+
 
 qt_cc_binary(
     name = "okapi.ui",
@@ -223,6 +233,10 @@ qt_cc_binary(
         "scenes/logo/logo.obj",
         "scenes/logo/logo.okapi.xml",
     ],
+    local_defines = select({
+        ":macos": [],
+        "//conditions:default": ["DE_VERTEXWAHN_HAS_CUDA"],
+    }),
     deps = [
         ":main_qrc",
         ":main_window",
@@ -441,7 +455,8 @@ genrule(
             CLI_PATH="$$(realpath "$(execpath //okapi/cli:okapi.cli)")"
             CLI_NAME="$$(basename "$$CLI_PATH")"
             cp "$$CLI_PATH" "$$PACKAGE_DIR/$$CLI_NAME"
-           
+
+
             # Copy icon to root
             cp "$(execpath okapi.ui.ico)" "$$PACKAGE_DIR/"
 
@@ -551,10 +566,6 @@ genrule(
     name = "okapi_ui_linux_portable",
     srcs = [
         ":okapi.ui",
-        "//okapi/cli:okapi.cli",
-        "//okapi/hub",
-        "//okapi/hub/oh",
-        "//okapi/hub/render_node",
         "okapi.ui.qss",
         "okapi.ui.ico",
         "license_notes.txt",
@@ -572,23 +583,7 @@ genrule(
             # Copy the main GUI binary
             cp "$$(realpath "$(execpath :okapi.ui)")" "$$PACKAGE_DIR/okapi.ui"
             chmod +x "$$PACKAGE_DIR/okapi.ui"
-
-            # Copy CLI executable
-            cp "$$(realpath "$(execpath //okapi/cli:okapi.cli)")" "$$PACKAGE_DIR/okapi.cli"
-            chmod +x "$$PACKAGE_DIR/okapi.cli"
-
-            # Copy hub executable
-            cp "$$(realpath "$(execpath //okapi/hub:hub)")" "$$PACKAGE_DIR/hub"
-            chmod +x "$$PACKAGE_DIR/hub"
-
-            # Copy oh executable
-            cp "$$(realpath "$(execpath //okapi/hub/oh:oh)")" "$$PACKAGE_DIR/oh"
-            chmod +x "$$PACKAGE_DIR/oh"
-
-            # Copy render_node executable
-            cp "$$(realpath "$(execpath //okapi/hub/render_node:render_node)")" "$$PACKAGE_DIR/render_node"
-            chmod +x "$$PACKAGE_DIR/render_node"
-
+            
             # Copy icon to root
             cp "$(execpath okapi.ui.ico)" "$$PACKAGE_DIR/"
 
