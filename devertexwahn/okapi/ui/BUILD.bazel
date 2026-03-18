@@ -420,9 +420,6 @@ genrule(
     srcs = [
         ":okapi.ui",
         "//okapi/cli:okapi.cli",
-        "//okapi/hub",
-        "//okapi/hub/oh",
-        "//okapi/hub/render_node",
         "okapi.ui.qss",
         "okapi.ui.ico",
         "license_notes.txt",
@@ -444,22 +441,7 @@ genrule(
             CLI_PATH="$$(realpath "$(execpath //okapi/cli:okapi.cli)")"
             CLI_NAME="$$(basename "$$CLI_PATH")"
             cp "$$CLI_PATH" "$$PACKAGE_DIR/$$CLI_NAME"
-
-            # Copy hub executable to root
-            HUB_PATH="$$(realpath "$(execpath //okapi/hub:hub)")"
-            HUB_NAME="$$(basename "$$HUB_PATH")"
-            cp "$$HUB_PATH" "$$PACKAGE_DIR/$$HUB_NAME"
-
-            # Copy oh executable to root
-            OH_PATH="$$(realpath "$(execpath //okapi/hub/oh:oh)")"
-            OH_NAME="$$(basename "$$OH_PATH")"
-            cp "$$OH_PATH" "$$PACKAGE_DIR/$$OH_NAME"
-
-            # Copy render_node executable to root
-            RN_PATH="$$(realpath "$(execpath //okapi/hub/render_node:render_node)")"
-            RN_NAME="$$(basename "$$RN_PATH")"
-            cp "$$RN_PATH" "$$PACKAGE_DIR/$$RN_NAME"
-
+           
             # Copy icon to root
             cp "$(execpath okapi.ui.ico)" "$$PACKAGE_DIR/"
 
