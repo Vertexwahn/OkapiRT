@@ -262,6 +262,11 @@ local_path_override(
 )
 
 local_path_override(
+    module_name = "libtiff",
+    path = "../third_party/libtiff-4.7.1",
+)
+
+local_path_override(
     module_name = "tinyobjloader",
     path = "../third_party/tinyobjloader",
 )

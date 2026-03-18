@@ -40,8 +40,5 @@ cc_library(
         "//okapi/rendering/shape:serialzied_mesh",
         "//okapi/rendering/shape:sphere",
         "//okapi/rendering/shape:triangle_mesh",
-        #"//okapi/rendering/texture:alpha_blended_texture",
-        #"//okapi/rendering/texture:bitmap",
-        #"//okapi/rendering/texture:checkerboard",
     ],
 )

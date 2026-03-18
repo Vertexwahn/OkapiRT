@@ -117,7 +117,7 @@ build_flags:
 
 #### Clang 14
 
-Bazel supports different toolchains. 
+Bazel supports different toolchains.
 Usually gcc is used a C++ default compiler when using Ubuntu 22.04.
 But you can also easily use Clang 14 to compile Okapi.
 
@@ -183,7 +183,7 @@ Use [Lavender](https://github.com/tmandry/lavender) to generate a solution and p
 python3 D:\dev\lavender\generate.py --config=vs2022  //...
 ```
 
-Lavender is far from being perfect. 
+Lavender is far from being perfect.
 It might be necessary to do some modifications to the generated solution and project files.
 
 ### macOS
@@ -194,7 +194,7 @@ bazel build --config=clang14 //...
 
 ## Development process
 
-I made a short video where I describe how I use test driven development to implement this project: 
+I made a short video where I describe how I use test driven development to implement this project:
 
 [![Let's Code: Using Test-driven Development to implement a ray tracer](https://img.youtube.com/vi/vFBXNr952nU/0.jpg)](https://www.youtube.com/watch?v=vFBXNr952nU)
 
@@ -204,10 +204,10 @@ See [LICENSE.md](../LICENSE.md).
 
 ## Copyright notes
 
-The Okapi Project makes use of several software libraries. 
-Besides this, 
-some source code was directly copied from other open-source software libraries or programs. 
-This is always clearly stated as a comment in the source code of Flatland. 
+The Okapi Project makes use of several software libraries.
+Besides this,
+some source code was directly copied from other open-source software libraries or programs.
+This is always clearly stated as a comment in the source code of Flatland.
 Additionally, some tools where copied to this repository.
 The corresponding licenses can be found in the Licenses folder distributed with this source code:
 
@@ -218,7 +218,7 @@ The corresponding licenses can be found in the Licenses folder distributed with 
 * pbrt, Version 4 (https://github.com/mmp/pbrt-v4) (concentric sampling of unit disk) ([License](licenses/pbrt-v4/LICENSE.txt))
 * bazel_clang_tidy (https://github.com/erenon/bazel_clang_tidy) (almost everything) ([License](licenses/bazel_clang_tidy/LICENSE))
 * appleseed (https://github.com/appleseedhq/appleseed)
-* 
+*
 ### Build related
 
 * LLVM toolchain for Bazel (https://github.com/grailbio/bazel-toolchain) (building Flatland with LLVM) ([License](licenses/llvm_bazel_toolchain/LICENSE))
@@ -239,7 +239,7 @@ The corresponding licenses can be found in the Licenses folder distributed with 
 
 ### Tools
 
-* Bazelisk (https://github.com/bazelbuild/bazelisk) ([License](licenses/bazelisk/)) 
+* Bazelisk (https://github.com/bazelbuild/bazelisk) ([License](licenses/bazelisk/))
 
 ### Artwork
 
