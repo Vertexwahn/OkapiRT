@@ -1,0 +1,59 @@
+"""
+    SPDX-FileCopyrightText: Copyright 2026 Julian Amann <dev@vertexwahn.de>
+    SPDX-License-Identifier: Apache-2.0
+"""
+
+load("@rules_python//python:defs.bzl", "py_binary")
+
+exports_files(
+    [
+        "cornell_box_with_spheres.next.okapi.xml",
+        "meshes/cbox_back.obj",
+        "meshes/cbox_ceiling.obj",
+        "meshes/cbox_floor.obj",
+        "meshes/cbox_greenwall.obj",
+        "meshes/cbox_largebox.obj",
+        "meshes/cbox_luminaire.obj",
+        "meshes/cbox_redwall.obj",
+        "meshes/cbox_smallbox.obj",
+        "meshes/sphere1.obj",
+        "meshes/sphere2.obj",
+    ],
+)
+
+#py_binary(
+#    name = "imagegen",
+#    srcs = ["imagegen.py"],
+#    deps = [
+#        #"@pypi//matplotlib",
+#        #"@pypi//pyqt6",
+#        #"@pypi//pyside6",
+#        "@pypi//simpleimageio",  # it seem that this does currently not wor k with Python 3.12.2
+#        "@pypi//figuregen",
+#    ],
+#)
+
+py_binary(
+    name = "mitsuba_reference_v4",
+    srcs = ["mitsuba_reference_v4.py"],
+    data = [
+        "cornell_box_with_spheres.next.mitsuba_v4.xml",
+        "meshes/cbox_back.obj",
+        "meshes/cbox_ceiling.obj",
+        "meshes/cbox_floor.obj",
+        "meshes/cbox_greenwall.obj",
+        "meshes/cbox_largebox.obj",
+        "meshes/cbox_luminaire.obj",
+        "meshes/cbox_redwall.obj",
+        "meshes/cbox_smallbox.obj",
+        "meshes/sphere1.obj",
+        "meshes/sphere2.obj",
+    ],
+    deps = [
+        "@pypi//drjit",
+        "@pypi//matplotlib",
+        "@pypi//mitsuba",
+        "@pypi//pyqt6",
+        "@pypi//pyside6",
+    ],
+)
