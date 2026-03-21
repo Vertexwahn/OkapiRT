@@ -36,7 +36,7 @@ cd OkapiRT # change directory to cloned repository
 cd devertexwahn # switch to the location where the MODULE.bazel file is located
 ```
 
-*Render a scene with macOS 11/12:*
+*Render a scene with macOS*
 
 ```shell
 bazel run --config=macos --compilation_mode=opt //okapi/ui:okapi.ui -- \
@@ -60,13 +60,13 @@ bazel run --config=gcc13 --compilation_mode=opt //okapi/ui:okapi.ui -- \
 --samples_per_pixel=100
 ```
 
-*Render a scene with Windows 10/11 x64 with Visual Studio 2019:*
+*Render a scene with Windows with Visual Studio 2019:*
 
 ```shell
 bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui -- --scene_filename=okapi/scenes/ajax/ajax.normal.okapi.xml
 ```
 
-*Render a scene with Windows 10/11 x64 with Visual Studio 2022:*
+*Render a scene with Windows with Visual Studio 2022:*
 
 ```shell
 bazel --output_base=G:/bazel_output_base run --config=vs2022 --compilation_mode=opt //okapi/ui:okapi.ui -- --scene_filename=okapi/scenes/ajax/ajax.normal.okapi.xml
@@ -115,7 +115,7 @@ build_flags:
   #--config=clang19
 ```
 
-#### Clang 14
+#### Clang 19
 
 Bazel supports different toolchains.
 Usually gcc is used a C++ default compiler when using Ubuntu 22.04.
@@ -123,14 +123,14 @@ But you can also easily use Clang 14 to compile Okapi.
 
 ```shell
 # Build with LLVM
-bazel build --config=clang14 //...
+bazel build --config=clang19 //...
 # Test with LLVM
-bazel test --config=clang14 //...
+bazel test --config=clang19 //...
 ```
 
 #### Remote Build Cache
 
-When switching configuration (`--config=gcc11` vs. `--config=clang14`) it turns out that using a (local) remote build cache server results in better build performance.
+When switching configuration (`--config=gcc11` vs. `--config=clang19`) it turns out that using a (local) remote build cache server results in better build performance.
 
 You can spin up your own local instance via:
 
@@ -162,18 +162,22 @@ Go to the directory that contains the `WORKSPACE.bazel` file and execute:
 
 There is a build config called `asan` that can be used for detection of memory errors.
 
-    bazel run --config=asan --compilation_mode=opt //okapi/cli:okapi.cli ~/scenes/sphere.okapi.xml
+```shell
+bazel run --config=asan --compilation_mode=opt //okapi/cli:okapi.cli ~/scenes/sphere.okapi.xml
+```
 
 #### Clang Tidy
 
     bazel build //flatland.cli:flatland --aspects clang_tidy/clang_tidy.bzl%clang_tidy_aspect --output_groups=report
 
-### Windows 10/11
+### Windows
 
 #### Command line (Powershell)
 
-    # Build with Visual Studio 2022 C++ Compiler
-    bazel build --config=vs2022 //...
+```shell
+# Build with Visual Studio 2022 C++ Compiler
+bazel build --config=vs2022 //...
+```
 
 #### Using Visual Studio 2022
 
