@@ -54,7 +54,7 @@ void register_okapi_plugins() {
 
     // BSDFs
     register_Diffuse();
-    
+
     // Emitters
 
     // Textures
